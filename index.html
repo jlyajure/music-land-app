@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Streamify - Tu Música</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#00e5ff">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <a href="https://wa.me/584125852879?text=Hola%20Music%20Land!%20Quiero%20comentar%20algo" class="whatsapp-btn" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <div id="lyrics-screen">
+        <div class="lyrics-header">
+            <span class="lyrics-title">LETRA</span>
+            <i class="fa-solid fa-chevron-down lyrics-close" onclick="toggleLyrics()"></i>
+        </div>
+        <div class="lyrics-content" id="lyrics-text">
+            No hay letra disponible para esta canción.
+        </div>
+    </div>
+
+    <div id="full-player-screen">
+        <div class="fp-header">
+            <button class="fp-back-btn" onclick="closeFullPlayer()"><i class="fa-solid fa-chevron-down"></i></button>
+            <span class="fp-title-header">REPRODUCIENDO</span>
+            <button class="fp-back-btn" onclick="toggleLyrics()"><i class="fa-solid fa-microphone-lines"></i></button>
+        </div>
+        
+        <div class="fp-img-container"><img src="" class="fp-img" id="fp-cover"></div>
+        
+        <div class="fp-info">
+            <div class="fp-song-title" id="fp-title">Título</div>
+            <span class="fp-artist" id="fp-artist">Artista</span>
+            
+            <div class="sound-wave" id="visualizer-fp">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+        </div>
+
+        <div class="fp-progress-wrapper">
+            <input type="range" value="0" id="fp-progress">
+            <div class="fp-timers"><span id="fp-currTime">0:00</span><span id="fp-durTime">0:00</span></div>
+        </div>
+        
+        <div class="fp-controls">
+            <button class="fp-btn" id="fp-shuffle" onclick="toggleShuffle()"><i class="fa-solid fa-shuffle"></i></button> 
+            <button class="fp-btn" id="fp-prev" style="font-size: 32px;"><i class="fa-solid fa-backward-step"></i></button>
+            <div class="fp-play-circle" id="fp-play"><i class="fa-solid fa-play"></i></div>
+            <button class="fp-btn" id="fp-next" style="font-size: 32px;"><i class="fa-solid fa-forward-step"></i></button>
+            <button class="fp-btn"><i class="fa-solid fa-repeat"></i></button>
+        </div>
+    </div>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <div style="font-size: 40px; margin-bottom: 10px;">🎵</div>
+            <h2>Bienvenido</h2>
+            <input type="text" id="username-input" class="login-input" placeholder="Escribe tu nombre...">
+            <button class="login-btn" onclick="loginUser()">ENTRAR</button>
+        </div>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="logo"><img src="logo.png" alt="Logo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"> Streamify</div>
+        <ul>
+            <li onclick="resetView()"><i class="fa-solid fa-house"></i> Inicio</li>
+            <li style="background: #222; border-radius: 20px;"><input type="text" id="search" placeholder="Buscar..." style="background:none; border:none; color:white; outline:none; padding: 5px 10px; width: 100%;"></li>
+            <li id="btn-playlist">➕ Crear Playlist</li>
+            <li class="back-btn-mobile" onclick="closeMenu()"><i class="fa-solid fa-arrow-left"></i> VOLVER A LA MÚSICA</li>
+        </ul>
+        <div style="margin-top:20px; border-top:1px solid #333; padding-top:10px;"><ul id="playlist-list"></ul></div>
+        <div class="user-stats"><p id="user-display" style="font-weight: bold; margin-bottom: 5px;">Invitado</p><div style="font-size: 11px; color: gray;"><span class="online-dot"></span> 1,245 Online</div></div>
+    </nav>
+
+    <div class="content">
+        <button class="mobile-btn" onclick="document.getElementById('sidebar').classList.toggle('active')">☰</button>
+        <div class="hero-section">
+            <div class="hero-text">
+                <h1 class="hero-title">LA MEJOR MÚSICA DEL PASADO EN EL PRESENTE</h1>
+                <p class="hero-desc">Disfruta de la selección más exclusiva de música retro seleccionada para ti.</p>
+                <button class="hero-btn" onclick="loadSong(0); openFullPlayer();"><i class="fa-solid fa-play"></i> REPRODUCIR AHORA</button>
+            </div>
+        </div>
+
+        <div class="artist-spotlight">
+            <img src="Artista del mes de enero 2025.jpg" alt="Artista" class="artist-img" onerror="this.src='https://via.placeholder.com/150'">
+            <div class="artist-content">
+                <h3>ARTISTA DEL MES: Bruno Mars</h3>
+                <p>Peter Eugene Hernandez, nacido en Honolulú el 8 de octubre de 1985, conocido artísticamente como Bruno Mars, es un cantante, compositor, productor musical y bailarín estadounidense de ascendencia puertorriqueña.
+Comenzó a crear música desde una edad muy temprana y actuó en muchos escenarios de su pueblo natal a lo largo de su niñez, realizando imitaciones. Se graduó de la escuela secundaria y se mudó a Los Ángeles, donde continuó con su carrera musical.</p>
+            </div>
+        </div>
+
+        <div class="category-list">
+            <button class="category-btn active" onclick="resetView()">🏠 Inicio</button>
+            <button class="category-btn" onclick="filterSongs('Mix', this)">Mixes</button>
+            <button class="category-btn" onclick="filterSongs('Salsa', this)">Salsa</button>
+            <button class="category-btn" onclick="filterSongs('Rock', this)">Rock</button>
+            <button class="category-btn" onclick="filterSongs('Pop', this)">Pop</button>
+            <button class="category-btn" onclick="filterSongs('Funk', this)">Funk</button>
+            <button class="category-btn" onclick="filterSongs('R&B Soul', this)">R&B Soul</button>
+            <button class="category-btn" onclick="filterSongs('Merengue', this)">Merengue</button>
+            <button class="category-btn" onclick="filterSongs('Latin', this)">Latin</button>
+            <button class="category-btn" onclick="filterSongs('Baladas', this)">Baladas</button>
+            <button class="category-btn" onclick="filterSongs('I.A.', this)">I.A.</button>
+            <button class="category-btn" onclick="filterSongs('De Todo Un Poco', this)">De Todo Un Poco</button>
+            <button class="category-btn" onclick="filterSongs('Podcast', this)">Podcast</button>
+            <button class="category-btn" onclick="filterSongs('Clásicos Bailables', this)">Clásicos Bailables</button>
+            <button class="category-btn" onclick="filterSongs('Disco', this)">Disco</button>
+            <button class="category-btn" onclick="filterSongs('Ranchera', this)">Ranchera</button>
+<button class="category-btn" onclick="filterSongs('Remixes', this)">Remixes</button>
+<button class="category-btn" onclick="filterSongs('Baladas en Español', this)">Baladas en Español</button>
+        </div>
+        
+        <div id="home-view">
+            <div class="section-title"><i class="fa-solid fa-clock"></i> 🔥 Agregadas Recientemente</div>
+            <div class="carousel" id="carousel-recent"></div>
+            <div class="section-title"><i class="fa-solid fa-compact-disc"></i> Mixes Exclusivos</div>
+            <div class="carousel" id="carousel-mix"></div>
+            <div class="section-title"><i class="fa-solid fa-music"></i> Salsa & Latino</div>
+            <div class="carousel" id="carousel-latin"></div>
+            <div class="section-title"><i class="fa-solid fa-guitar"></i> Clásicos (Pop/Rock/Soul)</div>
+            <div class="carousel" id="carousel-classics"></div>
+            <div class="section-title"><i class="fa-solid fa-robot"></i> Inteligencia Artificial</div>
+            <div class="carousel" id="carousel-ia"></div>
+        </div>
+
+        <div id="search-results-view" class="hidden">
+            <h3 id="search-title">Resultados</h3>
+            <div class="grid-view" id="grid-container"></div>
+        </div>
+    </div>
+
+    <footer class="player" onclick="openFullPlayer()">
+        <div class="song-info" style="display: flex; align-items: center; gap: 10px; width: 25%;">
+            <img src="img1.jpg" id="cover" class="song-img" style="width: 45px; height: 45px; background: #333; border-radius: 4px;">
+            <div style="overflow: hidden;">
+                <div id="title" style="font-weight: bold; font-size: 14px; white-space: nowrap;">Selecciona</div>
+                <div style="display:flex; align-items:center;">
+                    <div id="artist" style="font-size: 11px; color: #aaa;">...</div>
+                    <div class="sound-wave" id="visualizer">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="buttons">
+                <i class="fa-solid fa-shuffle" id="btn-shuffle" onclick="event.stopPropagation(); toggleShuffle()"></i>
+                <i class="fa-solid fa-backward-step" id="prev" onclick="event.stopPropagation(); prevSong()"></i>
+                <i class="fa-solid fa-circle-play" id="play" style="font-size: 32px; color: white;" onclick="event.stopPropagation(); togglePlay()"></i>
+                <i class="fa-solid fa-forward-step" id="next" onclick="event.stopPropagation(); nextSong()"></i>
+                <i class="fa-solid fa-repeat"></i>
+            </div>
+            <div class="progress-container" onclick="event.stopPropagation()">
+                <span class="time" id="currTime">0:00</span>
+                <input type="range" value="0" id="progress">
+                <span class="time" id="durTime">0:00</span>
+            </div>
+        </div>
+        <i class="fa-solid fa-chevron-up mobile-player-indicator"></i>
+        <div class="volume-box" style="width: 25%; display: flex; justify-content: flex-end; align-items: center; gap:10px;" onclick="event.stopPropagation()">
+            <i class="fa-solid fa-volume-high"></i>
+            <input type="range" value="100" id="volume" style="width: 80px;">
+        </div>
+        <audio id="audio"></audio>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
