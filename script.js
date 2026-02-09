@@ -83,7 +83,7 @@ const songs = [
     { title: "Advice For The Young At Heart", artist: "Tears For Fears", cover: "Advice For The Young At Heart.jpg", audio: "https://archive.org/download/proyecto-music-land-app/Tears%20For%20Fears%20-%20Advice%20For%20The%20Young%20At%20Heart.mp3", likes: 0, category: "Pop" },
     { title: "Smooth Vintage", artist: "Soul & Funk Groove Feat. Adam Hosmatt", cover: "Smooth Vintage.jpg", audio: "https://archive.org/download/back-to-1981-soul-funk-groove-smooth-vintage-r-b-nights-oldon-derrinor/Back%20to%201981%F0%9F%8E%B5%20Soul%20%26%20Funk%20Groove%20-%20Smooth%20Vintage%20R%26B%20Nights%20_%20Oldon%20Derrinor.mp3", likes: 0, category: "I.A." },
     { title: "I'm just a Gentleman", artist: "Eugene Thomas", cover: "I'm just a Gentleman.jpg", audio: "https://archive.org/download/back-to-1981-soul-funk-groove-smooth-vintage-r-b-nights-oldon-derrinor/Eugene%20Thomas%20-%20I%27m%20just%20a%20Gentleman.mp3", likes: 0, category: "I.A." },
-    { title: "All Night in Your Love", artist: "Leon Rivers", cover: "All Night in Your Love.jpg", audio: "https://archive.org/download/back-to-1981-soul-funk-groove-smooth-vintage-r-b-nights-oldon-derrinor/Leon%20Rivers%20-%20All%20Night%20in%20Your%20Love%20%28Groove%20Mix%29.mp3", likes: 0, category: "I.A." },
+    { title: "All Night In Your Love", artist: "Leon Rivers", cover: "All Night In Your Love.jpg", audio: "https://archive.org/download/back-to-1981-soul-funk-groove-smooth-vintage-r-b-nights-oldon-derrinor/Leon%20Rivers%20-%20All%20Night%20in%20Your%20Love%20%28Groove%20Mix%29.mp3", likes: 0, category: "I.A." },
     { title: "Moonlight Rendez Vous", artist: "Lowdii-Beats", cover: "Moonlight Rendez Vous.jpg", audio: "https://archive.org/download/back-to-1981-soul-funk-groove-smooth-vintage-r-b-nights-oldon-derrinor/Lowdii-Beats%20-%20Moonlight%20Rendez%20Vous.mp3", likes: 0, category: "I.A." },
     { title: "I Wanna Say I Love You", artist: "Truand De La Funk", cover: "I Wanna Say I Love You.jpg", audio: "https://archive.org/download/back-to-1981-soul-funk-groove-smooth-vintage-r-b-nights-oldon-derrinor/Truand%20De%20La%20Funk%20-%20I%20Wanna%20Say%20I%20Love%20You.mp3", likes: 0, category: "I.A." },
     { title: "Stop, look before you love", artist: "Ray Parker Jr.", cover: "Stop, look before you love.jpg", audio: "https://archive.org/download/stop-look-before-you-love/Stop%2C%20look%20before%20you%20love.mp3", likes: 0, category: "Baladas" },
@@ -377,5 +377,6 @@ document.getElementById('btn-playlist').onclick = () => {
     if(n) document.getElementById('playlist-list').innerHTML+=`<li>🎵 ${n}</li>`; 
 
 };
+
 
 
