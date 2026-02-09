@@ -97,7 +97,7 @@ const songs = [
     { title: "El Cigarrillo", artist: "Ana Gabriel", cover: "El Cigarrillo.jpg", audio: "https://archive.org/download/14-yo-no-se-que-me-paso/16%20EL%20CIGARRILLO.mp3", likes: 0, category: "Ranchera" },
 { title: "I Just Might", artist: "Bruno Mars", cover: "I Just Might.jpg", audio: "https://archive.org/download/bruno-mars-i-just-might/Bruno%20Mars%20-%20I%20Just%20Might.mp3", likes: 0, category: "Pop" },
 { title: "Got To Be Real", artist: "Cheryl Lynn", cover: "Got To Be Real.jpg", audio: "https://archive.org/download/ladies-night_202601/Got%20to%20be%20real.mp3", likes: 0, category: "Funk" },
-{ title: "Here I'am", artist: "Dynasty", cover: "Here I'am.jpg", audio: "https://archive.org/download/ladies-night_202601/Here%20I%27am.mp3", likes: 0, category: "R&B" },
+{ title: "Here I'am", artist: "Dynasty", cover: "Here-Iam.jpg", audio: "https://archive.org/download/ladies-night_202601/Here%20I%27am.mp3", likes: 0, category: "R&B" },
 { title: "Ladies Night", artist: "Kool & The Gang", cover: "Ladies Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Ladies%20night.mp3", likes: 0, category: "R&B" },
 { title: "Let's Groove", artist: "Earth, Wind & Fire", cover: "Let's Groove.jpg", audio: "https://archive.org/download/ladies-night_202601/Let%27s%20groove.mp3", likes: 0, category: "R&B" },
 { title: "Look At Her", artist: "Barry White", cover: "Look At Her.jpg", audio: "https://archive.org/download/ladies-night_202601/Look%20at%20her.mp3", likes: 0, category: "Disco" },
@@ -375,4 +375,5 @@ document.getElementById('search').addEventListener('keyup', function(event) {
 document.getElementById('btn-playlist').onclick = () => { 
     const n=prompt("Nombre de la nueva playlist:"); 
     if(n) document.getElementById('playlist-list').innerHTML+=`<li>🎵 ${n}</li>`; 
+
 };
