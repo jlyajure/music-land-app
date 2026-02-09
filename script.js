@@ -44,7 +44,7 @@ const songs = [
     { title: "Earth, Wind & Fire Mix Vol. 1", artist: "Earth, Wind & Fire", cover: "Earth, Wind & Fire Mix Vol. 1.jpg", audio: "https://archive.org/download/music-land-proyect/Earth%2C%20Wind%20%26%20Fire%20Mix%20Vol.%201.mp3", likes: 0, category: "Soul" },
     { title: "Earth, Wind & Fire Mix Vol. 2", artist: "Earth, Wind & Fire Mix", cover: "Earth, Wind & Fire Mix Vol. 2.jpg", audio: "https://archive.org/download/music-land-proyect/Earth%2C%20Wind%20%26%20Fire%20Mix%20Vol.%202.mp3", likes: 0, category: "Soul" },
     { title: "Music Land Mix 1", artist: "Jose Luis Yajure", cover: "Music Land Mix 1.jpg", audio: "https://archive.org/download/music-land-proyect/Music%20Land%20Mix%201.mp3", likes: 0, category: "Mix" },
-    { title: "Me + You", artist: "Agentic Orange", cover: "Agentic Orange.jpg", audio: "https://archive.org/download/music-land-proyect/Agentic%20Orange%20-%20Me%20%2B%20You%20%28JLY%20Edit%20Remix%29.mp3", likes: 0, category: "I.A." },
+    { title: "Me + You", artist: "Agentic Orange", cover: "agentic.jpg", audio: "https://archive.org/download/music-land-proyect/Agentic%20Orange%20-%20Me%20%2B%20You%20%28JLY%20Edit%20Remix%29.mp3", likes: 0, category: "I.A." },
     { title: "Saturday Fever On Friday Night", artist: "Agentic Orange", cover: "Agentic Orange - Saturday Fever On Friday Night.jpg", audio: "https://archive.org/download/music-land-proyect/Agentic%20Orange%20-%20Saturday%20Fever%20On%20Friday%20Night%20%28JLY%20Edit%20Remix%29.mp3", likes: 0, category: "I.A." },
     { title: "A Woman's Worth", artist: "Michael Jackson", cover: "Michael Jackson - A Woman's Worth.jpg", audio: "https://archive.org/download/music-land-proyect/Michael%20Jackson%20-%20A%20Woman%27s%20Worth%20%28I.A.%29.mp3", likes: 0, category: "I.A." },
     { title: "Guaco Mix Vol. 1", artist: "Guaco", cover: "Guaco Mix Vol. 1.jpg", audio: "https://archive.org/download/music-land-proyect/Guaco%20Mix%20Vol.%201.mp3", likes: 0, category: "Mix" },
@@ -377,6 +377,7 @@ document.getElementById('btn-playlist').onclick = () => {
     if(n) document.getElementById('playlist-list').innerHTML+=`<li>🎵 ${n}</li>`; 
 
 };
+
 
 
 
