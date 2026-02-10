@@ -1,42 +1,3 @@
-function loginUser() {
-    const name = document.getElementById('username-input').value.trim();
-    if (name) {
-        localStorage.setItem('streamify_user', name);
-        document.getElementById('user-display').innerHTML = `👤 ${name}`;
-        document.getElementById('login-screen').style.display = 'none';
-    } else { alert("Escribe un nombre"); }
-}
-
-window.onload = () => {
-    const saved = localStorage.getItem('streamify_user');
-    if (saved) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('user-display').innerHTML = `👤 ${saved}`;
-    }
-    initHome();
-
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.setActionHandler('play', togglePlay);
-        navigator.mediaSession.setActionHandler('pause', togglePlay);
-        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
-        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-    }
-};
-
-function shareApp() {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Music Land Retro',
-            text: 'Escucha la mejor música retro aquí:',
-            url: window.location.href
-        })
-        .then(() => console.log('Compartido exitosamente'))
-        .catch((error) => console.log('Error al compartir', error));
-    } else {
-        prompt("Copia este enlace para compartir:", window.location.href);
-    }
-}
-
 // --- LISTA DE CANCIONES ---
 const songs = [
     { title: "D Train - You're the One for Me", artist: "D Train", cover: "D-Train.jpg", audio: "https://archive.org/download/music-land-proyect/D%20Train%20-%20You%27re%20the%20One%20for%20Me%20%28Original%20Mix%29.mp3", likes: 0, category: "Funk" },
@@ -94,42 +55,142 @@ const songs = [
     { title: "Siempre", artist: "Rocío Dúrcal", cover: "Siempre.jpg", audio: "https://archive.org/download/14-yo-no-se-que-me-paso/04%20SIEMPRE.mp3", likes: 0, category: "Ranchera" },
     { title: "La Media Vuelta", artist: "Luis Miguel", cover: "La Media Vuelta.jpg", audio: "https://archive.org/download/14-yo-no-se-que-me-paso/05%20LA%20MEDIA%20VUELTA.mp3", likes: 0, category: "Ranchera" },
     { title: "El Cigarrillo", artist: "Ana Gabriel", cover: "El Cigarrillo.jpg", audio: "https://archive.org/download/14-yo-no-se-que-me-paso/16%20EL%20CIGARRILLO.mp3", likes: 0, category: "Ranchera" },
-{ title: "I Just Might", artist: "Bruno Mars", cover: "I Just Might.jpg", audio: "https://archive.org/download/bruno-mars-i-just-might/Bruno%20Mars%20-%20I%20Just%20Might.mp3", likes: 0, category: "Pop" },
-{ title: "Got To Be Real", artist: "Cheryl Lynn", cover: "Got To Be Real.jpg", audio: "https://archive.org/download/ladies-night_202601/Got%20to%20be%20real.mp3", likes: 0, category: "Funk" },
-{ title: "Here I'am", artist: "Dynasty", cover: "hereiam.jpg", audio: "https://archive.org/download/ladies-night_202601/Here%20I%27am.mp3", likes: 0, category: "R&B" },
-{ title: "Ladies Night", artist: "Kool & The Gang", cover: "Ladies Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Ladies%20night.mp3", likes: 0, category: "R&B" },
-{ title: "Let's Groove", artist: "Earth, Wind & Fire", cover: "Let's Groove.jpg", audio: "https://archive.org/download/ladies-night_202601/Let%27s%20groove.mp3", likes: 0, category: "R&B" },
-{ title: "Look At Her", artist: "Barry White", cover: "Look At Her.jpg", audio: "https://archive.org/download/ladies-night_202601/Look%20at%20her.mp3", likes: 0, category: "Disco" },
-{ title: "Lookin' For Love", artist: "Fat Larry's Band", cover: "Lookin' For Love.jpg", audio: "https://archive.org/download/ladies-night_202601/Looking%20for%20love.mp3", likes: 0, category: "Disco" },
-{ title: "PTY (Pretty Young Thing)", artist: "Michael Jakson", cover: "PTY (Pretty Young Thing).jpg", audio: "https://archive.org/download/ladies-night_202601/PYT-Pretty%20Young%20Thing.mp3", likes: 0, category: "Pop" },
-{ title: "Stomp!", artist: "The Brothers Johnson", cover: "Stomp!.jpg", audio: "https://archive.org/download/ladies-night_202601/Stomp%21.mp3", likes: 0, category: "R&B" },
-{ title: "Tonight", artist: "The Whispers", cover: "Tonight.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonight.mp3", likes: 0, category: "R&B" },
-{ title: "Tonihgt's The Night", artist: "Kleeer", cover: "Tonihgt's The Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonihgt%27s%20the%20night.mp3", likes: 0, category: "R&B" },
+    { title: "I Just Might", artist: "Bruno Mars", cover: "I Just Might.jpg", audio: "https://archive.org/download/bruno-mars-i-just-might/Bruno%20Mars%20-%20I%20Just%20Might.mp3", likes: 0, category: "Pop" },
+    { title: "Got To Be Real", artist: "Cheryl Lynn", cover: "Got To Be Real.jpg", audio: "https://archive.org/download/ladies-night_202601/Got%20to%20be%20real.mp3", likes: 0, category: "Funk" },
+    { title: "Here I'am", artist: "Dynasty", cover: "hereiam.jpg", audio: "https://archive.org/download/ladies-night_202601/Here%20I%27am.mp3", likes: 0, category: "R&B" },
+    { title: "Ladies Night", artist: "Kool & The Gang", cover: "Ladies Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Ladies%20night.mp3", likes: 0, category: "R&B" },
+    { title: "Let's Groove", artist: "Earth, Wind & Fire", cover: "Let's Groove.jpg", audio: "https://archive.org/download/ladies-night_202601/Let%27s%20groove.mp3", likes: 0, category: "R&B" },
+    { title: "Look At Her", artist: "Barry White", cover: "Look At Her.jpg", audio: "https://archive.org/download/ladies-night_202601/Look%20at%20her.mp3", likes: 0, category: "Disco" },
+    { title: "Lookin' For Love", artist: "Fat Larry's Band", cover: "Lookin' For Love.jpg", audio: "https://archive.org/download/ladies-night_202601/Looking%20for%20love.mp3", likes: 0, category: "Disco" },
+    { title: "PTY (Pretty Young Thing)", artist: "Michael Jackson", cover: "PTY (Pretty Young Thing).jpg", audio: "https://archive.org/download/ladies-night_202601/PYT-Pretty%20Young%20Thing.mp3", likes: 0, category: "Pop" },
+    { title: "Stomp!", artist: "The Brothers Johnson", cover: "Stomp!.jpg", audio: "https://archive.org/download/ladies-night_202601/Stomp%21.mp3", likes: 0, category: "R&B" },
+    { title: "Tonight", artist: "The Whispers", cover: "Tonight.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonight.mp3", likes: 0, category: "R&B" },
+    { title: "Tonihgt's The Night", artist: "Kleeer", cover: "Tonihgt's The Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonihgt%27s%20the%20night.mp3", likes: 0, category: "R&B" },
+    { title: "Artista del Mes", artist: "Agentic Orange", cover: "artistames.jpg", audio: "https://archive.org/download/music-land-proyect/Agentic%20Orange%20-%20Me%20%2B%20You%20%28JLY%20Edit%20Remix%29.mp3", likes: 0, category: "I.A." }
 ];
 
-const audio = document.getElementById('audio');
-const container = document.getElementById('cards-container');
-const miniPlayBtn = document.getElementById('play');
-const miniProgress = document.getElementById('progress');
-const miniCurr = document.getElementById('currTime');
-const miniDur = document.getElementById('durTime');
-const fullScreen = document.getElementById('full-player-screen');
-const fpTitle = document.getElementById('fp-title');
-const fpArtist = document.getElementById('fp-artist');
-const fpCover = document.getElementById('fp-cover');
-const fpPlayBtn = document.getElementById('fp-play');
-const fpProgress = document.getElementById('fp-progress');
-const fpCurr = document.getElementById('fp-currTime');
-const fpDur = document.getElementById('fp-durTime');
-const visualizer = document.getElementById('visualizer');
-const visualizerFP = document.getElementById('visualizer-fp');
-const lyricsScreen = document.getElementById('lyrics-screen');
-const lyricsText = document.getElementById('lyrics-text');
-
+// --- VARIABLES GLOBALES ---
 let isPlaying = false; 
 let index = 0;
 let currentPlaylist = songs; 
-let isShuffle = false; 
+let isShuffle = false;
+let audio, miniPlayBtn, visualizer, visualizerFP, fpPlayBtn; // Declaradas para usar globalmente
+
+// --- FUNCIÓN DE INICIO SEGURO ---
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Conectamos los elementos (Ahora que la página existe)
+    audio = document.getElementById('audio');
+    miniPlayBtn = document.getElementById('play');
+    const miniProgress = document.getElementById('progress');
+    const miniCurr = document.getElementById('currTime');
+    const miniDur = document.getElementById('durTime');
+    const fullScreen = document.getElementById('full-player-screen');
+    const fpTitle = document.getElementById('fp-title');
+    const fpArtist = document.getElementById('fp-artist');
+    const fpCover = document.getElementById('fp-cover');
+    fpPlayBtn = document.getElementById('fp-play');
+    const fpProgress = document.getElementById('fp-progress');
+    const fpCurr = document.getElementById('fp-currTime');
+    const fpDur = document.getElementById('fp-durTime');
+    visualizer = document.getElementById('visualizer');
+    visualizerFP = document.getElementById('visualizer-fp');
+    const lyricsScreen = document.getElementById('lyrics-screen');
+    const lyricsText = document.getElementById('lyrics-text');
+
+    // 2. Revisamos si el usuario ya existe
+    const saved = localStorage.getItem('streamify_user');
+    if (saved) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('user-display').innerHTML = `👤 ${saved}`;
+    }
+
+    // 3. Cargamos el contenido inicial
+    initHome();
+
+    // 4. Activamos MediaSession (Controles de Android/iPhone)
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', togglePlay);
+        navigator.mediaSession.setActionHandler('pause', togglePlay);
+        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+    }
+
+    // --- EVENT LISTENERS (BOTONES) ---
+    // Importante: Los ponemos aquí dentro para que no den error si el elemento no existe aun.
+    
+    // Controles de Audio
+    audio.addEventListener('ended', nextSong);
+    audio.addEventListener('waiting', () => { if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>'; });
+    audio.addEventListener('playing', () => { if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>'; });
+    
+    // Barras de progreso
+    audio.addEventListener('timeupdate', (e) => {
+        if(e.target.duration && !isNaN(e.target.duration)) {
+            const pct = (e.target.currentTime / e.target.duration) * 100;
+            if(miniProgress) miniProgress.value = pct; 
+            if(fpProgress) fpProgress.value = pct;
+            const c = format(e.target.currentTime); const d = format(e.target.duration);
+            if(miniCurr) miniCurr.innerText = c; if(miniDur) miniDur.innerText = d;
+            if(fpCurr) fpCurr.innerText = c; if(fpDur) fpDur.innerText = d;
+        }
+    });
+
+    if(miniProgress) miniProgress.addEventListener('input', () => { audio.currentTime = (miniProgress.value * audio.duration) / 100; });
+    if(fpProgress) fpProgress.addEventListener('input', () => { audio.currentTime = (fpProgress.value * audio.duration) / 100; });
+    
+    // Volumen
+    const volSlider = document.getElementById('volume');
+    if(volSlider) volSlider.oninput = (e) => audio.volume = e.target.value / 100;
+
+    // Buscador
+    const searchInput = document.getElementById('search');
+    if(searchInput) {
+        searchInput.addEventListener('input', function(event) {
+            const txt = this.value.toLowerCase();
+            if(txt.length > 0) {
+                document.getElementById('home-view').classList.add('hidden');
+                document.getElementById('search-results-view').classList.remove('hidden');
+                document.getElementById('search-title').innerText = "Resultados de búsqueda";
+                const grid = document.getElementById('grid-container');
+                grid.innerHTML = "";
+                
+                const filtered = songs.filter(s => s.title.toLowerCase().includes(txt) || s.artist.toLowerCase().includes(txt));
+                currentPlaylist = filtered; 
+                
+                filtered.forEach(song => {
+                    grid.appendChild(createCard(song, songs.indexOf(song)));
+                });
+            } else {
+                resetView();
+            }
+        });
+
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === "Enter") { closeMenu(); this.blur(); }
+        });
+    }
+
+    // Botón Playlist
+    const btnPlay = document.getElementById('btn-playlist');
+    if(btnPlay) {
+        btnPlay.onclick = () => { 
+            const n=prompt("Nombre de la nueva playlist:"); 
+            if(n) document.getElementById('playlist-list').innerHTML+=`<li>🎵 ${n}</li>`; 
+        };
+    }
+});
+
+// --- FUNCIONES (Lógica) ---
+
+function loginUser() {
+    const input = document.getElementById('username-input');
+    const name = input ? input.value.trim() : "";
+    if (name) {
+        localStorage.setItem('streamify_user', name);
+        document.getElementById('user-display').innerHTML = `👤 ${name}`;
+        document.getElementById('login-screen').style.display = 'none';
+    } else { alert("Escribe un nombre"); }
+}
 
 function createCard(song, i) {
     const div = document.createElement('div');
@@ -147,20 +208,25 @@ function createCard(song, i) {
 
 function initHome() {
     currentPlaylist = songs; 
-    document.getElementById('home-view').classList.remove('hidden');
-    document.getElementById('search-results-view').classList.add('hidden');
+    const homeView = document.getElementById('home-view');
+    if(homeView) homeView.classList.remove('hidden');
+    
+    const searchView = document.getElementById('search-results-view');
+    if(searchView) searchView.classList.add('hidden');
+    
     document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.category-btn:first-child').classList.add('active');
+    const firstBtn = document.querySelector('.category-btn:first-child');
+    if(firstBtn) firstBtn.classList.add('active');
 
-    // --- MOSTRAR LAS ÚLTIMAS 30 CANCIONES ---
+    // --- CAROUSEL RECIENTES ---
     const recentSongs = songs.slice().reverse().slice(0, 30); 
-    // ----------------------------------------
-
     const recentContainer = document.getElementById('carousel-recent');
-    recentContainer.innerHTML = "";
-    recentSongs.forEach(song => {
-        recentContainer.appendChild(createCard(song, songs.indexOf(song)));
-    });
+    if(recentContainer) {
+        recentContainer.innerHTML = "";
+        recentSongs.forEach(song => {
+            recentContainer.appendChild(createCard(song, songs.indexOf(song)));
+        });
+    }
 
     fillCarousel('carousel-mix', ['Mix']);
     fillCarousel('carousel-latin', ['Salsa', 'Merengue', 'Latin']);
@@ -170,6 +236,7 @@ function initHome() {
 
 function fillCarousel(id, categories) {
     const container = document.getElementById(id);
+    if(!container) return; // Evita error si no existe
     container.innerHTML = "";
     songs.forEach((song, i) => {
         if (categories.includes(song.category)) {
@@ -206,10 +273,10 @@ function filterSongs(category, btn) {
 }
 
 function resetView() { initHome(); }
-function openFullPlayer() { fullScreen.classList.add('active'); }
-function closeFullPlayer() { fullScreen.classList.remove('active'); }
+function openFullPlayer() { const fs = document.getElementById('full-player-screen'); if(fs) fs.classList.add('active'); }
+function closeFullPlayer() { const fs = document.getElementById('full-player-screen'); if(fs) fs.classList.remove('active'); }
 function closeMenu() { document.getElementById('sidebar').classList.remove('active'); }
-function toggleLyrics() { lyricsScreen.classList.toggle('active'); }
+function toggleLyrics() { document.getElementById('lyrics-screen').classList.toggle('active'); }
 
 function updateMediaSession(s) {
     if ('mediaSession' in navigator) {
@@ -224,18 +291,29 @@ function updateMediaSession(s) {
 function loadSong(globalIndex) {
     index = globalIndex;
     const s = songs[index];
-    document.getElementById('title').innerText = s.title;
-    document.getElementById('artist').innerText = s.artist;
-    document.getElementById('cover').src = s.cover;
-    fpTitle.innerText = s.title;
-    fpArtist.innerText = s.artist;
-    fpCover.src = s.cover;
-    fullScreen.style.backgroundImage = `url('${s.cover}')`;
-    lyricsText.innerText = s.lyrics ? s.lyrics : "Letra no disponible.";
     
-    // --- INDICADOR DE CARGA ---
-    fpPlayBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>'; 
-    // --------------------------
+    // Elementos del Player
+    const titleEl = document.getElementById('title');
+    const artistEl = document.getElementById('artist');
+    const coverEl = document.getElementById('cover');
+    const fpTitle = document.getElementById('fp-title');
+    const fpArtist = document.getElementById('fp-artist');
+    const fpCover = document.getElementById('fp-cover');
+    const fullScreen = document.getElementById('full-player-screen');
+    const lyricsText = document.getElementById('lyrics-text');
+
+    if(titleEl) titleEl.innerText = s.title;
+    if(artistEl) artistEl.innerText = s.artist;
+    if(coverEl) coverEl.src = s.cover;
+    if(fpTitle) fpTitle.innerText = s.title;
+    if(fpArtist) fpArtist.innerText = s.artist;
+    if(fpCover) fpCover.src = s.cover;
+    if(fullScreen) fullScreen.style.backgroundImage = `url('${s.cover}')`;
+    if(lyricsText) lyricsText.innerText = s.lyrics ? s.lyrics : "Letra no disponible.";
+    
+    // Reset Play Button
+    const fpPlayBtn = document.getElementById('fp-play');
+    if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>'; 
 
     audio.src = s.audio;
     updateMediaSession(s);
@@ -245,19 +323,21 @@ function loadSong(globalIndex) {
 
 function playSong() { 
     isPlaying = true; 
-    miniPlayBtn.className = "fa-solid fa-circle-pause"; 
-    visualizer.classList.add('active'); 
-    visualizerFP.classList.add('active');
-    audio.play().catch(e=>console.log(e)); 
+    if(miniPlayBtn) miniPlayBtn.className = "fa-solid fa-circle-pause"; 
+    if(visualizer) visualizer.classList.add('active'); 
+    if(visualizerFP) visualizerFP.classList.add('active');
+    audio.play().catch(e=>console.log("Esperando interacción:", e)); 
 }
+
 function pauseSong() { 
     isPlaying = false; 
-    miniPlayBtn.className = "fa-solid fa-circle-play"; 
-    fpPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-    visualizer.classList.remove('active'); 
-    visualizerFP.classList.remove('active');
+    if(miniPlayBtn) miniPlayBtn.className = "fa-solid fa-circle-play"; 
+    if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+    if(visualizer) visualizer.classList.remove('active'); 
+    if(visualizerFP) visualizerFP.classList.remove('active');
     audio.pause(); 
 }
+
 function togglePlay() { isPlaying ? pauseSong() : playSong(); }
 
 function toggleShuffle() {
@@ -265,11 +345,11 @@ function toggleShuffle() {
     const shuffleBtn = document.getElementById('btn-shuffle');
     const shuffleBtnFP = document.getElementById('fp-shuffle');
     if (isShuffle) {
-        shuffleBtn.classList.add('shuffle-active');
-        shuffleBtnFP.classList.add('shuffle-active');
+        if(shuffleBtn) shuffleBtn.classList.add('shuffle-active');
+        if(shuffleBtnFP) shuffleBtnFP.classList.add('shuffle-active');
     } else {
-        shuffleBtn.classList.remove('shuffle-active');
-        shuffleBtnFP.classList.remove('shuffle-active');
+        if(shuffleBtn) shuffleBtn.classList.remove('shuffle-active');
+        if(shuffleBtnFP) shuffleBtnFP.classList.remove('shuffle-active');
     }
 }
 
@@ -277,7 +357,6 @@ function nextSong() {
     const currentSongObj = songs[index];
     let playlistIndex = currentPlaylist.indexOf(currentSongObj);
     
-    // Si la canción actual no está en la playlist filtrada (ej. cambiaste de categoría mientras sonaba)
     if (playlistIndex === -1) { 
         currentPlaylist = songs; 
         playlistIndex = currentPlaylist.indexOf(currentSongObj); 
@@ -286,7 +365,6 @@ function nextSong() {
     let nextPlaylistIndex;
     if (isShuffle) {
         nextPlaylistIndex = Math.floor(Math.random() * currentPlaylist.length);
-        // Evitar repetir la misma si hay más de 1 canción
         if (currentPlaylist.length > 1 && nextPlaylistIndex === playlistIndex) {
             nextPlaylistIndex = (nextPlaylistIndex + 1) % currentPlaylist.length;
         }
@@ -308,74 +386,25 @@ function prevSong() {
     loadSong(songs.indexOf(prevSongObj));
 }
 
-audio.addEventListener('ended', nextSong);
-
-// --- EVENTOS DE CARGA / BUFFERING ---
-audio.addEventListener('waiting', () => {
-        fpPlayBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-});
-audio.addEventListener('playing', () => {
-        fpPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-});
-// ------------------------------------
-
-miniPlayBtn.onclick = (e) => { e.stopPropagation(); togglePlay(); };
-fpPlayBtn.onclick = togglePlay;
-document.getElementById('fp-next').onclick = nextSong;
-document.getElementById('fp-prev').onclick = prevSong;
-document.getElementById('next').onclick = (e) => {e.stopPropagation(); nextSong();};
-document.getElementById('prev').onclick = (e) => {e.stopPropagation(); prevSong();};
-
 function format(s) { 
     if(isNaN(s)) return "0:00"; 
     const m=Math.floor(s/60), sc=Math.floor(s%60); 
     return `${m}:${sc<10?'0'+sc:sc}`; 
 }
 
-audio.addEventListener('timeupdate', (e) => {
-    if(e.target.duration) {
-        const pct = (e.target.currentTime / e.target.duration) * 100;
-        miniProgress.value = pct; fpProgress.value = pct;
-        const c = format(e.target.currentTime); const d = format(e.target.duration);
-        miniCurr.innerText = c; miniDur.innerText = d;
-        fpCurr.innerText = c; fpDur.innerText = d;
-    }
-});
-
-miniProgress.addEventListener('input', () => { audio.currentTime = (miniProgress.value * audio.duration) / 100; });
-fpProgress.addEventListener('input', () => { audio.currentTime = (fpProgress.value * audio.duration) / 100; });
-document.getElementById('volume').oninput = (e) => audio.volume = e.target.value / 100;
-
-document.getElementById('search').addEventListener('input', function(event) {
-    const txt = this.value.toLowerCase();
-    if(txt.length > 0) {
-        document.getElementById('home-view').classList.add('hidden');
-        document.getElementById('search-results-view').classList.remove('hidden');
-        document.getElementById('search-title').innerText = "Resultados de búsqueda";
-        const grid = document.getElementById('grid-container');
-        grid.innerHTML = "";
-        
-        // BÚSQUEDA EN TÍTULO O ARTISTA (DUAL)
-        const filtered = songs.filter(s => s.title.toLowerCase().includes(txt) || s.artist.toLowerCase().includes(txt));
-        currentPlaylist = filtered; 
-        
-        filtered.forEach(song => {
-            grid.appendChild(createCard(song, songs.indexOf(song)));
-        });
+function shareApp() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Music Land Retro',
+            text: 'Escucha la mejor música retro aquí:',
+            url: window.location.href
+        })
+        .then(() => console.log('Compartido exitosamente'))
+        .catch((error) => console.log('Error al compartir', error));
     } else {
-        resetView();
+        prompt("Copia este enlace para compartir:", window.location.href);
     }
-});
-
-document.getElementById('search').addEventListener('keyup', function(event) {
-        if (event.key === "Enter") { closeMenu(); this.blur(); }
-});
-
-document.getElementById('btn-playlist').onclick = () => { 
-    const n=prompt("Nombre de la nueva playlist:"); 
-    if(n) document.getElementById('playlist-list').innerHTML+=`<li>🎵 ${n}</li>`; 
-
-};
+}
 
 
 
