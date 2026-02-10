@@ -64,7 +64,18 @@ const songs = [
     { title: "PTY (Pretty Young Thing)", artist: "Michael Jackson", cover: "PTY (Pretty Young Thing).jpg", audio: "https://archive.org/download/ladies-night_202601/PYT-Pretty%20Young%20Thing.mp3", likes: 0, category: "Pop" },
     { title: "Stomp!", artist: "The Brothers Johnson", cover: "Stomp!.jpg", audio: "https://archive.org/download/ladies-night_202601/Stomp%21.mp3", likes: 0, category: "R&B" },
     { title: "Tonight", artist: "The Whispers", cover: "Tonight.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonight.mp3", likes: 0, category: "R&B" },
-    { title: "Tonihgt's The Night", artist: "Kleeer", cover: "Tonihgt's The Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonihgt%27s%20the%20night.mp3", likes: 0, category: "R&B" }
+    { title: "Tonihgt's The Night", artist: "Kleeer", cover: "Tonihgt's The Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonihgt%27s%20the%20night.mp3", likes: 0, category: "R&B" },
+    { title: "Nada Se Compara Contigo", artist: "Alvaro Torres", cover: "nadasecomparacontigo.jpg", audio: "https://archive.org/download/canciones-music-land/Alvaro%20Torres%20-%20Nada%20Se%20Compara%20Contigo.mp3", likes: 0, category: "Baladas En Español" },
+{ title: "Honey", artist: "Aramis Camilo", cover: "honey.jpg", audio: "https://archive.org/download/canciones-music-land/Aramis%20Camilo%20-%20Honey.mp3", likes: 0, category: "Merengue" },
+{ title: "Till The World Ends (Remix)", artist: "Britney Spears", cover: "tilltheworldends.jpg", audio: "https://archive.org/download/canciones-music-land/Britney%20Spears%20-%20Till%20The%20World%20Ends%20%28Remix%29.mp3", likes: 0, category: "Pop" },
+{ title: "Don't rush tonight", artist: "Carl Jones", cover: "dontrushtonight.jpg", audio: "https://archive.org/download/canciones-music-land/Carl%20Jones%20-%20Don%27t%20Rush%20Tonight.mp3", likes: 0, category: "I.A." },
+    { title: "Get Lucky", artist: "Daft Punk  Feat. Pharrell William", cover: "getlucky.jpg", audio: "https://archive.org/download/canciones-music-land/Daft%20Punk%20%20Feat.%20Pharrell%20William%20-%20Get%20Lucky.mp3", likes: 0, category: "Pop" },
+        { title: "Wepa", artist: "Gloria Estefan", cover: "wepa.jpg", audio: "https://archive.org/download/canciones-music-land/Gloria%20Estefan%20-%20Wepa%20%28Club%20Remix%29.mp3", likes: 0, category: "Remixes" },
+            { title: "Midnight Rendezvous", artist: "Harold Lawson", cover: "midnight.jpg", audio: "https://archive.org/download/canciones-music-land/Harold%20Lawson%20-%20Midnight%20Rendezvous.mp3", likes: 0, category: "I.A." },
+                       { title: "A Bailar Fandango", artist: "Moises Angulo", cover: "abailarfandango.jpg", audio: "https://archive.org/download/canciones-music-land/Moises%20Angulo%20-%20A%20Bailar%20Fandango.mp3", likes: 0, category: "De Todo Un Poco" },
+    { title: "Mi Dulce Sueño", artist: "Los Imperials", cover: "midulcesueno.jpg", audio: "https://archive.org/download/canciones-music-land/Los%20Imperials%20-%20Mi%20Dulce%20Sue%C3%B1o.mp3", likes: 0, category: "Clásicos Bailables" },
+    { title: "No Te Apartes De Mi", artist: "Roberto Carlos", cover: "noteapartesdemi.jpg", audio: "https://archive.org/download/canciones-music-land/Roberto%20Carlos%20-%20No%20Te%20Apartes%20De%20Mi.mp3", likes: 0, category: "Baladas En Español" },
+
 ];
 
 // --- VARIABLES GLOBALES ---
@@ -438,3 +449,4 @@ function shareApp() {
         prompt("Copia este enlace para compartir:", window.location.href);
     }
 }
+
