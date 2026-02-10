@@ -1,4 +1,4 @@
-// --- LISTA DE CANCIONES (SIN AGENTIC ORANGE) ---
+// --- LISTA DE CANCIONES ---
 const songs = [
     { title: "D Train - You're the One for Me", artist: "D Train", cover: "D-Train.jpg", audio: "https://archive.org/download/music-land-proyect/D%20Train%20-%20You%27re%20the%20One%20for%20Me%20%28Original%20Mix%29.mp3", likes: 0, category: "Funk" },
     { title: "Level 42 - Lessons In Love", artist: "Level 42", cover: "Level 42 Lessons in Love.jpg", audio: "https://archive.org/download/music-land-proyect/Level%2042%20-%20Lessons%20In%20Love%20%28Reconstructed%20Master%20Mix%29.mp3", likes: 0, category: "Pop" },
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LISTENERS DE LOS BOTONES DE PLAY/PAUSA ---
     if(miniPlayBtn) {
         miniPlayBtn.onclick = (e) => {
-            e.stopPropagation(); // IMPORTANTE: Que no abra el player grande
+            e.stopPropagation(); 
             togglePlay();
         };
     }
@@ -283,8 +283,23 @@ function filterSongs(category, btn) {
 }
 
 function resetView() { initHome(); }
-function openFullPlayer() { const fs = document.getElementById('full-player-screen'); if(fs) fs.classList.add('active'); }
-function closeFullPlayer() { const fs = document.getElementById('full-player-screen'); if(fs) fs.classList.remove('active'); }
+
+// --- AQUÍ ESTÁ EL TRUCO PARA OCULTAR EL BOTÓN ---
+function openFullPlayer() { 
+    const fs = document.getElementById('full-player-screen'); 
+    const btnArtista = document.getElementById('btnArtista');
+    if(fs) fs.classList.add('active'); 
+    if(btnArtista) btnArtista.style.display = 'none'; // ¡DESAPARECE!
+}
+
+function closeFullPlayer() { 
+    const fs = document.getElementById('full-player-screen'); 
+    const btnArtista = document.getElementById('btnArtista');
+    if(fs) fs.classList.remove('active'); 
+    if(btnArtista) btnArtista.style.display = 'flex'; // ¡APARECE!
+}
+// ------------------------------------------------
+
 function closeMenu() { document.getElementById('sidebar').classList.remove('active'); }
 function toggleLyrics() { document.getElementById('lyrics-screen').classList.toggle('active'); }
 
@@ -302,7 +317,6 @@ function loadSong(globalIndex) {
     index = globalIndex;
     const s = songs[index];
     
-    // Elementos del Player
     const titleEl = document.getElementById('title');
     const artistEl = document.getElementById('artist');
     const coverEl = document.getElementById('cover');
@@ -321,7 +335,6 @@ function loadSong(globalIndex) {
     if(fullScreen) fullScreen.style.backgroundImage = `url('${s.cover}')`;
     if(lyricsText) lyricsText.innerText = s.lyrics ? s.lyrics : "Letra no disponible.";
     
-    // Reset Play Button
     if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>'; 
 
     audio.src = s.audio;
@@ -336,7 +349,6 @@ function playSong() {
     if(visualizer) visualizer.classList.add('active'); 
     if(visualizerFP) visualizerFP.classList.add('active');
     
-    // Aseguramos que el botón del full player también cambie a PAUSA
     if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
 
     audio.play().catch(e=>console.log("Esperando interacción:", e)); 
@@ -346,7 +358,6 @@ function pauseSong() {
     isPlaying = false; 
     if(miniPlayBtn) miniPlayBtn.className = "fa-solid fa-circle-play"; 
     
-    // Aseguramos que el botón del full player también cambie a PLAY
     if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
     
     if(visualizer) visualizer.classList.remove('active'); 
