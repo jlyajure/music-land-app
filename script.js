@@ -1,4 +1,4 @@
-// --- LISTA DE CANCIONES (LIMPIA) ---
+// --- LISTA DE CANCIONES (SIN AGENTIC ORANGE) ---
 const songs = [
     { title: "D Train - You're the One for Me", artist: "D Train", cover: "D-Train.jpg", audio: "https://archive.org/download/music-land-proyect/D%20Train%20-%20You%27re%20the%20One%20for%20Me%20%28Original%20Mix%29.mp3", likes: 0, category: "Funk" },
     { title: "Level 42 - Lessons In Love", artist: "Level 42", cover: "Level 42 Lessons in Love.jpg", audio: "https://archive.org/download/music-land-proyect/Level%2042%20-%20Lessons%20In%20Love%20%28Reconstructed%20Master%20Mix%29.mp3", likes: 0, category: "Pop" },
@@ -72,11 +72,11 @@ let isPlaying = false;
 let index = 0;
 let currentPlaylist = songs; 
 let isShuffle = false;
-let audio, miniPlayBtn, visualizer, visualizerFP, fpPlayBtn; // Declaradas para usar globalmente
+let audio, miniPlayBtn, visualizer, visualizerFP, fpPlayBtn; 
 
 // --- FUNCIÓN DE INICIO SEGURO ---
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Conectamos los elementos (Ahora que la página existe)
+    // 1. Conectamos los elementos
     audio = document.getElementById('audio');
     miniPlayBtn = document.getElementById('play');
     const miniProgress = document.getElementById('progress');
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Cargamos el contenido inicial
     initHome();
 
-    // 4. Activamos MediaSession (Controles de Android/iPhone)
+    // 4. MediaSession
     if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('play', togglePlay);
         navigator.mediaSession.setActionHandler('pause', togglePlay);
@@ -113,9 +113,21 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.mediaSession.setActionHandler('nexttrack', nextSong);
     }
 
-    // --- EVENT LISTENERS (BOTONES) ---
-    // Importante: Los ponemos aquí dentro para que no den error si el elemento no existe aun.
-    
+    // --- LISTENERS DE LOS BOTONES DE PLAY/PAUSA ---
+    if(miniPlayBtn) {
+        miniPlayBtn.onclick = (e) => {
+            e.stopPropagation(); // IMPORTANTE: Que no abra el player grande
+            togglePlay();
+        };
+    }
+
+    if(fpPlayBtn) {
+        fpPlayBtn.onclick = (e) => {
+            e.stopPropagation(); 
+            togglePlay();
+        };
+    }
+
     // Controles de Audio
     audio.addEventListener('ended', nextSong);
     audio.addEventListener('waiting', () => { if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>'; });
@@ -310,7 +322,6 @@ function loadSong(globalIndex) {
     if(lyricsText) lyricsText.innerText = s.lyrics ? s.lyrics : "Letra no disponible.";
     
     // Reset Play Button
-    const fpPlayBtn = document.getElementById('fp-play');
     if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>'; 
 
     audio.src = s.audio;
@@ -344,7 +355,6 @@ function pauseSong() {
 }
 
 function togglePlay() { 
-    // Lógica simplificada para evitar errores
     if (audio.paused) {
         playSong();
     } else {
@@ -417,12 +427,3 @@ function shareApp() {
         prompt("Copia este enlace para compartir:", window.location.href);
     }
 }
-
-
-
-
-
-
-
-
-
