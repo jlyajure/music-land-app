@@ -1,6 +1,6 @@
 {
-  "name": "Streamify Music",
-  "short_name": "Streamify",
+  "name": "Music Land App",
+"short_name": "Music Land",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#222222",
