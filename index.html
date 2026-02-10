@@ -90,10 +90,7 @@
             </div>
         </div>
 
-        <div class="artist-spotlight" style="display: none;">
-            <img src="artist.jpg" class="artist-img">
-            <div class="artist-content"><h3>OCULTO</h3></div>
-        </div>
+        <div class="artist-spotlight" style="display: none;"></div>
 
         <div class="category-list">
             <button class="category-btn active" onclick="resetView()">🏠 Inicio</button>
@@ -170,7 +167,7 @@
         <audio id="audio"></audio>
     </footer>
 
-    <button id="btnArtista" style="position: fixed; bottom: 100px; right: 20px; z-index: 9999; background: #ff4757; color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); cursor: pointer; display: flex; align-items: center; gap: 10px; font-family: 'Montserrat', sans-serif; transition: transform 0.2s;">
+    <button id="btnArtista" style="position: fixed; bottom: 160px; right: 20px; z-index: 9999; background: #ff4757; color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); cursor: pointer; display: flex; align-items: center; gap: 10px; font-family: 'Montserrat', sans-serif; transition: transform 0.2s;">
       <i class="fa-solid fa-star"></i> Artista del Mes
     </button>
 
@@ -197,13 +194,6 @@
       document.getElementById('modalArtista').onclick = function(e) { if (e.target === this) { this.style.display = 'none'; } }
     </script>
 
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=5"></script>
 </body>
 </html>
-
-
-
-
-
-
-
