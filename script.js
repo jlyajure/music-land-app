@@ -1,11 +1,10 @@
-// --- LISTA DE CANCIONES ---
+// --- LISTA DE CANCIONES (LIMPIA) ---
 const songs = [
     { title: "D Train - You're the One for Me", artist: "D Train", cover: "D-Train.jpg", audio: "https://archive.org/download/music-land-proyect/D%20Train%20-%20You%27re%20the%20One%20for%20Me%20%28Original%20Mix%29.mp3", likes: 0, category: "Funk" },
     { title: "Level 42 - Lessons In Love", artist: "Level 42", cover: "Level 42 Lessons in Love.jpg", audio: "https://archive.org/download/music-land-proyect/Level%2042%20-%20Lessons%20In%20Love%20%28Reconstructed%20Master%20Mix%29.mp3", likes: 0, category: "Pop" },
     { title: "Earth, Wind & Fire Mix Vol. 1", artist: "Earth, Wind & Fire", cover: "Earth, Wind & Fire Mix Vol. 1.jpg", audio: "https://archive.org/download/music-land-proyect/Earth%2C%20Wind%20%26%20Fire%20Mix%20Vol.%201.mp3", likes: 0, category: "Soul" },
     { title: "Earth, Wind & Fire Mix Vol. 2", artist: "Earth, Wind & Fire Mix", cover: "Earth, Wind & Fire Mix Vol. 2.jpg", audio: "https://archive.org/download/music-land-proyect/Earth%2C%20Wind%20%26%20Fire%20Mix%20Vol.%202.mp3", likes: 0, category: "Soul" },
     { title: "Music Land Mix 1", artist: "Jose Luis Yajure", cover: "Music Land Mix 1.jpg", audio: "https://archive.org/download/music-land-proyect/Music%20Land%20Mix%201.mp3", likes: 0, category: "Mix" },
-    { title: "Saturday Fever On Friday Night", artist: "Agentic Orange", cover: "Agentic Orange - Saturday Fever On Friday Night.jpg", audio: "https://archive.org/download/music-land-proyect/Agentic%20Orange%20-%20Saturday%20Fever%20On%20Friday%20Night%20%28JLY%20Edit%20Remix%29.mp3", likes: 0, category: "I.A." },
     { title: "A Woman's Worth", artist: "Michael Jackson", cover: "Michael Jackson - A Woman's Worth.jpg", audio: "https://archive.org/download/music-land-proyect/Michael%20Jackson%20-%20A%20Woman%27s%20Worth%20%28I.A.%29.mp3", likes: 0, category: "I.A." },
     { title: "Guaco Mix Vol. 1", artist: "Guaco", cover: "Guaco Mix Vol. 1.jpg", audio: "https://archive.org/download/music-land-proyect/Guaco%20Mix%20Vol.%201.mp3", likes: 0, category: "Mix" },
     { title: "Guaco Mix Vol. 2", artist: "Guaco", cover: "Guaco Mix Vol. 2.jpg", audio: "https://archive.org/download/music-land-proyect/Guaco%20Mix%20Vol.%202.mp3", likes: 0, category: "Mix" },
@@ -65,8 +64,7 @@ const songs = [
     { title: "PTY (Pretty Young Thing)", artist: "Michael Jackson", cover: "PTY (Pretty Young Thing).jpg", audio: "https://archive.org/download/ladies-night_202601/PYT-Pretty%20Young%20Thing.mp3", likes: 0, category: "Pop" },
     { title: "Stomp!", artist: "The Brothers Johnson", cover: "Stomp!.jpg", audio: "https://archive.org/download/ladies-night_202601/Stomp%21.mp3", likes: 0, category: "R&B" },
     { title: "Tonight", artist: "The Whispers", cover: "Tonight.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonight.mp3", likes: 0, category: "R&B" },
-    { title: "Tonihgt's The Night", artist: "Kleeer", cover: "Tonihgt's The Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonihgt%27s%20the%20night.mp3", likes: 0, category: "R&B" },
-    { title: "Artista del Mes", artist: "Agentic Orange", cover: "artistames.jpg", audio: "https://archive.org/download/music-land-proyect/Agentic%20Orange%20-%20Me%20%2B%20You%20%28JLY%20Edit%20Remix%29.mp3", likes: 0, category: "I.A." }
+    { title: "Tonihgt's The Night", artist: "Kleeer", cover: "Tonihgt's The Night.jpg", audio: "https://archive.org/download/ladies-night_202601/Tonihgt%27s%20the%20night.mp3", likes: 0, category: "R&B" }
 ];
 
 // --- VARIABLES GLOBALES ---
@@ -326,19 +324,33 @@ function playSong() {
     if(miniPlayBtn) miniPlayBtn.className = "fa-solid fa-circle-pause"; 
     if(visualizer) visualizer.classList.add('active'); 
     if(visualizerFP) visualizerFP.classList.add('active');
+    
+    // Aseguramos que el botón del full player también cambie a PAUSA
+    if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+
     audio.play().catch(e=>console.log("Esperando interacción:", e)); 
 }
 
 function pauseSong() { 
     isPlaying = false; 
     if(miniPlayBtn) miniPlayBtn.className = "fa-solid fa-circle-play"; 
+    
+    // Aseguramos que el botón del full player también cambie a PLAY
     if(fpPlayBtn) fpPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+    
     if(visualizer) visualizer.classList.remove('active'); 
     if(visualizerFP) visualizerFP.classList.remove('active');
     audio.pause(); 
 }
 
-function togglePlay() { isPlaying ? pauseSong() : playSong(); }
+function togglePlay() { 
+    // Lógica simplificada para evitar errores
+    if (audio.paused) {
+        playSong();
+    } else {
+        pauseSong();
+    }
+}
 
 function toggleShuffle() {
     isShuffle = !isShuffle;
