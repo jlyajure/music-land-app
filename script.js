@@ -71,7 +71,7 @@ const songs = [
 { title: "Don't rush tonight", artist: "Carl Jones", cover: "dontrushtonight.jpg", audio: "https://archive.org/download/canciones-music-land/Carl%20Jones%20-%20Don%27t%20Rush%20Tonight.mp3", likes: 0, category: "I.A." },
     { title: "Get Lucky", artist: "Daft Punk  Feat. Pharrell William", cover: "getlucky.jpg", audio: "https://archive.org/download/canciones-music-land/Daft%20Punk%20%20Feat.%20Pharrell%20William%20-%20Get%20Lucky.mp3", likes: 0, category: "Pop" },
         { title: "Wepa", artist: "Gloria Estefan", cover: "wepa.jpg", audio: "https://archive.org/download/canciones-music-land/Gloria%20Estefan%20-%20Wepa%20%28Club%20Remix%29.mp3", likes: 0, category: "Remixes" },
-            { title: "Midnight Rendezvous", artist: "Harold Lawson", cover: "midnight.jpg", audio: "https://archive.org/download/canciones-music-land/Harold%20Lawson%20-%20Midnight%20Rendezvous.mp3", likes: 0, category: "I.A." },
+            { title: "Midnight Rendezvoous", artist: "Harold Lawson", cover: "midnight.jpg", audio: "https://archive.org/download/canciones-music-land/Harold%20Lawson%20-%20Midnight%20Rendezvous.mp3", likes: 0, category: "I.A." },
                        { title: "A Bailar Fandango", artist: "Moises Angulo", cover: "abailarfandango.jpg", audio: "https://archive.org/download/canciones-music-land/Moises%20Angulo%20-%20A%20Bailar%20Fandango.mp3", likes: 0, category: "De Todo Un Poco" },
     { title: "Mi Dulce Sueño", artist: "Los Imperials", cover: "midulcesueno.jpg", audio: "https://archive.org/download/canciones-music-land/Los%20Imperials%20-%20Mi%20Dulce%20Sue%C3%B1o.mp3", likes: 0, category: "Clásicos Bailables" },
     { title: "No Te Apartes De Mi", artist: "Roberto Carlos", cover: "noteapartesdemi.jpg", audio: "https://archive.org/download/canciones-music-land/Roberto%20Carlos%20-%20No%20Te%20Apartes%20De%20Mi.mp3", likes: 0, category: "Baladas En Español" },
@@ -450,6 +450,7 @@ function shareApp() {
         prompt("Copia este enlace para compartir:", window.location.href);
     }
 }
+
 
 
 
