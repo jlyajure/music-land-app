@@ -90,15 +90,6 @@
             </div>
         </div>
 
-        <div class="artist-spotlight">
-            <img src="artist.jpg" alt="Foto de Bruno" class="artist-img" onerror="this.src='https://via.placeholder.com/150'">
-            <div class="artist-content">
-                <h3>ARTISTA DEL MES: Bruno Mars</h3>
-                <p>Peter Eugene Hernandez, nacido en Honolulú el 8 de octubre de 1985, conocido artísticamente como Bruno Mars, es un cantante, compositor, productor musical y bailarín estadounidense de ascendencia puertorriqueña.
-Comenzó a crear música desde una edad muy temprana y actuó en muchos escenarios de su pueblo natal a lo largo de su niñez, realizando imitaciones. Se graduó de la escuela secundaria y se mudó a Los Ángeles, donde continuó con su carrera musical.</p>
-            </div>
-        </div>
-
         <div class="category-list">
             <button class="category-btn active" onclick="resetView()">🏠 Inicio</button>
             <button class="category-btn" onclick="filterSongs('Mix', this)">Mixes</button>
@@ -116,8 +107,8 @@ Comenzó a crear música desde una edad muy temprana y actuó en muchos escenari
             <button class="category-btn" onclick="filterSongs('Clásicos Bailables', this)">Clásicos Bailables</button>
             <button class="category-btn" onclick="filterSongs('Disco', this)">Disco</button>
             <button class="category-btn" onclick="filterSongs('Ranchera', this)">Ranchera</button>
-<button class="category-btn" onclick="filterSongs('Remixes', this)">Remixes</button>
-<button class="category-btn" onclick="filterSongs('Baladas en Español', this)">Baladas en Español</button>
+            <button class="category-btn" onclick="filterSongs('Remixes', this)">Remixes</button>
+            <button class="category-btn" onclick="filterSongs('Baladas en Español', this)">Baladas en Español</button>
         </div>
         
         <div id="home-view">
@@ -174,10 +165,45 @@ Comenzó a crear música desde una edad muy temprana y actuó en muchos escenari
         <audio id="audio"></audio>
     </footer>
 
+    <button id="btnArtista" style="position: fixed; bottom: 100px; right: 20px; z-index: 9999; background: #ff4757; color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); cursor: pointer; display: flex; align-items: center; gap: 10px; font-family: 'Montserrat', sans-serif; transition: transform 0.2s;">
+      <i class="fa-solid fa-star"></i> Artista del Mes
+    </button>
+
+    <div id="modalArtista" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+      <div style="background: linear-gradient(145deg, #222, #111); padding: 30px; border-radius: 20px; max-width: 90%; width: 400px; text-align: center; color: white; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative;">
+        
+        <button onclick="document.getElementById('modalArtista').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+        
+        <h2 style="margin-top: 0; color: #ff4757; font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 18px;">🌟 Artista Destacado</h2>
+        
+        <img src="artistames.jpg" style="width: 100%; height: 250px; object-fit: cover; border-radius: 15px; margin: 20px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        
+        <h3 style="margin: 0 0 10px 0; font-size: 24px;">Agentic Orange</h3>
+        <p style="color: #ccc; line-height: 1.6; font-size: 14px; margin-bottom: 20px;">
+          Un sonido único que mezcla lo retro con el futuro.
+        </p>
+        
+        <button onclick="document.getElementById('modalArtista').style.display='none'" style="background: #ff4757; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%;">¡Entendido!</button>
+      </div>
+    </div>
+
+    <script>
+      // Lógica para abrir y cerrar el botón
+      document.getElementById('btnArtista').onclick = function() {
+        document.getElementById('modalArtista').style.display = 'flex';
+      }
+      // Cerrar si tocan fuera de la caja
+      document.getElementById('modalArtista').onclick = function(e) {
+        if (e.target === this) {
+          this.style.display = 'none';
+        }
+      }
+    </script>
+
     <script src="script.js"></script>
 </body>
-
 </html>
+
 
 
 
