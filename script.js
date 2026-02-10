@@ -75,6 +75,7 @@ const songs = [
                        { title: "A Bailar Fandango", artist: "Moises Angulo", cover: "abailarfandango.jpg", audio: "https://archive.org/download/canciones-music-land/Moises%20Angulo%20-%20A%20Bailar%20Fandango.mp3", likes: 0, category: "De Todo Un Poco" },
     { title: "Mi Dulce Sueño", artist: "Los Imperials", cover: "midulcesueno.jpg", audio: "https://archive.org/download/canciones-music-land/Los%20Imperials%20-%20Mi%20Dulce%20Sue%C3%B1o.mp3", likes: 0, category: "Clásicos Bailables" },
     { title: "No Te Apartes De Mi", artist: "Roberto Carlos", cover: "noteapartesdemi.jpg", audio: "https://archive.org/download/canciones-music-land/Roberto%20Carlos%20-%20No%20Te%20Apartes%20De%20Mi.mp3", likes: 0, category: "Baladas En Español" },
+    { title: "Dícelo", artist: "Los Vecinos", cover: "dicelo.jpg", audio: "https://archive.org/download/Dicelo/Dicelo.mp3", likes: 0, category: "Merengue" },
 
 ];
 
@@ -449,4 +450,5 @@ function shareApp() {
         prompt("Copia este enlace para compartir:", window.location.href);
     }
 }
+
 
