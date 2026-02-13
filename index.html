@@ -3,422 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-    <title>Music Land</title>
+    <title>Reproductor de Música Pro</title>
     <meta name="theme-color" content="#000000">
-    
-    <link rel="icon" type="image/png" href="logo.png?v=2">
-    <link rel="apple-touch-icon" href="logo.png?v=2">
-    <link rel="manifest" href="manifest.json">
-    
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --neon: #00d2ff; --bg: #050505; --card: #121212; }
+        :root { --accent: #00d2ff; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
-        body { font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; font-family: 'Outfit', sans-serif; }
         
-        #login-screen { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--neon); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
-        .btn-neon { display: block; width: 100%; background: var(--neon); color: black; border: none; padding: 18px; border-radius: 50px; font-weight: 900; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
+        header { background: rgba(0,0,0,0.95); padding: 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
+        .brand-title { color: var(--accent); font-size: 22px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
-        header { background: rgba(0,0,0,0.95); padding: 12px 15px; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
-        .header-logo { width: 35px; height: 35px; border-radius: 8px; border: 1px solid var(--neon); object-fit: cover; }
-        .brand-title { color: var(--neon); font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        /* SECCIÓN DE FILTROS */
+        .filter-container { padding: 10px; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; background: #080808; border-bottom: 1px solid #222; }
+        .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        .container { max-width: 600px; margin: auto; padding: 15px; padding-bottom: 150px; }
+
+        /* PANEL DE ADMINISTRACIÓN */
+        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px dashed var(--accent); }
+        .input-box, .select-box { width: 100%; padding: 12px; margin-bottom: 10px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
+        .btn-subir { width: 100%; background: var(--accent); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
+
+        /* LISTA DE PISTAS */
+        .track-card { background: var(--card); border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; display: flex; align-items: center; padding: 10px; }
+        .track-img { width: 60px; height: 60px; border-radius: 10px; background-size: cover; background-position: center; }
+        .track-info { flex: 1; margin-left: 15px; }
+        .track-title { font-size: 15px; font-weight: 900; margin: 0; }
+        .track-category { font-size: 10px; color: var(--accent); text-transform: uppercase; font-weight: 800; }
         
-        .sensor-secreto { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; padding: 5px; }
+        .btn-play-mini { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); border: none; color: black; font-size: 18px; cursor: pointer; }
 
-        #app-content { flex: 1; overflow-y: auto; padding-bottom: 150px; }
-        .container { max-width: 600px; margin: auto; padding: 15px; }
-
-        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px dashed var(--neon); }
-        .admin-title { color: var(--neon); font-size: 14px; margin-top: 0; font-weight: 800; text-align: center; }
-        .input-box { width: 100%; padding: 12px; margin-bottom: 10px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; }
-        .btn-action { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-subir { flex: 1; background: var(--neon); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
-        .btn-cancelar { flex: 1; background: #333; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; display: none; }
-        .btn-cerrar-panel { width: 100%; background: #ff4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-
-        .track-card { background: var(--card); border-radius: 15px; margin-bottom: 20px; border: 1px solid #222; display: flex; flex-direction: column; padding: 10px; transition: 0.3s; }
-        .track-card.is-playing { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
-        .track-main { display: flex; width: 100%; align-items: center; }
-        .track-img { width: 70px; height: 70px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
-        .track-info { flex: 1; margin-left: 15px; overflow: hidden; }
-        .track-title { font-size: 15px; font-weight: 900; color: white; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-artist { font-size: 11px; color: #aaa; margin: 0; font-weight: 700; text-transform: uppercase; }
-        
-        .btn-play-mini { width: 45px; height: 45px; border-radius: 50%; background: var(--neon); border: none; color: black; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-left: 10px; }
-        .is-playing .btn-play-mini { background: black; color: var(--neon); border: 2px solid var(--neon); }
-
-        .admin-controls { display: none; width: 100%; padding-top: 10px; margin-top: 10px; border-top: 1px solid #333; gap: 10px; }
-        .btn-edit { flex: 1; background: #1a1a1a; color: var(--neon); border: 1px solid var(--neon); padding: 8px; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .btn-delete { flex: 1; background: #1a1a1a; color: #ff4444; border: 1px solid #ff4444; padding: 8px; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
-
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--neon); padding: 15px; display: none; z-index: 1000; }
-        .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-        .p-art { width: 45px; height: 45px; border-radius: 8px; background-size: cover; }
-        .p-info { flex: 1; overflow: hidden; }
-        .p-info h4 { margin: 0; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-time { font-size: 10px; color: var(--neon); font-weight: 900; margin-top: 3px; }
-        .btn-p-main { background: none; border: none; color: var(--neon); font-size: 32px; cursor: pointer; }
-        
-        #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; margin-bottom: 10px; }
-        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--neon); border-radius: 50%; cursor: pointer; }
-        
-        .tool-row { display: flex; justify-content: space-between; align-items: center; }
-        .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        
-        #main-media { display: none; }
+        /* REPRODUCTOR */
+        #global-player { position: fixed; bottom: 0; width: 100%; background: #080808; border-top: 2px solid var(--accent); padding: 15px; display: none; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="login-card">
-        <img src="logo.png?v=2" style="width: 80px; height: 80px; object-fit: cover; border-radius: 15px; border: 2px solid var(--neon); margin-bottom: 15px;" onerror="this.src='https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp'">
-        <h2 style="color:var(--neon); margin-top:0;">MUSIC LAND<br><span style="font-size:12px; color:#fff;">ACCESO DIRECTOR</span></h2>
-        <input type="password" id="passInput" placeholder="Clave de Cabina">
-        <button onclick="verificarClave()" class="btn-neon">ENTRAR</button>
-        <button onclick="cerrarLogin()" style="background:none; border:none; color:#888; margin-top:15px; font-size:12px; cursor:pointer;">Cancelar</button>
-    </div>
-</div>
-
 <header>
-    <div class="sensor-secreto" onclick="toqueSecreto()">
-        <img src="logo.png?v=2" class="header-logo" alt="Logo" onerror="this.src='https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp'">
-        <div class="brand-title">Music Land</div>
-    </div>
+    <div class="brand-title" onclick="toggleAdmin()">REPRODUCTOR DINÁMICO</div>
 </header>
 
-<div id="app-content">
-    <div class="container">
-        
-        <div id="admin-panel">
-            <h3 class="admin-title" id="form-titulo">SINTONIZAR NUEVA CANCIÓN</h3>
-            <input type="text" id="t-titulo" class="input-box" placeholder="Título de la Canción">
-            <input type="text" id="t-artista" class="input-box" placeholder="Artista o Banda">
-            <input type="text" id="t-url" class="input-box" placeholder="Link del MP3 (Drive, Dropbox, etc.)">
-            <input type="text" id="t-img" class="input-box" placeholder="Link de la Portada (Postimages)">
-            <div class="btn-action">
-                <button onclick="guardarCancion()" id="btn-save" class="btn-subir">📻 SUBIR PISTA</button>
-                <button onclick="cancelarEdicion()" id="btn-cancel" class="btn-cancelar">❌ CANCELAR</button>
-            </div>
-            <button onclick="salirAdmin()" class="btn-cerrar-panel">🔴 SALIR DEL MODO DJ</button>
-        </div>
-
-        <div id="tracks-feed"></div>
-
+<div class="filter-container" id="filter-bar">
+    <button class="filter-btn active" onclick="filtrar('TODOS')">TODOS</button>
     </div>
+
+<div class="container">
+    <div id="admin-panel">
+        <h3 style="text-align:center; color:var(--accent); font-size:14px;">SUBIR NUEVA CANCIÓN</h3>
+        <input type="text" id="t-titulo" class="input-box" placeholder="Título">
+        <input type="text" id="t-artista" class="input-box" placeholder="Artista">
+        <input type="text" id="t-url" class="input-box" placeholder="URL del MP3">
+        <input type="text" id="t-img" class="input-box" placeholder="URL de la Portada">
+        <select id="t-categoria" class="select-box"></select>
+        <button onclick="guardarPista()" class="btn-subir">GUARDAR PISTA</button>
+    </div>
+
+    <div id="tracks-feed"></div>
 </div>
 
 <div id="global-player">
-    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
-    <div class="player-top">
-        <div id="p-art" class="p-art"></div>
-        <div class="p-info">
-            <h4 id="p-title">...</h4>
-            <div id="p-time-display" class="p-time">00:00 / 00:00</div>
-        </div>
-        <button onclick="window.togglePlay()" id="p-play-btn" class="btn-p-main">▶</button>
-        <button onclick="window.cerrarPlayer()" class="btn-p-main" style="color:#555; font-size:24px; margin-left:10px;">×</button>
-    </div>
-    <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
-    <div class="tool-row">
-        <div id="btn-cast-box" class="btn-tool" style="border-color: var(--neon); display: flex; align-items: center; gap: 5px;">
-            <google-cast-launcher style="width: 16px; height: 16px; --connected-color: black; --disconnected-color: #00d2ff; cursor: pointer;"></google-cast-launcher>
-            <span id="cast-text" style="color: var(--neon);">ONN TV</span>
-        </div>
-        <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
-    </div>
+    <div style="text-align:center; color:white; font-size:12px;" id="p-info-display">Selecciona una canción</div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // CONFIGURACIÓN DE FIREBASE
     const firebaseConfig = {
-      apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
-      authDomain: "familia-yajure-app.firebaseapp.com",
-      projectId: "familia-yajure-app",
-      storageBucket: "familia-yajure-app.firebasestorage.app",
-      messagingSenderId: "692035727386",
-      appId: "1:692035727386:web:dfa3e39a481d56368a61a3",
-      measurementId: "G-PLRGRQT36L"
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_DOMINIO",
+        projectId: "TU_PROYECTO_ID",
+        storageBucket: "TU_STORAGE",
+        messagingSenderId: "TU_ID",
+        appId: "TU_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const coleccionDB = "musicland_canciones"; 
+    const coleccionDB = "canciones_app";
+
+    const categorias = [
+        "SALSA", "MERENGUE", "BALADAS EN ESPAÑOL", "BALADAS EN INGLES", 
+        "FUNK", "POP", "SOUL", "R&B", "ROCK", "MUSICA TROPICAL", 
+        "CLASICOS BAILABLES", "PODCAST", "I.A.", "HOUSE", "DANCE", 
+        "RANCHERAS", "LLANERAS", "ROCK EN ESPAÑOL"
+    ];
+
+    let todasLasCanciones = [];
+    let filtroActual = "TODOS";
+
+    // Iniciar filtros y selector
+    const filterBar = document.getElementById('filter-bar');
+    const selectCat = document.getElementById('t-categoria');
     
-    let canciones = [];
-    let idActual = null;
-    let editandoId = null;
-    const claveAdmin = "musicland2026"; 
-    let modoAdmin = false;
+    categorias.forEach(cat => {
+        // Botones de filtro
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.innerText = cat;
+        btn.onclick = () => filtrar(cat);
+        filterBar.appendChild(btn);
 
-    const media = document.getElementById('main-media');
-    const seekBar = document.getElementById('seek-bar');
-    const timeDisplay = document.getElementById('p-time-display');
+        // Opciones del selector
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.innerText = cat;
+        selectCat.appendChild(opt);
+    });
 
-    let toques = 0;
-    let tiempoToque = 0;
-    window.toqueSecreto = () => {
-        const ahora = new Date().getTime();
-        if (ahora - tiempoToque > 1000) toques = 0; 
-        tiempoToque = ahora;
-        toques++;
-        if (toques === 3) {
-            toques = 0;
-            window.abrirLogin();
-        }
+    window.toggleAdmin = () => {
+        const panel = document.getElementById('admin-panel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     };
 
-    window.abrirLogin = () => {
-        if(modoAdmin) return;
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('passInput').value = ""; 
-    };
-    window.cerrarLogin = () => { document.getElementById('login-screen').style.display = 'none'; };
-    
-    window.verificarClave = () => {
-        if(document.getElementById('passInput').value === claveAdmin) {
-            modoAdmin = true;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-panel').style.display = 'block';
-            render(); 
-        } else { alert("Clave Incorrecta."); }
+    window.filtrar = (cat) => {
+        filtroActual = cat;
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.toggle('active', b.innerText === cat);
+        });
+        render();
     };
 
-    window.salirAdmin = () => {
-        modoAdmin = false;
-        document.getElementById('admin-panel').style.display = 'none';
-        cancelarEdicion();
-        render(); 
-    };
-
-    window.guardarCancion = async () => {
-        const tit = document.getElementById('t-titulo').value.trim();
-        const art = document.getElementById('t-artista').value.trim();
-        const url = document.getElementById('t-url').value.trim();
-        const img = document.getElementById('t-img').value.trim();
-
-        if(!tit || !url) { alert("El Título y el Link MP3 son obligatorios."); return; }
-
+    window.guardarPista = async () => {
         const datos = {
-            titulo: tit, artista: art || "Artista Desconocido",
-            mp3Url: url, imagenUrl: img || "logo.png",
+            titulo: document.getElementById('t-titulo').value,
+            artista: document.getElementById('t-artista').value,
+            mp3Url: document.getElementById('t-url').value,
+            imagenUrl: document.getElementById('t-img').value,
+            categoria: document.getElementById('t-categoria').value,
             fecha: new Date().getTime()
         };
-
-        const btn = document.getElementById('btn-save');
-        btn.innerText = "⏳ Guardando..."; btn.disabled = true;
-
-        try {
-            if(editandoId) {
-                await updateDoc(doc(db, coleccionDB, editandoId), datos);
-                alert("✅ Canción actualizada.");
-            } else {
-                await addDoc(collection(db, coleccionDB), datos);
-                alert("✅ Canción subida a Music Land.");
-            }
-            cancelarEdicion();
-        } catch (e) {
-            console.error(e); alert("Error al guardar.");
-        }
-        btn.disabled = false;
-    };
-
-    window.prepararEdicion = (id, tit, art, url, img) => {
-        editandoId = id;
-        document.getElementById('t-titulo').value = tit;
-        document.getElementById('t-artista').value = art;
-        document.getElementById('t-url').value = url;
-        document.getElementById('t-img').value = img;
-        
-        document.getElementById('form-titulo').innerText = "📝 EDITANDO CANCIÓN";
-        document.getElementById('btn-save').innerText = "💾 GUARDAR CAMBIOS";
-        document.getElementById('btn-cancel').style.display = "block";
-        window.scrollTo(0, 0);
-    };
-
-    window.cancelarEdicion = () => {
-        editandoId = null;
-        document.getElementById('t-titulo').value = "";
-        document.getElementById('t-artista').value = "";
-        document.getElementById('t-url').value = "";
-        document.getElementById('t-img').value = "";
-        
-        document.getElementById('form-titulo').innerText = "SINTONIZAR NUEVA CANCIÓN";
-        document.getElementById('btn-save').innerText = "📻 SUBIR PISTA";
-        document.getElementById('btn-cancel').style.display = "none";
-    };
-
-    window.borrarCancion = async (id, titulo) => {
-        if(confirm(`¿Seguro que quieres borrar "${titulo}"?`)) {
-            await deleteDoc(doc(db, coleccionDB, id));
-        }
+        await addDoc(collection(db, coleccionDB), datos);
+        alert("Canción subida");
     };
 
     onSnapshot(query(collection(db, coleccionDB), orderBy("fecha", "desc")), (snap) => {
-        canciones = []; snap.forEach(d => { canciones.push({id: d.id, ...d.data()}); }); render();
+        todasLasCanciones = [];
+        snap.forEach(d => todasLasCanciones.push({id: d.id, ...d.data()}));
+        render();
     });
 
     function render() {
-        const feed = document.getElementById('tracks-feed'); if(!feed) return;
+        const feed = document.getElementById('tracks-feed');
         feed.innerHTML = "";
         
-        canciones.forEach(p => {
-            const isCastPlaying = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() && window.player && !window.player.isPaused;
-            const isPlaying = idActual === p.id && (isCastPlaying || !media.paused);
-            
-            const div = document.createElement('div');
-            div.className = `track-card ${isPlaying ? 'is-playing' : ''}`;
-            
-            let controlesHTML = "";
-            if(modoAdmin) {
-                controlesHTML = `
-                <div class="admin-controls" style="display:flex;">
-                    <button class="btn-edit" onclick="window.prepararEdicion('${p.id}', '${p.titulo.replace(/'/g,"\\'")}', '${p.artista.replace(/'/g,"\\'")}', '${p.mp3Url}', '${p.imagenUrl}')">📝 EDITAR</button>
-                    <button class="btn-delete" onclick="window.borrarCancion('${p.id}', '${p.titulo.replace(/'/g,"\\'")}')">🗑️ BORRAR</button>
-                </div>`;
-            }
+        const filtradas = filtroActual === "TODOS" 
+            ? todasLasCanciones 
+            : todasLasCanciones.filter(c => c.categoria === filtroActual);
 
+        filtradas.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'track-card';
             div.innerHTML = `
-                <div class="track-main">
-                    <div class="track-img" style="background-image: url('${p.imagenUrl || 'logo.png'}')"></div>
-                    <div class="track-info">
-                        <h3 class="track-title">${p.titulo}</h3>
-                        <p class="track-artist">${p.artista}</p>
-                    </div>
-                    <button class="btn-play-mini" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo.replace(/'/g,"\\'")}', '${p.artista.replace(/'/g,"\\'")}', '${p.imagenUrl}')">${isPlaying ? '||' : '▶'}</button>
+                <div class="track-img" style="background-image: url('${c.imagenUrl || 'logo.png'}')"></div>
+                <div class="track-info">
+                    <div class="track-category">${c.categoria}</div>
+                    <div class="track-title">${c.titulo}</div>
+                    <div style="font-size:11px; color:#888;">${c.artista}</div>
                 </div>
-                ${controlesHTML}
+                <button class="btn-play-mini">▶</button>
             `;
             feed.appendChild(div);
         });
     }
-
-    window.player = null; window.playerController = null; window.lastCastTime = 0;
-
-    window['__onGCastApiAvailable'] = function(isAvailable) {
-        if (isAvailable) {
-            cast.framework.CastContext.getInstance().setOptions({
-                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-            });
-            window.player = new cast.framework.RemotePlayer();
-            window.playerController = new cast.framework.RemotePlayerController(window.player);
-            
-            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, function() {
-                var isConnected = cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-                if (isConnected) {
-                    document.getElementById('cast-text').style.color = "black";
-                    document.getElementById('btn-cast-box').style.background = "var(--neon)";
-                    if (idActual && !media.paused) {
-                        var p = canciones.find(x => x.id === idActual);
-                        if(p) window.loadCastMedia(p.titulo, p.artista, p.mp3Url, p.imagenUrl);
-                    }
-                } else {
-                    document.getElementById('cast-text').style.color = "var(--neon)";
-                    document.getElementById('btn-cast-box').style.background = "#1a1a1a";
-                    if (idActual) { media.currentTime = window.lastCastTime; media.play(); }
-                }
-            });
-
-            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, function() {
-                if (cast.framework.CastContext.getInstance().getCurrentSession() && idActual) {
-                    window.lastCastTime = window.player.currentTime;
-                    seekBar.value = Math.floor(window.player.currentTime);
-                    timeDisplay.innerText = formatTime(window.player.currentTime) + " / " + formatTime(window.player.duration);
-                }
-            });
-        }
-    };
-
-    function rutaAbsoluta(ruta) {
-        if (!ruta) return new URL('logo.png', window.location.href).href;
-        if (ruta.startsWith('http')) return ruta;
-        return new URL(ruta, window.location.href).href;
-    }
-
-    window.loadCastMedia = (titulo, art, url, img) => {
-        var castSession = cast.framework.CastContext.getInstance().getCurrentSession();
-        if (castSession) {
-            var mediaInfo = new chrome.cast.media.MediaInfo(url, 'audio/mpeg');
-            var metadata = new chrome.cast.media.MusicTrackMediaMetadata();
-            metadata.title = titulo; metadata.artist = art;
-            var coverImg = img || "logo.png";
-            metadata.images = [new chrome.cast.Image(rutaAbsoluta(coverImg))];
-            mediaInfo.metadata = metadata;
-            var request = new chrome.cast.media.LoadRequest(mediaInfo);
-            request.currentTime = media.currentTime || 0;
-            media.pause();
-            castSession.loadMedia(request).then(
-                function() { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; },
-                function(error) { console.log('Error Cast'); }
-            );
-        }
-    };
-
-    window.gestionarReproduccion = (id, url, titulo, art, img) => {
-        if (idActual === id) { window.togglePlay(); } 
-        else {
-            idActual = id; 
-            const imgSegura = rutaAbsoluta(img || "logo.png");
-            document.getElementById('p-title').innerText = titulo;
-            document.getElementById('p-art').style.backgroundImage = `url('${imgSegura}')`;
-            document.getElementById('global-player').style.display = 'block';
-            
-            var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-            if (isConnected) { window.loadCastMedia(titulo, art, url, img); } 
-            else { media.src = url; media.play(); }
-        }
-        render();
-    };
-
-    window.togglePlay = () => { 
-        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-        if (isConnected) {
-            window.playerController.playOrPause();
-            setTimeout(() => {
-                document.getElementById('p-play-btn').innerText = window.player.isPaused ? '▶' : '||';
-                if(window.player.isPaused) document.getElementById('global-player').classList.remove('playing');
-                else document.getElementById('global-player').classList.add('playing');
-                render();
-            }, 200);
-        } else {
-            if (media.paused) media.play(); else media.pause(); render(); 
-        }
-    };
-    
-    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
-
-    media.onloadedmetadata = () => { if(!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession()){ seekBar.max = Math.floor(media.duration); } };
-    media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
-    media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
-    
-    media.ontimeupdate = () => { 
-        if(idActual && (!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession())) { 
-            seekBar.value = Math.floor(media.currentTime); 
-            timeDisplay.innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); 
-        } 
-    };
-    
-    seekBar.oninput = () => { 
-        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-        if (isConnected) { window.player.currentTime = seekBar.value; window.playerController.seek(); } 
-        else { media.currentTime = seekBar.value; }
-    };
-    
-    window.cerrarPlayer = () => { 
-        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-        if(isConnected) window.playerController.stop();
-        media.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); 
-    };
-    
-    function formatTime(s) { if (isNaN(s)) return "00:00"; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec); }
 </script>
 </body>
 </html>
