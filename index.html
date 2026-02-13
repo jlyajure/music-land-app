@@ -2,209 +2,420 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Music Land - Tu Música</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Music Land</title>
+    <meta name="theme-color" content="#000000">
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <link rel="icon" href="logo.png" type="image/png">
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="manifest" href="manifest.json">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#222">
+    <style>
+        /* TEMA MUSIC LAND: AZUL NEÓN Y NEGRO */
+        :root { --neon: #00d2ff; --bg: #050505; --card: #121212; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
+        body { font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; }
+        
+        /* LOGIN DIRECTOR */
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--neon); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
+        .btn-neon { display: block; width: 100%; background: var(--neon); color: black; border: none; padding: 18px; border-radius: 50px; font-weight: 900; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+        /* HEADER */
+        header { background: rgba(0,0,0,0.95); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
+        .brand-title { color: var(--neon); font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-admin-nav { background: transparent; border: 1.5px solid var(--neon); color: var(--neon); padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+
+        #app-content { flex: 1; overflow-y: auto; padding-bottom: 150px; }
+        .container { max-width: 600px; margin: auto; padding: 15px; }
+
+        /* PANEL DE CONTROL (OCULTO AL PÚBLICO) */
+        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px dashed var(--neon); }
+        .admin-title { color: var(--neon); font-size: 14px; margin-top: 0; font-weight: 800; text-align: center; }
+        .input-box { width: 100%; padding: 12px; margin-bottom: 10px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; }
+        .btn-action { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-subir { flex: 1; background: var(--neon); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
+        .btn-cancelar { flex: 1; background: #333; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; display: none; }
+
+        /* GALERÍA DE CANCIONES */
+        .track-card { background: var(--card); border-radius: 15px; margin-bottom: 20px; border: 1px solid #222; display: flex; align-items: center; padding: 10px; transition: 0.3s; }
+        .track-card.is-playing { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        .track-img { width: 70px; height: 70px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
+        .track-info { flex: 1; margin-left: 15px; overflow: hidden; }
+        .track-title { font-size: 15px; font-weight: 900; color: white; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-artist { font-size: 11px; color: #aaa; margin: 0; font-weight: 700; text-transform: uppercase; }
+        
+        .btn-play-mini { width: 45px; height: 45px; border-radius: 50%; background: var(--neon); border: none; color: black; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-left: 10px; }
+        .is-playing .btn-play-mini { background: black; color: var(--neon); border: 2px solid var(--neon); }
+
+        /* BOTONES DE EDICIÓN EN LA TARJETA (Solo visibles en modo admin) */
+        .admin-controls { display: none; width: 100%; padding-top: 10px; margin-top: 10px; border-top: 1px solid #333; gap: 10px; }
+        .btn-edit { flex: 1; background: #1a1a1a; color: var(--neon); border: 1px solid var(--neon); padding: 8px; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .btn-delete { flex: 1; background: #1a1a1a; color: #ff4444; border: 1px solid #ff4444; padding: 8px; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
+
+        /* REPRODUCTOR FLOTANTE */
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--neon); padding: 15px; display: none; z-index: 1000; }
+        .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .p-art { width: 45px; height: 45px; border-radius: 8px; background-size: cover; }
+        .p-info { flex: 1; overflow: hidden; }
+        .p-info h4 { margin: 0; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-time { font-size: 10px; color: var(--neon); font-weight: 900; margin-top: 3px; }
+        .btn-p-main { background: none; border: none; color: var(--neon); font-size: 32px; cursor: pointer; }
+        
+        #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; margin-bottom: 10px; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--neon); border-radius: 50%; cursor: pointer; }
+        
+        .tool-row { display: flex; justify-content: space-between; align-items: center; }
+        .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        
+        #main-media { display: none; }
+    </style>
 </head>
 <body>
 
-    <a href="https://wa.me/584125852879?text=Hola%20Music%20Land!%20Quiero%20comentar%20algo" class="whatsapp-btn" target="_blank">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
-
-    <div id="lyrics-screen">
-        <div class="lyrics-header">
-            <span class="lyrics-title">LETRA</span>
-            <i class="fa-solid fa-chevron-down lyrics-close" onclick="toggleLyrics()"></i>
-        </div>
-        <div class="lyrics-content" id="lyrics-text">
-            No hay letra disponible para esta canción.
-        </div>
+<div id="login-screen">
+    <div class="login-card">
+        <h2 style="color:var(--neon); margin-top:0;">MUSIC LAND<br><span style="font-size:12px; color:#fff;">ACCESO DIRECTOR</span></h2>
+        <input type="password" id="passInput" placeholder="Clave de Cabina">
+        <button onclick="verificarClave()" class="btn-neon">ENTRAR</button>
+        <button onclick="cerrarLogin()" style="background:none; border:none; color:#888; margin-top:15px; font-size:12px;">Cancelar</button>
     </div>
+</div>
 
-    <div id="full-player-screen">
-        <div class="fp-header">
-            <button class="fp-back-btn" onclick="closeFullPlayer()"><i class="fa-solid fa-chevron-down"></i></button>
-            <span class="fp-title-header">REPRODUCIENDO</span>
-            <button class="fp-back-btn" onclick="toggleLyrics()"><i class="fa-solid fa-microphone-lines"></i></button>
+<header>
+    <div class="brand-title">🎵 Music Land</div>
+    <button id="btn-toggle-admin" onclick="abrirLogin()" class="btn-admin-nav">⚙️ MODO DJ</button>
+</header>
+
+<div id="app-content">
+    <div class="container">
+        
+        <div id="admin-panel">
+            <h3 class="admin-title" id="form-titulo">SINTONIZAR NUEVA CANCIÓN</h3>
+            <input type="text" id="t-titulo" class="input-box" placeholder="Título de la Canción">
+            <input type="text" id="t-artista" class="input-box" placeholder="Artista o Banda">
+            <input type="text" id="t-url" class="input-box" placeholder="Link del MP3 (Drive, Dropbox, etc.)">
+            <input type="text" id="t-img" class="input-box" placeholder="Link de la Portada (Postimages)">
+            <div class="btn-action">
+                <button onclick="guardarCancion()" id="btn-save" class="btn-subir">📻 SUBIR PISTA</button>
+                <button onclick="cancelarEdicion()" id="btn-cancel" class="btn-cancelar">❌ CANCELAR</button>
+            </div>
         </div>
+
+        <div id="tracks-feed"></div>
+
+    </div>
+</div>
+
+<div id="global-player">
+    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
+    <div class="player-top">
+        <div id="p-art" class="p-art"></div>
+        <div class="p-info">
+            <h4 id="p-title">...</h4>
+            <div id="p-time-display" class="p-time">00:00 / 00:00</div>
+        </div>
+        <button onclick="window.togglePlay()" id="p-play-btn" class="btn-p-main">▶</button>
+        <button onclick="window.cerrarPlayer()" class="btn-p-main" style="color:#555; font-size:24px; margin-left:10px;">×</button>
+    </div>
+    <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
+    <div class="tool-row">
+        <div id="btn-cast-box" class="btn-tool" style="border-color: var(--neon); display: flex; align-items: center; gap: 5px;">
+            <google-cast-launcher style="width: 16px; height: 16px; --connected-color: black; --disconnected-color: #00d2ff; cursor: pointer;"></google-cast-launcher>
+            <span id="cast-text" style="color: var(--neon);">ONN TV</span>
+        </div>
+        <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // ✅ AQUÍ ESTÁ TU CONFIGURACIÓN SOLDADA DIRECTAMENTE ✅
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
+      authDomain: "familia-yajure-app.firebaseapp.com",
+      projectId: "familia-yajure-app",
+      storageBucket: "familia-yajure-app.firebasestorage.app",
+      messagingSenderId: "692035727386",
+      appId: "1:692035727386:web:dfa3e39a481d56368a61a3",
+      measurementId: "G-PLRGRQT36L"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // NUEVA CARPETA PARA MUSIC LAND EN TU MISMA BASE DE DATOS
+    const coleccionDB = "musicland_canciones"; 
+    
+    // Variables Globales
+    let canciones = [];
+    let idActual = null;
+    let editandoId = null;
+    const claveAdmin = "musicland2026"; // Clave para entrar al modo DJ
+    let modoAdmin = false;
+
+    const media = document.getElementById('main-media');
+    const seekBar = document.getElementById('seek-bar');
+    const timeDisplay = document.getElementById('p-time-display');
+
+    // --- SISTEMA DE LOGIN Y PANEL DE CONTROL ---
+    window.abrirLogin = () => {
+        if(modoAdmin) { window.salirAdmin(); return; }
+        document.getElementById('login-screen').style.display = 'flex';
+    };
+    window.cerrarLogin = () => { document.getElementById('login-screen').style.display = 'none'; };
+    
+    window.verificarClave = () => {
+        if(document.getElementById('passInput').value === claveAdmin) {
+            modoAdmin = true;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('btn-toggle-admin').innerText = "🔴 SALIR DEL MODO DJ";
+            document.getElementById('btn-toggle-admin').style.color = "#ff4444";
+            document.getElementById('btn-toggle-admin').style.borderColor = "#ff4444";
+            render(); 
+        } else { alert("Clave Incorrecta, Director."); }
+    };
+
+    window.salirAdmin = () => {
+        modoAdmin = false;
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('btn-toggle-admin').innerText = "⚙️ MODO DJ";
+        document.getElementById('btn-toggle-admin').style.color = "var(--neon)";
+        document.getElementById('btn-toggle-admin').style.borderColor = "var(--neon)";
+        cancelarEdicion();
+        render(); 
+    };
+
+    // --- SUBIR / EDITAR CANCIÓN ---
+    window.guardarCancion = async () => {
+        const tit = document.getElementById('t-titulo').value.trim();
+        const art = document.getElementById('t-artista').value.trim();
+        const url = document.getElementById('t-url').value.trim();
+        const img = document.getElementById('t-img').value.trim();
+
+        if(!tit || !url) { alert("El Título y el Link MP3 son obligatorios."); return; }
+
+        const datos = {
+            titulo: tit, artista: art || "Artista Desconocido",
+            mp3Url: url, imagenUrl: img || "https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp",
+            fecha: new Date().getTime()
+        };
+
+        const btn = document.getElementById('btn-save');
+        btn.innerText = "⏳ Guardando..."; btn.disabled = true;
+
+        try {
+            if(editandoId) {
+                await updateDoc(doc(db, coleccionDB, editandoId), datos);
+                alert("✅ Canción actualizada con éxito.");
+            } else {
+                await addDoc(collection(db, coleccionDB), datos);
+                alert("✅ Canción subida a Music Land.");
+            }
+            cancelarEdicion();
+        } catch (e) {
+            console.error(e); alert("Error al guardar.");
+        }
+        btn.disabled = false;
+    };
+
+    window.prepararEdicion = (id, tit, art, url, img) => {
+        editandoId = id;
+        document.getElementById('t-titulo').value = tit;
+        document.getElementById('t-artista').value = art;
+        document.getElementById('t-url').value = url;
+        document.getElementById('t-img').value = img;
         
-        <div class="fp-img-container"><img src="" class="fp-img" id="fp-cover"></div>
+        document.getElementById('form-titulo').innerText = "📝 EDITANDO CANCIÓN";
+        document.getElementById('btn-save').innerText = "💾 GUARDAR CAMBIOS";
+        document.getElementById('btn-cancel').style.display = "block";
+        window.scrollTo(0, 0);
+    };
+
+    window.cancelarEdicion = () => {
+        editandoId = null;
+        document.getElementById('t-titulo').value = "";
+        document.getElementById('t-artista').value = "";
+        document.getElementById('t-url').value = "";
+        document.getElementById('t-img').value = "";
         
-        <div class="fp-info">
-            <div class="fp-song-title" id="fp-title">Título</div>
-            <span class="fp-artist" id="fp-artist">Artista</span>
+        document.getElementById('form-titulo').innerText = "SINTONIZAR NUEVA CANCIÓN";
+        document.getElementById('btn-save').innerText = "📻 SUBIR PISTA";
+        document.getElementById('btn-cancel').style.display = "none";
+    };
+
+    window.borrarCancion = async (id, titulo) => {
+        if(confirm(`¿Seguro que quieres borrar "${titulo}" de Music Land?`)) {
+            await deleteDoc(doc(db, coleccionDB, id));
+        }
+    };
+
+    // --- LEER CANCIONES DE FIREBASE ---
+    onSnapshot(query(collection(db, coleccionDB), orderBy("fecha", "desc")), (snap) => {
+        canciones = []; snap.forEach(d => { canciones.push({id: d.id, ...d.data()}); }); render();
+    });
+
+    // --- DIBUJAR LA PANTALLA ---
+    function render() {
+        const feed = document.getElementById('tracks-feed'); if(!feed) return;
+        feed.innerHTML = "";
+        
+        canciones.forEach(p => {
+            const isCastPlaying = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() && window.player && !window.player.isPaused;
+            const isPlaying = idActual === p.id && (isCastPlaying || !media.paused);
             
-            <div class="sound-wave" id="visualizer-fp">
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-            </div>
-        </div>
+            const div = document.createElement('div');
+            div.className = `track-card ${isPlaying ? 'is-playing' : ''}`;
+            
+            let controlesHTML = "";
+            if(modoAdmin) {
+                controlesHTML = `
+                <div class="admin-controls" style="display:flex;">
+                    <button class="btn-edit" onclick="window.prepararEdicion('${p.id}', '${p.titulo.replace(/'/g,"\\'")}', '${p.artista.replace(/'/g,"\\'")}', '${p.mp3Url}', '${p.imagenUrl}')">📝 EDITAR</button>
+                    <button class="btn-delete" onclick="window.borrarCancion('${p.id}', '${p.titulo.replace(/'/g,"\\'")}')">🗑️ BORRAR</button>
+                </div>`;
+            }
 
-        <div class="fp-progress-wrapper">
-            <input type="range" value="0" id="fp-progress">
-            <div class="fp-timers"><span id="fp-currTime">0:00</span><span id="fp-durTime">0:00</span></div>
-        </div>
-        
-        <div class="fp-controls">
-            <button class="fp-btn" id="fp-shuffle" onclick="toggleShuffle()"><i class="fa-solid fa-shuffle"></i></button> 
-            <button class="fp-btn" id="fp-prev" style="font-size: 32px;"><i class="fa-solid fa-backward-step"></i></button>
-            <div class="fp-play-circle" id="fp-play"><i class="fa-solid fa-play"></i></div>
-            <button class="fp-btn" id="fp-next" style="font-size: 32px;"><i class="fa-solid fa-forward-step"></i></button>
-            <button class="fp-btn"><i class="fa-solid fa-repeat"></i></button>
-        </div>
-    </div>
-
-    <div id="login-screen">
-        <div class="login-box">
-            <div style="font-size: 40px; margin-bottom: 10px;">🎵</div>
-            <h2>Bienvenido</h2>
-            <input type="text" id="username-input" class="login-input" placeholder="Escribe tu nombre...">
-            <button class="login-btn" onclick="loginUser()">ENTRAR</button>
-        </div>
-    </div>
-
-    <nav class="sidebar" id="sidebar">
-        <div class="logo"><img src="logo.png" alt="Logo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"> Music Land</div>
-        <ul>
-            <li onclick="resetView()"><i class="fa-solid fa-house"></i> Inicio</li>
-            <li style="background: #222; border-radius: 20px;"><input type="text" id="search" placeholder="Buscar..." style="background:none; border:none; color:white; outline:none; padding: 5px 10px; width: 100%;"></li>
-            <li id="btn-playlist">➕ Crear Playlist</li>
-            <li class="back-btn-mobile" onclick="closeMenu()"><i class="fa-solid fa-arrow-left"></i> VOLVER A LA MÚSICA</li>
-        </ul>
-        <div style="margin-top:20px; border-top:1px solid #333; padding-top:10px;"><ul id="playlist-list"></ul></div>
-        <div class="user-stats"><p id="user-display" style="font-weight: bold; margin-bottom: 5px;">Invitado</p><div style="font-size: 11px; color: gray;"><span class="online-dot"></span> 1,245 Online</div></div>
-    </nav>
-
-    <div class="content">
-        <button class="mobile-btn" onclick="document.getElementById('sidebar').classList.toggle('active')">☰</button>
-        <div class="hero-section">
-            <div class="hero-text">
-                <h1 class="hero-title">LA MEJOR MÚSICA DEL PASADO EN EL PRESENTE</h1>
-                <p class="hero-desc">Disfruta de la selección más exclusiva de música retro seleccionada para ti.</p>
-                <button class="hero-btn" onclick="loadSong(0); openFullPlayer();"><i class="fa-solid fa-play"></i> REPRODUCIR AHORA</button>
-            </div>
-        </div>
-
-        <div class="artist-spotlight" style="display: none;"></div>
-
-        <div class="category-list">
-            <button class="category-btn active" onclick="resetView()">🏠 Inicio</button>
-            <button class="category-btn" onclick="filterSongs('Mix', this)">Mixes</button>
-            <button class="category-btn" onclick="filterSongs('Salsa', this)">Salsa</button>
-            <button class="category-btn" onclick="filterSongs('Rock', this)">Rock</button>
-            <button class="category-btn" onclick="filterSongs('Pop', this)">Pop</button>
-            <button class="category-btn" onclick="filterSongs('Funk', this)">Funk</button>
-            <button class="category-btn" onclick="filterSongs('R&B Soul', this)">R&B Soul</button>
-            <button class="category-btn" onclick="filterSongs('Merengue', this)">Merengue</button>
-            <button class="category-btn" onclick="filterSongs('Latin', this)">Latin</button>
-            <button class="category-btn" onclick="filterSongs('Baladas', this)">Baladas</button>
-            <button class="category-btn" onclick="filterSongs('I.A.', this)">I.A.</button>
-            <button class="category-btn" onclick="filterSongs('De Todo Un Poco', this)">De Todo Un Poco</button>
-            <button class="category-btn" onclick="filterSongs('Podcast', this)">Podcast</button>
-            <button class="category-btn" onclick="filterSongs('Clásicos Bailables', this)">Clásicos Bailables</button>
-            <button class="category-btn" onclick="filterSongs('Disco', this)">Disco</button>
-            <button class="category-btn" onclick="filterSongs('Ranchera', this)">Ranchera</button>
-            <button class="category-btn" onclick="filterSongs('Remixes', this)">Remixes</button>
-            <button class="category-btn" onclick="filterSongs('Baladas en Español', this)">Baladas en Español</button>
-        </div>
-        
-        <div id="home-view">
-            <div class="section-title"><i class="fa-solid fa-clock"></i> 🔥 Agregadas Recientemente</div>
-            <div class="carousel" id="carousel-recent"></div>
-            <div class="section-title"><i class="fa-solid fa-compact-disc"></i> Mixes Exclusivos</div>
-            <div class="carousel" id="carousel-mix"></div>
-            <div class="section-title"><i class="fa-solid fa-music"></i> Salsa & Latino</div>
-            <div class="carousel" id="carousel-latin"></div>
-            <div class="section-title"><i class="fa-solid fa-guitar"></i> Clásicos (Pop/Rock/Soul)</div>
-            <div class="carousel" id="carousel-classics"></div>
-            <div class="section-title"><i class="fa-solid fa-robot"></i> Inteligencia Artificial</div>
-            <div class="carousel" id="carousel-ia"></div>
-        </div>
-
-        <div id="search-results-view" class="hidden">
-            <h3 id="search-title">Resultados</h3>
-            <div class="grid-view" id="grid-container"></div>
-        </div>
-    </div>
-
-    <footer class="player" onclick="openFullPlayer()">
-        <div class="song-info" style="display: flex; align-items: center; gap: 10px; width: 25%;">
-            <img src="img1.jpg" id="cover" class="song-img" style="width: 45px; height: 45px; background: #333; border-radius: 4px;">
-            <div style="overflow: hidden;">
-                <div id="title" style="font-weight: bold; font-size: 14px; white-space: nowrap;">Selecciona</div>
-                <div style="display:flex; align-items:center;">
-                    <div id="artist" style="font-size: 11px; color: #aaa;">...</div>
-                    <div class="sound-wave" id="visualizer">
-                        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            div.innerHTML = `
+                <div style="display:flex; width:100%; align-items:center;">
+                    <div class="track-img" style="background-image: url('${p.imagenUrl || 'https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp'}')"></div>
+                    <div class="track-info">
+                        <h3 class="track-title">${p.titulo}</h3>
+                        <p class="track-artist">${p.artista}</p>
                     </div>
+                    <button class="btn-play-mini" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo.replace(/'/g,"\\'")}', '${p.artista.replace(/'/g,"\\'")}', '${p.imagenUrl}')">${isPlaying ? '||' : '▶'}</button>
                 </div>
-            </div>
-        </div>
-        <div class="controls">
-            <div class="buttons">
-                <i class="fa-solid fa-shuffle" id="btn-shuffle" onclick="event.stopPropagation(); toggleShuffle()"></i>
-                <i class="fa-solid fa-backward-step" id="prev" onclick="event.stopPropagation(); prevSong()"></i>
-                <i class="fa-solid fa-circle-play" id="play" style="font-size: 32px; color: white;" onclick="event.stopPropagation(); togglePlay()"></i>
-                <i class="fa-solid fa-forward-step" id="next" onclick="event.stopPropagation(); nextSong()"></i>
-                <i class="fa-solid fa-repeat"></i>
-            </div>
-            <div class="progress-container" onclick="event.stopPropagation()">
-                <span class="time" id="currTime">0:00</span>
-                <input type="range" value="0" id="progress">
-                <span class="time" id="durTime">0:00</span>
-            </div>
-        </div>
-        <i class="fa-solid fa-chevron-up mobile-player-indicator"></i>
-        <div class="volume-box" style="width: 25%; display: flex; justify-content: flex-end; align-items: center; gap:10px;" onclick="event.stopPropagation()">
-            <i class="fa-solid fa-volume-high"></i>
-            <input type="range" value="100" id="volume" style="width: 80px;">
-        </div>
-        <audio id="audio"></audio>
-    </footer>
+                ${controlesHTML}
+            `;
+            feed.appendChild(div);
+        });
+    }
 
-    <button id="btnArtista" style="position: fixed; top: 85px; right: 20px; z-index: 9999; background: #ff4757; color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.5); cursor: pointer; display: flex; align-items: center; gap: 10px; font-family: 'Montserrat', sans-serif; transition: transform 0.2s;">
-      <i class="fa-solid fa-star"></i> Artista del Mes
-    </button>
+    // --- MOTOR DEL REPRODUCTOR Y CAST V14.1 ---
+    window.player = null; window.playerController = null; window.lastCastTime = 0;
 
-    <div id="modalArtista" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-      <div style="background: linear-gradient(145deg, #222, #111); padding: 30px; border-radius: 20px; max-width: 90%; width: 400px; text-align: center; color: white; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; max-height: 80vh; overflow-y: auto;">
-        
-        <button onclick="document.getElementById('modalArtista').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
-        
-        <h2 style="margin-top: 0; color: #ff4757; font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 18px;">🌟 Artista Destacado</h2>
-        
-        <img src="artistames.jpg" style="width: 100%; height: 250px; object-fit: cover; border-radius: 15px; margin: 20px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-        
-        <h3 style="margin: 0 0 10px 0; font-size: 24px;">Barry White</h3>
-        <p style="color: #ccc; line-height: 1.6; font-size: 13px; margin-bottom: 20px; text-align: justify;">
-          Barrence Eugene Carter (Galveston, Texas, 12 de septiembre de 1944 - Los Ángeles, California, 4 de julio de 2003), conocido artísticamente como <strong>Barry White</strong> y "El Maestro", fue un compositor, cantante, arreglista y productor musical estadounidense de los géneros R&B y Soul. Caracterizado por un timbre bajo, grave y ronco, ganó dos premios Grammy en el año 2000 y otros reconocimientos, como los premios Soul Train o los American Music.
-        </p>
-        
-        <button onclick="document.getElementById('modalArtista').style.display='none'" style="background: #ff4757; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%;">Cerrar</button>
-      </div>
-    </div>
+    window['__onGCastApiAvailable'] = function(isAvailable) {
+        if (isAvailable) {
+            cast.framework.CastContext.getInstance().setOptions({
+                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+            });
+            window.player = new cast.framework.RemotePlayer();
+            window.playerController = new cast.framework.RemotePlayerController(window.player);
+            
+            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, function() {
+                var isConnected = cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+                if (isConnected) {
+                    document.getElementById('cast-text').style.color = "black";
+                    document.getElementById('btn-cast-box').style.background = "var(--neon)";
+                    if (idActual && !media.paused) {
+                        var p = canciones.find(x => x.id === idActual);
+                        if(p) window.loadCastMedia(p.titulo, p.artista, p.mp3Url, p.imagenUrl);
+                    }
+                } else {
+                    document.getElementById('cast-text').style.color = "var(--neon)";
+                    document.getElementById('btn-cast-box').style.background = "#1a1a1a";
+                    if (idActual) { media.currentTime = window.lastCastTime; media.play(); }
+                }
+            });
 
-    <script>
-      document.getElementById('btnArtista').onclick = function() { document.getElementById('modalArtista').style.display = 'flex'; }
-      document.getElementById('modalArtista').onclick = function(e) { if (e.target === this) { this.style.display = 'none'; } }
-    </script>
+            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, function() {
+                if (cast.framework.CastContext.getInstance().getCurrentSession() && idActual) {
+                    window.lastCastTime = window.player.currentTime;
+                    seekBar.value = Math.floor(window.player.currentTime);
+                    timeDisplay.innerText = formatTime(window.player.currentTime) + " / " + formatTime(window.player.duration);
+                }
+            });
+        }
+    };
 
-    <script src="script.js?v=9"></script>
+    function rutaAbsoluta(ruta) {
+        if (!ruta) return new URL('logo.png', window.location.href).href;
+        if (ruta.startsWith('http')) return ruta;
+        return new URL(ruta, window.location.href).href;
+    }
+
+    window.loadCastMedia = (titulo, art, url, img) => {
+        var castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+        if (castSession) {
+            var mediaInfo = new chrome.cast.media.MediaInfo(url, 'audio/mpeg');
+            var metadata = new chrome.cast.media.MusicTrackMediaMetadata();
+            metadata.title = titulo; metadata.artist = art;
+            
+            var coverImg = img || "https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp";
+            metadata.images = [new chrome.cast.Image(rutaAbsoluta(coverImg))];
+            
+            mediaInfo.metadata = metadata;
+            var request = new chrome.cast.media.LoadRequest(mediaInfo);
+            request.currentTime = media.currentTime || 0;
+            media.pause();
+            castSession.loadMedia(request).then(
+                function() { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; },
+                function(error) { console.log('Error Cast'); }
+            );
+        }
+    };
+
+    window.gestionarReproduccion = (id, url, titulo, art, img) => {
+        if (idActual === id) { window.togglePlay(); } 
+        else {
+            idActual = id; 
+            const imgSegura = rutaAbsoluta(img || "https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp");
+            document.getElementById('p-title').innerText = titulo;
+            document.getElementById('p-art').style.backgroundImage = `url('${imgSegura}')`;
+            document.getElementById('global-player').style.display = 'block';
+            
+            var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+            if (isConnected) { window.loadCastMedia(titulo, art, url, img); } 
+            else { media.src = url; media.play(); }
+        }
+        render();
+    };
+
+    window.togglePlay = () => { 
+        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+        if (isConnected) {
+            window.playerController.playOrPause();
+            setTimeout(() => {
+                document.getElementById('p-play-btn').innerText = window.player.isPaused ? '▶' : '||';
+                if(window.player.isPaused) document.getElementById('global-player').classList.remove('playing');
+                else document.getElementById('global-player').classList.add('playing');
+                render();
+            }, 200);
+        } else {
+            if (media.paused) media.play(); else media.pause(); render(); 
+        }
+    };
+    
+    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
+
+    media.onloadedmetadata = () => { if(!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession()){ seekBar.max = Math.floor(media.duration); } };
+    media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
+    media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
+    
+    media.ontimeupdate = () => { 
+        if(idActual && (!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession())) { 
+            seekBar.value = Math.floor(media.currentTime); 
+            timeDisplay.innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); 
+        } 
+    };
+    
+    seekBar.oninput = () => { 
+        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+        if (isConnected) { window.player.currentTime = seekBar.value; window.playerController.seek(); } 
+        else { media.currentTime = seekBar.value; }
+    };
+    
+    window.cerrarPlayer = () => { 
+        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+        if(isConnected) window.playerController.stop();
+        media.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); 
+    };
+    
+    function formatTime(s) { if (isNaN(s)) return "00:00"; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec); }
+</script>
 </body>
 </html>
-
-
-
