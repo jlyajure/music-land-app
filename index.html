@@ -3,174 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-    <title>Reproductor de Música Pro</title>
+    <title>Music Land</title>
     <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="logo.png?v=2">
+    <link rel="apple-touch-icon" href="logo.png?v=2">
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #00d2ff; --bg: #050505; --card: #121212; }
+        :root { --neon: #00d2ff; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; font-family: 'Outfit', sans-serif; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; font-family: 'Outfit', sans-serif; }
         
-        header { background: rgba(0,0,0,0.95); padding: 15px; text-align: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
-        .brand-title { color: var(--accent); font-size: 22px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+        /* HEADER CON BOTÓN SALIR */
+        header { background: rgba(0,0,0,0.95); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
+        .sensor-secreto { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+        .header-logo { width: 35px; height: 35px; border-radius: 8px; border: 1px solid var(--neon); object-fit: cover; }
+        .brand-title { color: var(--neon); font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-salir-app { background: transparent; border: 1.5px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
-        /* SECCIÓN DE FILTROS */
-        .filter-container { padding: 10px; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; background: #080808; border-bottom: 1px solid #222; }
-        .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
-        .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        /* FILTROS */
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px; background: #080808; border-bottom: 1px solid #222; scrollbar-width: none; }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .filter-btn.active { background: var(--neon); color: black; border-color: var(--neon); }
 
-        .container { max-width: 600px; margin: auto; padding: 15px; padding-bottom: 150px; }
-
-        /* PANEL DE ADMINISTRACIÓN */
-        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px dashed var(--accent); }
+        /* PANEL ADMIN */
+        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin: 15px; border: 1px dashed var(--neon); }
+        .admin-title { color: var(--neon); font-size: 14px; margin-bottom: 15px; font-weight: 800; text-align: center; }
         .input-box, .select-box { width: 100%; padding: 12px; margin-bottom: 10px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
-        .btn-subir { width: 100%; background: var(--accent); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
+        .btn-subir { width: 100%; background: var(--neon); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 5px; }
 
-        /* LISTA DE PISTAS */
-        .track-card { background: var(--card); border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; display: flex; align-items: center; padding: 10px; }
-        .track-img { width: 60px; height: 60px; border-radius: 10px; background-size: cover; background-position: center; }
-        .track-info { flex: 1; margin-left: 15px; }
-        .track-title { font-size: 15px; font-weight: 900; margin: 0; }
-        .track-category { font-size: 10px; color: var(--accent); text-transform: uppercase; font-weight: 800; }
+        /* LISTA */
+        .container { max-width: 600px; margin: auto; padding-bottom: 150px; }
+        .track-card { background: var(--card); border-radius: 15px; margin: 10px 15px; padding: 12px; border: 1px solid #222; display: flex; flex-direction: column; transition: 0.3s; }
+        .track-card.is-playing { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        .track-main { display: flex; align-items: center; width: 100%; }
+        .track-img { width: 65px; height: 65px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
+        .track-info { flex: 1; margin: 0 15px; overflow: hidden; }
+        .track-title { font-size: 15px; font-weight: 900; color: white; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-artist { font-size: 11px; color: #aaa; margin: 3px 0; font-weight: 700; text-transform: uppercase; }
+        .track-tag { font-size: 9px; color: var(--neon); font-weight: 900; }
+        .btn-play-mini { width: 45px; height: 45px; border-radius: 50%; background: var(--neon); border: none; font-size: 20px; cursor: pointer; flex-shrink: 0; }
+
+        /* LOGIN */
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         
-        .btn-play-mini { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); border: none; color: black; font-size: 18px; cursor: pointer; }
-
         /* REPRODUCTOR */
-        #global-player { position: fixed; bottom: 0; width: 100%; background: #080808; border-top: 2px solid var(--accent); padding: 15px; display: none; }
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--neon); padding: 15px; display: none; z-index: 1000; }
+        .btn-p-main { background: none; border: none; color: var(--neon); font-size: 32px; cursor: pointer; }
+        #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; margin-bottom: 10px; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--neon); border-radius: 50%; }
     </style>
 </head>
 <body>
 
+<div id="login-screen">
+    <div class="login-card">
+        <img src="logo.png?v=2" style="width: 70px; border-radius: 12px; margin-bottom: 15px; border: 2px solid var(--neon);">
+        <h2 style="color:var(--neon); margin:0; font-size:18px;">ACCESO DIRECTOR</h2>
+        <input type="password" id="passInput" class="input-box" style="margin-top:20px;" placeholder="Clave de Cabina">
+        <button onclick="verificarClave()" class="btn-subir">ENTRAR</button>
+        <button onclick="cerrarLogin()" style="background:none; border:none; color:#666; margin-top:15px; font-size:12px;">Cancelar</button>
+    </div>
+</div>
+
 <header>
-    <div class="brand-title" onclick="toggleAdmin()">REPRODUCTOR DINÁMICO</div>
+    <div class="sensor-secreto" onclick="toqueSecreto()">
+        <img src="logo.png?v=2" class="header-logo" alt="Logo" onerror="this.src='https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp'">
+        <div class="brand-title">Music Land</div>
+    </div>
+    <button onclick="confirmarSalida()" class="btn-salir-app">CERRAR APP</button>
 </header>
 
-<div class="filter-container" id="filter-bar">
+<div class="filter-bar" id="filter-bar">
     <button class="filter-btn active" onclick="filtrar('TODOS')">TODOS</button>
-    </div>
+</div>
 
 <div class="container">
     <div id="admin-panel">
-        <h3 style="text-align:center; color:var(--accent); font-size:14px;">SUBIR NUEVA CANCIÓN</h3>
+        <h3 class="admin-title" id="form-titulo">NUEVA CANCIÓN</h3>
         <input type="text" id="t-titulo" class="input-box" placeholder="Título">
         <input type="text" id="t-artista" class="input-box" placeholder="Artista">
-        <input type="text" id="t-url" class="input-box" placeholder="URL del MP3">
-        <input type="text" id="t-img" class="input-box" placeholder="URL de la Portada">
+        <input type="text" id="t-url" class="input-box" placeholder="Link MP3">
+        <input type="text" id="t-img" class="input-box" placeholder="Link Portada">
         <select id="t-categoria" class="select-box"></select>
-        <button onclick="guardarPista()" class="btn-subir">GUARDAR PISTA</button>
+        <button onclick="guardarPista()" id="btn-save" class="btn-subir">📻 SUBIR PISTA</button>
+        <button onclick="salirAdmin()" style="width:100%; background:#222; color:#ff4444; border:none; padding:10px; border-radius:8px; margin-top:10px; font-weight:800; cursor:pointer;">CERRAR PANEL</button>
     </div>
 
     <div id="tracks-feed"></div>
 </div>
 
 <div id="global-player">
-    <div style="text-align:center; color:white; font-size:12px;" id="p-info-display">Selecciona una canción</div>
+    <audio id="main-media" crossorigin="anonymous"></audio>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+        <div id="p-art" style="width:45px; height:45px; border-radius:8px; background-size:cover;"></div>
+        <div style="flex:1; overflow:hidden;">
+            <h4 id="p-title" style="margin:0; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</h4>
+            <div id="p-time" style="font-size:10px; color:var(--neon); font-weight:900;">00:00 / 00:00</div>
+        </div>
+        <button onclick="window.togglePlay()" id="p-play-btn" class="btn-p-main">▶</button>
+        <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#444; font-size:24px;">×</button>
+    </div>
+    <input type="range" id="seek-bar" value="0" min="0" step="1">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <google-cast-launcher style="width:20px; height:20px; --disconnected-color:#00d2ff;"></google-cast-launcher>
+        <button onclick="window.toggleMute()" id="btn-mute" style="background:#1a1a1a; border:1px solid #333; color:white; font-size:10px; padding:5px 10px; border-radius:5px;">🔊 VOL</button>
+    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // CONFIGURACIÓN DE FIREBASE
     const firebaseConfig = {
-        apiKey: "TU_API_KEY",
-        authDomain: "TU_DOMINIO",
-        projectId: "TU_PROYECTO_ID",
-        storageBucket: "TU_STORAGE",
-        messagingSenderId: "TU_ID",
-        appId: "TU_APP_ID"
+      apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
+      authDomain: "familia-yajure-app.firebaseapp.com",
+      projectId: "familia-yajure-app",
+      storageBucket: "familia-yajure-app.firebasestorage.app",
+      messagingSenderId: "692035727386",
+      appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const coleccionDB = "canciones_app";
+    const coleccionDB = "musicland_canciones";
 
-    const categorias = [
-        "SALSA", "MERENGUE", "BALADAS EN ESPAÑOL", "BALADAS EN INGLES", 
-        "FUNK", "POP", "SOUL", "R&B", "ROCK", "MUSICA TROPICAL", 
-        "CLASICOS BAILABLES", "PODCAST", "I.A.", "HOUSE", "DANCE", 
-        "RANCHERAS", "LLANERAS", "ROCK EN ESPAÑOL"
-    ];
-
-    let todasLasCanciones = [];
+    const categorias = ["SALSA", "MERENGUE", "BALADAS EN ESPAÑOL", "BALADAS EN INGLES", "FUNK", "POP", "SOUL", "R&B", "ROCK", "MUSICA TROPICAL", "CLASICOS BAILABLES", "PODCAST", "I.A.", "HOUSE", "DANCE", "RANCHERAS", "LLANERAS", "ROCK EN ESPAÑOL"];
+    
+    let canciones = [];
+    let idActual = null;
     let filtroActual = "TODOS";
+    let modoAdmin = false;
 
-    // Iniciar filtros y selector
+    // Iniciar Categorías
     const filterBar = document.getElementById('filter-bar');
     const selectCat = document.getElementById('t-categoria');
-    
     categorias.forEach(cat => {
-        // Botones de filtro
         const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.innerText = cat;
+        btn.className = 'filter-btn'; btn.innerText = cat;
         btn.onclick = () => filtrar(cat);
         filterBar.appendChild(btn);
-
-        // Opciones del selector
         const opt = document.createElement('option');
-        opt.value = cat;
-        opt.innerText = cat;
+        opt.value = cat; opt.innerText = cat;
         selectCat.appendChild(opt);
     });
 
-    window.toggleAdmin = () => {
-        const panel = document.getElementById('admin-panel');
-        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-    };
-
     window.filtrar = (cat) => {
         filtroActual = cat;
-        document.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.toggle('active', b.innerText === cat);
-        });
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.innerText === cat));
         render();
     };
 
+    // SENSOR 3 TOQUES
+    let toques = 0; let tiempoToque = 0;
+    window.toqueSecreto = () => {
+        const ahora = new Date().getTime();
+        if (ahora - tiempoToque > 1000) toques = 0;
+        tiempoToque = ahora; toques++;
+        if (toques === 3) { toques = 0; abrirLogin(); }
+    };
+
+    window.abrirLogin = () => { document.getElementById('login-screen').style.display = 'flex'; };
+    window.cerrarLogin = () => { document.getElementById('login-screen').style.display = 'none'; };
+    window.verificarClave = () => {
+        if(document.getElementById('passInput').value === "musicland2026") {
+            modoAdmin = true; cerrarLogin();
+            document.getElementById('admin-panel').style.display = 'block';
+            render();
+        } else { alert("Clave Incorrecta"); }
+    };
+    window.salirAdmin = () => { modoAdmin = false; document.getElementById('admin-panel').style.display = 'none'; render(); };
+
     window.guardarPista = async () => {
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true; btn.innerText = "...";
         const datos = {
             titulo: document.getElementById('t-titulo').value,
             artista: document.getElementById('t-artista').value,
             mp3Url: document.getElementById('t-url').value,
-            imagenUrl: document.getElementById('t-img').value,
+            imagenUrl: document.getElementById('t-img').value || "logo.png",
             categoria: document.getElementById('t-categoria').value,
             fecha: new Date().getTime()
         };
         await addDoc(collection(db, coleccionDB), datos);
-        alert("Canción subida");
+        btn.disabled = false; btn.innerText = "📻 SUBIR PISTA";
+        alert("¡Al aire!");
+    };
+
+    window.borrarPista = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, coleccionDB, id)); };
+
+    window.confirmarSalida = () => {
+        if(confirm("¿Quieres cerrar Music Land?")) {
+            window.close();
+            window.location.href = "about:blank";
+        }
     };
 
     onSnapshot(query(collection(db, coleccionDB), orderBy("fecha", "desc")), (snap) => {
-        todasLasCanciones = [];
-        snap.forEach(d => todasLasCanciones.push({id: d.id, ...d.data()}));
+        canciones = []; snap.forEach(d => canciones.push({id: d.id, ...d.data()}));
         render();
     });
+
+    const media = document.getElementById('main-media');
+    const seekBar = document.getElementById('seek-bar');
 
     function render() {
         const feed = document.getElementById('tracks-feed');
         feed.innerHTML = "";
-        
-        const filtradas = filtroActual === "TODOS" 
-            ? todasLasCanciones 
-            : todasLasCanciones.filter(c => c.categoria === filtroActual);
-
-        filtradas.forEach(c => {
+        const lista = filtroActual === "TODOS" ? canciones : canciones.filter(c => c.categoria === filtroActual);
+        lista.forEach(c => {
+            const isPlaying = idActual === c.id;
             const div = document.createElement('div');
-            div.className = 'track-card';
+            div.className = `track-card ${isPlaying ? 'is-playing' : ''}`;
             div.innerHTML = `
-                <div class="track-img" style="background-image: url('${c.imagenUrl || 'logo.png'}')"></div>
-                <div class="track-info">
-                    <div class="track-category">${c.categoria}</div>
-                    <div class="track-title">${c.titulo}</div>
-                    <div style="font-size:11px; color:#888;">${c.artista}</div>
+                <div class="track-main">
+                    <div class="track-img" style="background-image: url('${c.imagenUrl}')"></div>
+                    <div class="track-info">
+                        <div class="track-tag">${c.categoria}</div>
+                        <h3 class="track-title">${c.titulo}</h3>
+                        <p class="track-artist">${c.artista}</p>
+                    </div>
+                    <button class="btn-play-mini" onclick="playPista('${c.id}','${c.mp3Url}','${c.titulo}','${c.imagenUrl}')">${isPlaying ? '||' : '▶'}</button>
                 </div>
-                <button class="btn-play-mini">▶</button>
+                ${modoAdmin ? `<button onclick="borrarPista('${c.id}')" style="margin-top:10px; background:none; border:1px solid #444; color:#ff4444; font-size:9px; padding:5px; border-radius:5px;">🗑️ BORRAR</button>` : ''}
             `;
             feed.appendChild(div);
         });
     }
+
+    window.playPista = (id, url, tit, img) => {
+        if(idActual === id) { window.togglePlay(); return; }
+        idActual = id;
+        document.getElementById('p-title').innerText = tit;
+        document.getElementById('p-art').style.backgroundImage = `url('${img}')`;
+        document.getElementById('global-player').style.display = 'block';
+        media.src = url; media.play();
+        render();
+    };
+
+    window.togglePlay = () => { if(media.paused) media.play(); else media.pause(); };
+    media.onplay = () => { document.getElementById('p-play-btn').innerText = '||'; };
+    media.onpause = () => { document.getElementById('p-play-btn').innerText = '▶'; };
+    media.ontimeupdate = () => { 
+        seekBar.max = media.duration || 0;
+        seekBar.value = media.currentTime;
+        document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration);
+    };
+    seekBar.oninput = () => { media.currentTime = seekBar.value; };
+    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
+    window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
+    function formatTime(s) { if(isNaN(s)) return "00:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
 </script>
 </body>
 </html>
