@@ -9,37 +9,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* TEMA MUSIC LAND: AZUL NEÓN Y NEGRO */
         :root { --neon: #00d2ff; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Outfit', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN DIRECTOR */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--neon); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
         .btn-neon { display: block; width: 100%; background: var(--neon); color: black; border: none; padding: 18px; border-radius: 50px; font-weight: 900; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
 
-        /* HEADER */
-        header { background: rgba(0,0,0,0.95); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
-        .brand-title { color: var(--neon); font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-admin-nav { background: transparent; border: 1.5px solid var(--neon); color: var(--neon); padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        header { background: rgba(0,0,0,0.95); padding: 15px; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
+        
+        /* EL TÍTULO AHORA ES EL BOTÓN SECRETO */
+        .brand-title { color: var(--neon); font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; user-select: none; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 150px; }
         .container { max-width: 600px; margin: auto; padding: 15px; }
 
-        /* PANEL DE CONTROL (OCULTO AL PÚBLICO) */
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px dashed var(--neon); }
         .admin-title { color: var(--neon); font-size: 14px; margin-top: 0; font-weight: 800; text-align: center; }
         .input-box { width: 100%; padding: 12px; margin-bottom: 10px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; }
         .btn-action { display: flex; gap: 10px; margin-top: 10px; }
         .btn-subir { flex: 1; background: var(--neon); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
         .btn-cancelar { flex: 1; background: #333; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; display: none; }
+        .btn-cerrar-panel { width: 100%; background: #ff4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
-        /* GALERÍA DE CANCIONES */
-        .track-card { background: var(--card); border-radius: 15px; margin-bottom: 20px; border: 1px solid #222; display: flex; align-items: center; padding: 10px; transition: 0.3s; }
+        .track-card { background: var(--card); border-radius: 15px; margin-bottom: 20px; border: 1px solid #222; display: flex; flex-direction: column; padding: 10px; transition: 0.3s; }
         .track-card.is-playing { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        .track-main { display: flex; width: 100%; align-items: center; }
         .track-img { width: 70px; height: 70px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
         .track-info { flex: 1; margin-left: 15px; overflow: hidden; }
         .track-title { font-size: 15px; font-weight: 900; color: white; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -48,12 +46,10 @@
         .btn-play-mini { width: 45px; height: 45px; border-radius: 50%; background: var(--neon); border: none; color: black; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-left: 10px; }
         .is-playing .btn-play-mini { background: black; color: var(--neon); border: 2px solid var(--neon); }
 
-        /* BOTONES DE EDICIÓN EN LA TARJETA (Solo visibles en modo admin) */
         .admin-controls { display: none; width: 100%; padding-top: 10px; margin-top: 10px; border-top: 1px solid #333; gap: 10px; }
         .btn-edit { flex: 1; background: #1a1a1a; color: var(--neon); border: 1px solid var(--neon); padding: 8px; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .btn-delete { flex: 1; background: #1a1a1a; color: #ff4444; border: 1px solid #ff4444; padding: 8px; border-radius: 5px; font-size: 10px; font-weight: bold; cursor: pointer; }
 
-        /* REPRODUCTOR FLOTANTE */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--neon); padding: 15px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
         .p-art { width: 45px; height: 45px; border-radius: 8px; background-size: cover; }
@@ -78,13 +74,12 @@
         <h2 style="color:var(--neon); margin-top:0;">MUSIC LAND<br><span style="font-size:12px; color:#fff;">ACCESO DIRECTOR</span></h2>
         <input type="password" id="passInput" placeholder="Clave de Cabina">
         <button onclick="verificarClave()" class="btn-neon">ENTRAR</button>
-        <button onclick="cerrarLogin()" style="background:none; border:none; color:#888; margin-top:15px; font-size:12px;">Cancelar</button>
+        <button onclick="cerrarLogin()" style="background:none; border:none; color:#888; margin-top:15px; font-size:12px; cursor:pointer;">Cancelar</button>
     </div>
 </div>
 
 <header>
-    <div class="brand-title">🎵 Music Land</div>
-    <button id="btn-toggle-admin" onclick="abrirLogin()" class="btn-admin-nav">⚙️ MODO DJ</button>
+    <div class="brand-title" onclick="toqueSecreto()">🎵 Music Land</div>
 </header>
 
 <div id="app-content">
@@ -100,6 +95,7 @@
                 <button onclick="guardarCancion()" id="btn-save" class="btn-subir">📻 SUBIR PISTA</button>
                 <button onclick="cancelarEdicion()" id="btn-cancel" class="btn-cancelar">❌ CANCELAR</button>
             </div>
+            <button onclick="salirAdmin()" class="btn-cerrar-panel">🔴 SALIR DEL MODO DJ</button>
         </div>
 
         <div id="tracks-feed"></div>
@@ -132,7 +128,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ✅ AQUÍ ESTÁ TU CONFIGURACIÓN SOLDADA DIRECTAMENTE ✅
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
       authDomain: "familia-yajure-app.firebaseapp.com",
@@ -145,25 +140,36 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    // NUEVA CARPETA PARA MUSIC LAND EN TU MISMA BASE DE DATOS
     const coleccionDB = "musicland_canciones"; 
     
-    // Variables Globales
     let canciones = [];
     let idActual = null;
     let editandoId = null;
-    const claveAdmin = "musicland2026"; // Clave para entrar al modo DJ
+    const claveAdmin = "musicland2026"; 
     let modoAdmin = false;
 
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
 
-    // --- SISTEMA DE LOGIN Y PANEL DE CONTROL ---
+    // --- EL TRUCO DE LOS 3 TOQUES ---
+    let toques = 0;
+    let tiempoToque = 0;
+    window.toqueSecreto = () => {
+        const ahora = new Date().getTime();
+        if (ahora - tiempoToque > 1000) toques = 0; // Se resetea si tardas más de 1 segundo
+        tiempoToque = ahora;
+        toques++;
+        if (toques === 3) {
+            toques = 0;
+            window.abrirLogin();
+        }
+    };
+
     window.abrirLogin = () => {
-        if(modoAdmin) { window.salirAdmin(); return; }
+        if(modoAdmin) return;
         document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('passInput').value = ""; // Limpia la clave anterior
     };
     window.cerrarLogin = () => { document.getElementById('login-screen').style.display = 'none'; };
     
@@ -172,24 +178,17 @@
             modoAdmin = true;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('btn-toggle-admin').innerText = "🔴 SALIR DEL MODO DJ";
-            document.getElementById('btn-toggle-admin').style.color = "#ff4444";
-            document.getElementById('btn-toggle-admin').style.borderColor = "#ff4444";
             render(); 
-        } else { alert("Clave Incorrecta, Director."); }
+        } else { alert("Clave Incorrecta."); }
     };
 
     window.salirAdmin = () => {
         modoAdmin = false;
         document.getElementById('admin-panel').style.display = 'none';
-        document.getElementById('btn-toggle-admin').innerText = "⚙️ MODO DJ";
-        document.getElementById('btn-toggle-admin').style.color = "var(--neon)";
-        document.getElementById('btn-toggle-admin').style.borderColor = "var(--neon)";
         cancelarEdicion();
         render(); 
     };
 
-    // --- SUBIR / EDITAR CANCIÓN ---
     window.guardarCancion = async () => {
         const tit = document.getElementById('t-titulo').value.trim();
         const art = document.getElementById('t-artista').value.trim();
@@ -210,7 +209,7 @@
         try {
             if(editandoId) {
                 await updateDoc(doc(db, coleccionDB, editandoId), datos);
-                alert("✅ Canción actualizada con éxito.");
+                alert("✅ Canción actualizada.");
             } else {
                 await addDoc(collection(db, coleccionDB), datos);
                 alert("✅ Canción subida a Music Land.");
@@ -248,17 +247,15 @@
     };
 
     window.borrarCancion = async (id, titulo) => {
-        if(confirm(`¿Seguro que quieres borrar "${titulo}" de Music Land?`)) {
+        if(confirm(`¿Seguro que quieres borrar "${titulo}"?`)) {
             await deleteDoc(doc(db, coleccionDB, id));
         }
     };
 
-    // --- LEER CANCIONES DE FIREBASE ---
     onSnapshot(query(collection(db, coleccionDB), orderBy("fecha", "desc")), (snap) => {
         canciones = []; snap.forEach(d => { canciones.push({id: d.id, ...d.data()}); }); render();
     });
 
-    // --- DIBUJAR LA PANTALLA ---
     function render() {
         const feed = document.getElementById('tracks-feed'); if(!feed) return;
         feed.innerHTML = "";
@@ -280,7 +277,7 @@
             }
 
             div.innerHTML = `
-                <div style="display:flex; width:100%; align-items:center;">
+                <div class="track-main">
                     <div class="track-img" style="background-image: url('${p.imagenUrl || 'https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp'}')"></div>
                     <div class="track-info">
                         <h3 class="track-title">${p.titulo}</h3>
@@ -294,7 +291,6 @@
         });
     }
 
-    // --- MOTOR DEL REPRODUCTOR Y CAST V14.1 ---
     window.player = null; window.playerController = null; window.lastCastTime = 0;
 
     window['__onGCastApiAvailable'] = function(isAvailable) {
