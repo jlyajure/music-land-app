@@ -15,28 +15,23 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; font-family: 'Outfit', sans-serif; }
         
-        /* HEADER CON BOTÓN SALIR */
         header { background: rgba(0,0,0,0.95); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
         .sensor-secreto { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; border: 1px solid var(--neon); object-fit: cover; }
         .brand-title { color: var(--neon); font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .btn-salir-app { background: transparent; border: 1.5px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
-        /* FILTROS */
         .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px; background: #080808; border-bottom: 1px solid #222; scrollbar-width: none; }
         .filter-bar::-webkit-scrollbar { display: none; }
         .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
         .filter-btn.active { background: var(--neon); color: black; border-color: var(--neon); }
 
-        /* PANEL ADMIN */
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin: 15px; border: 1px dashed var(--neon); }
-        .admin-title { color: var(--neon); font-size: 14px; margin-bottom: 15px; font-weight: 800; text-align: center; }
         .input-box, .select-box { width: 100%; padding: 12px; margin-bottom: 10px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
         .btn-subir { width: 100%; background: var(--neon); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 5px; }
 
-        /* LISTA */
         .container { max-width: 600px; margin: auto; padding-bottom: 150px; }
-        .track-card { background: var(--card); border-radius: 15px; margin: 10px 15px; padding: 12px; border: 1px solid #222; display: flex; flex-direction: column; transition: 0.3s; }
+        .track-card { background: var(--card); border-radius: 15px; margin: 10px 15px; padding: 12px; border: 1px solid #222; transition: 0.3s; }
         .track-card.is-playing { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
         .track-main { display: flex; align-items: center; width: 100%; }
         .track-img { width: 65px; height: 65px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
@@ -46,11 +41,9 @@
         .track-tag { font-size: 9px; color: var(--neon); font-weight: 900; }
         .btn-play-mini { width: 45px; height: 45px; border-radius: 50%; background: var(--neon); border: none; font-size: 20px; cursor: pointer; flex-shrink: 0; }
 
-        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         
-        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--neon); padding: 15px; display: none; z-index: 1000; }
         .btn-p-main { background: none; border: none; color: var(--neon); font-size: 32px; cursor: pointer; }
         #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; margin-bottom: 10px; }
@@ -64,35 +57,34 @@
         <img src="logo.png?v=2" style="width: 70px; border-radius: 12px; margin-bottom: 15px; border: 2px solid var(--neon);">
         <h2 style="color:var(--neon); margin:0; font-size:18px;">ACCESO DIRECTOR</h2>
         <input type="password" id="passInput" class="input-box" style="margin-top:20px;" placeholder="Clave de Cabina">
-        <button onclick="verificarClave()" class="btn-subir">ENTRAR</button>
-        <button onclick="cerrarLogin()" style="background:none; border:none; color:#666; margin-top:15px; font-size:12px;">Cancelar</button>
+        <button id="btn-entrar-login" class="btn-subir">ENTRAR</button>
+        <button onclick="document.getElementById('login-screen').style.display='none'" style="background:none; border:none; color:#666; margin-top:15px; font-size:12px;">Cancelar</button>
     </div>
 </div>
 
 <header>
-    <div class="sensor-secreto" onclick="toqueSecreto()">
+    <div class="sensor-secreto" id="sensor-btn">
         <img src="logo.png?v=2" class="header-logo" alt="Logo" onerror="this.src='https://i.postimg.cc/1zbT8bC8/DALL-E-2025-02-13-16-16-56-A-sleek-and-modern-neon-blue-logo-design-for-a-music-app-The-logo-fe.webp'">
         <div class="brand-title">Music Land</div>
     </div>
-    <button onclick="confirmarSalida()" class="btn-salir-app">CERRAR APP</button>
+    <button onclick="window.confirmarSalida()" class="btn-salir-app">CERRAR APP</button>
 </header>
 
 <div class="filter-bar" id="filter-bar">
-    <button class="filter-btn active" onclick="filtrar('TODOS')">TODOS</button>
+    <button class="filter-btn active" id="btn-filtro-todos">TODOS</button>
 </div>
 
 <div class="container">
     <div id="admin-panel">
-        <h3 class="admin-title" id="form-titulo">NUEVA CANCIÓN</h3>
+        <h3 style="color:var(--neon); text-align:center; font-size:14px; margin-bottom:15px;">NUEVA CANCIÓN</h3>
         <input type="text" id="t-titulo" class="input-box" placeholder="Título">
         <input type="text" id="t-artista" class="input-box" placeholder="Artista">
         <input type="text" id="t-url" class="input-box" placeholder="Link MP3">
         <input type="text" id="t-img" class="input-box" placeholder="Link Portada">
         <select id="t-categoria" class="select-box"></select>
-        <button onclick="guardarPista()" id="btn-save" class="btn-subir">📻 SUBIR PISTA</button>
-        <button onclick="salirAdmin()" style="width:100%; background:#222; color:#ff4444; border:none; padding:10px; border-radius:8px; margin-top:10px; font-weight:800; cursor:pointer;">CERRAR PANEL</button>
+        <button id="btn-guardar-pista" class="btn-subir">📻 SUBIR PISTA</button>
+        <button id="btn-salir-admin" style="width:100%; background:#222; color:#ff4444; border:none; padding:10px; border-radius:8px; margin-top:10px; font-weight:800; cursor:pointer;">CERRAR PANEL</button>
     </div>
-
     <div id="tracks-feed"></div>
 </div>
 
@@ -104,19 +96,19 @@
             <h4 id="p-title" style="margin:0; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</h4>
             <div id="p-time" style="font-size:10px; color:var(--neon); font-weight:900;">00:00 / 00:00</div>
         </div>
-        <button onclick="window.togglePlay()" id="p-play-btn" class="btn-p-main">▶</button>
-        <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#444; font-size:24px;">×</button>
+        <button id="p-play-btn" class="btn-p-main">▶</button>
+        <button id="p-close-btn" style="background:none; border:none; color:#444; font-size:24px;">×</button>
     </div>
     <input type="range" id="seek-bar" value="0" min="0" step="1">
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <google-cast-launcher style="width:20px; height:20px; --disconnected-color:#00d2ff;"></google-cast-launcher>
-        <button onclick="window.toggleMute()" id="btn-mute" style="background:#1a1a1a; border:1px solid #333; color:white; font-size:10px; padding:5px 10px; border-radius:5px;">🔊 VOL</button>
+        <button id="btn-mute" style="background:#1a1a1a; border:1px solid #333; color:white; font-size:10px; padding:5px 10px; border-radius:5px;">🔊 VOL</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -138,9 +130,12 @@
     let filtroActual = "TODOS";
     let modoAdmin = false;
 
-    // Iniciar Categorías
+    const media = document.getElementById('main-media');
+    const seekBar = document.getElementById('seek-bar');
     const filterBar = document.getElementById('filter-bar');
     const selectCat = document.getElementById('t-categoria');
+
+    // Inicializar Categorías
     categorias.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = 'filter-btn'; btn.innerText = cat;
@@ -151,64 +146,60 @@
         selectCat.appendChild(opt);
     });
 
-    window.filtrar = (cat) => {
+    document.getElementById('btn-filtro-todos').onclick = () => filtrar('TODOS');
+
+    function filtrar(cat) {
         filtroActual = cat;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.innerText === cat));
         render();
-    };
+    }
 
-    // SENSOR 3 TOQUES
+    // SENSOR SECRETO
     let toques = 0; let tiempoToque = 0;
-    window.toqueSecreto = () => {
+    document.getElementById('sensor-btn').onclick = () => {
         const ahora = new Date().getTime();
         if (ahora - tiempoToque > 1000) toques = 0;
         tiempoToque = ahora; toques++;
-        if (toques === 3) { toques = 0; abrirLogin(); }
+        if (toques === 3) { toques = 0; document.getElementById('login-screen').style.display = 'flex'; }
     };
 
-    window.abrirLogin = () => { document.getElementById('login-screen').style.display = 'flex'; };
-    window.cerrarLogin = () => { document.getElementById('login-screen').style.display = 'none'; };
-    window.verificarClave = () => {
+    document.getElementById('btn-entrar-login').onclick = () => {
         if(document.getElementById('passInput').value === "musicland2026") {
-            modoAdmin = true; cerrarLogin();
+            modoAdmin = true; document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
             render();
         } else { alert("Clave Incorrecta"); }
     };
-    window.salirAdmin = () => { modoAdmin = false; document.getElementById('admin-panel').style.display = 'none'; render(); };
 
-    window.guardarPista = async () => {
-        const btn = document.getElementById('btn-save');
+    document.getElementById('btn-salir-admin').onclick = () => {
+        modoAdmin = false; document.getElementById('admin-panel').style.display = 'none'; render();
+    };
+
+    document.getElementById('btn-guardar-pista').onclick = async () => {
+        const btn = document.getElementById('btn-guardar-pista');
         btn.disabled = true; btn.innerText = "...";
-        const datos = {
-            titulo: document.getElementById('t-titulo').value,
-            artista: document.getElementById('t-artista').value,
-            mp3Url: document.getElementById('t-url').value,
-            imagenUrl: document.getElementById('t-img').value || "logo.png",
-            categoria: document.getElementById('t-categoria').value,
-            fecha: new Date().getTime()
-        };
-        await addDoc(collection(db, coleccionDB), datos);
+        try {
+            await addDoc(collection(db, coleccionDB), {
+                titulo: document.getElementById('t-titulo').value,
+                artista: document.getElementById('t-artista').value,
+                mp3Url: document.getElementById('t-url').value,
+                imagenUrl: document.getElementById('t-img').value || "logo.png",
+                categoria: document.getElementById('t-categoria').value,
+                fecha: new Date().getTime()
+            });
+            alert("¡Canción subida!");
+        } catch(e) { alert("Error al subir"); }
         btn.disabled = false; btn.innerText = "📻 SUBIR PISTA";
-        alert("¡Al aire!");
     };
 
     window.borrarPista = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, coleccionDB, id)); };
 
-    window.confirmarSalida = () => {
-        if(confirm("¿Quieres cerrar Music Land?")) {
-            window.close();
-            window.location.href = "about:blank";
-        }
-    };
+    window.confirmarSalida = () => { if(confirm("¿Cerrar App?")) { window.close(); window.location.href = "about:blank"; } };
 
     onSnapshot(query(collection(db, coleccionDB), orderBy("fecha", "desc")), (snap) => {
         canciones = []; snap.forEach(d => canciones.push({id: d.id, ...d.data()}));
         render();
     });
-
-    const media = document.getElementById('main-media');
-    const seekBar = document.getElementById('seek-bar');
 
     function render() {
         const feed = document.getElementById('tracks-feed');
@@ -218,6 +209,13 @@
             const isPlaying = idActual === c.id;
             const div = document.createElement('div');
             div.className = `track-card ${isPlaying ? 'is-playing' : ''}`;
+            
+            // Usamos una función interna para evitar problemas con comillas en el HTML
+            const btnPlay = document.createElement('button');
+            btnPlay.className = 'btn-play-mini';
+            btnPlay.innerText = isPlaying ? '||' : '▶';
+            btnPlay.onclick = () => window.gestionarPlay(c);
+
             div.innerHTML = `
                 <div class="track-main">
                     <div class="track-img" style="background-image: url('${c.imagenUrl}')"></div>
@@ -226,35 +224,41 @@
                         <h3 class="track-title">${c.titulo}</h3>
                         <p class="track-artist">${c.artista}</p>
                     </div>
-                    <button class="btn-play-mini" onclick="playPista('${c.id}','${c.mp3Url}','${c.titulo}','${c.imagenUrl}')">${isPlaying ? '||' : '▶'}</button>
                 </div>
-                ${modoAdmin ? `<button onclick="borrarPista('${c.id}')" style="margin-top:10px; background:none; border:1px solid #444; color:#ff4444; font-size:9px; padding:5px; border-radius:5px;">🗑️ BORRAR</button>` : ''}
+                ${modoAdmin ? `<button onclick="borrarPista('${c.id}')" style="margin-top:10px; background:none; border:1px solid #444; color:#ff4444; font-size:10px; padding:5px; border-radius:5px; width:100px;">🗑️ BORRAR</button>` : ''}
             `;
+            div.querySelector('.track-main').appendChild(btnPlay);
             feed.appendChild(div);
         });
     }
 
-    window.playPista = (id, url, tit, img) => {
-        if(idActual === id) { window.togglePlay(); return; }
-        idActual = id;
-        document.getElementById('p-title').innerText = tit;
-        document.getElementById('p-art').style.backgroundImage = `url('${img}')`;
-        document.getElementById('global-player').style.display = 'block';
-        media.src = url; media.play();
+    window.gestionarPlay = (c) => {
+        if(idActual === c.id) {
+            if(media.paused) media.play(); else media.pause();
+        } else {
+            idActual = c.id;
+            document.getElementById('p-title').innerText = c.titulo;
+            document.getElementById('p-art').style.backgroundImage = `url('${c.imagenUrl}')`;
+            document.getElementById('global-player').style.display = 'block';
+            media.src = c.mp3Url;
+            media.play().catch(err => alert("Error: El link de la canción no es directo o no funciona."));
+        }
         render();
     };
 
-    window.togglePlay = () => { if(media.paused) media.play(); else media.pause(); };
-    media.onplay = () => { document.getElementById('p-play-btn').innerText = '||'; };
-    media.onpause = () => { document.getElementById('p-play-btn').innerText = '▶'; };
+    document.getElementById('p-play-btn').onclick = () => { if(media.paused) media.play(); else media.pause(); };
+    document.getElementById('p-close-btn').onclick = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
+    document.getElementById('btn-mute').onclick = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
+
+    media.onplay = () => { document.getElementById('p-play-btn').innerText = '||'; render(); };
+    media.onpause = () => { document.getElementById('p-play-btn').innerText = '▶'; render(); };
     media.ontimeupdate = () => { 
         seekBar.max = media.duration || 0;
         seekBar.value = media.currentTime;
         document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration);
     };
     seekBar.oninput = () => { media.currentTime = seekBar.value; };
-    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
-    window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
+
     function formatTime(s) { if(isNaN(s)) return "00:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
 </script>
 </body>
