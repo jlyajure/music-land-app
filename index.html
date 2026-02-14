@@ -168,16 +168,13 @@
         <span style="font-size:10px; font-weight:800; letter-spacing:3px; color:var(--neon);">MUSIC LAND RADIO</span>
         <div style="width:28px;"></div>
     </div>
-    
     <div class="fp-art-container">
         <div id="fp-art" class="fp-art"></div>
     </div>
-    
     <div class="fp-info">
         <h2 id="fp-title" class="fp-title">...</h2>
         <p id="fp-artist" class="fp-artist">...</p>
     </div>
-    
     <div class="fp-progress">
         <input type="range" id="fp-seek" class="fp-seek" value="0" min="0" step="1">
         <div class="fp-time-row">
@@ -185,7 +182,6 @@
             <span id="fp-time-total">00:00</span>
         </div>
     </div>
-    
     <div class="fp-controls">
         <button onclick="window.toggleMute()" id="fp-btn-mute" class="fp-btn-sec">🔊</button>
         <button onclick="window.toggleMainPlay()" id="fp-play-btn" class="fp-btn-main"></button>
@@ -221,7 +217,6 @@
 
     window.actualizarUI = () => { render(); };
 
-    // INICIALIZAR MENÚS
     const filterBar = document.getElementById('filter-bar');
     const selectCat = document.getElementById('t-categoria');
     categorias.forEach(cat => {
@@ -229,7 +224,6 @@
         btn.className = 'filter-btn'; btn.innerText = cat;
         btn.onclick = function() { window.filtrar(cat, this); };
         filterBar.appendChild(btn);
-        
         const opt = document.createElement('option');
         opt.value = cat; opt.innerText = cat;
         selectCat.appendChild(opt);
@@ -305,14 +299,12 @@
             feed.appendChild(div);
         });
 
-        // Actualizar iconos de Play/Pausa en ambos reproductores
         const miniBtn = document.getElementById('mini-play-btn');
         const fpBtn = document.getElementById('fp-play-btn');
         if(miniBtn) miniBtn.innerHTML = media.paused ? SVG_PLAY : SVG_PAUSE;
         if(fpBtn) fpBtn.innerHTML = media.paused ? SVG_PLAY : SVG_PAUSE;
     }
 
-    // ABRIR Y CERRAR EL REPRODUCTOR GIGANTE
     window.openFullPlayer = () => document.getElementById('full-player').classList.add('active');
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
 
@@ -322,13 +314,11 @@
         } else {
             idActual = id; window.castUrl = url; window.castTitle = tit; window.castCover = img;
             
-            // Llenar datos Mini Player
             document.getElementById('mini-title').innerText = tit;
             document.getElementById('mini-artist').innerText = art;
             document.getElementById('mini-art').style.backgroundImage = `url('${img}')`;
             document.getElementById('mini-player').style.display = 'flex';
             
-            // Llenar datos Full Player
             document.getElementById('fp-title').innerText = tit;
             document.getElementById('fp-artist').innerText = art;
             document.getElementById('fp-art').style.backgroundImage = `url('${img}')`;
