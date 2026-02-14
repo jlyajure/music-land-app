@@ -56,9 +56,11 @@
         .brand-title { color: var(--neon); font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .btn-salir-app { background: transparent; border: 1.5px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
-        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px; background: #080808; border-bottom: 1px solid #222; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        /* SCROLL CON MOUSE PARA PC */
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px; background: #080808; border-bottom: 1px solid #222; scrollbar-width: none; -webkit-overflow-scrolling: touch; cursor: grab; }
+        .filter-bar:active { cursor: grabbing; }
         .filter-bar::-webkit-scrollbar { display: none; }
-        .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+        .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; user-select: none; }
         .filter-btn.active { background: var(--neon); color: black; border-color: var(--neon); }
 
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin: 15px; border: 1px dashed var(--neon); }
@@ -81,7 +83,7 @@
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: none; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         
-        /* REPRODUCTOR MINI (Barra inferior) */
+        /* REPRODUCTOR MINI */
         #mini-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(8,8,8,0.95); backdrop-filter: blur(10px); border-top: 2px solid var(--neon); padding: 12px 15px; display: none; z-index: 1000; align-items: center; gap: 12px; }
         .mini-art { width: 45px; height: 45px; border-radius: 8px; background-size: cover; border: 1px solid #333; cursor: pointer; }
         .mini-info { flex: 1; overflow: hidden; cursor: pointer; }
@@ -90,7 +92,7 @@
         .btn-mini-play { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 10px; }
         .btn-mini-play svg { width: 30px; height: 30px; fill: var(--neon); }
 
-        /* REPRODUCTOR GIGANTE (Modo Concierto) */
+        /* REPRODUCTOR GIGANTE */
         #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #111 0%, #000 100%); z-index: 2000; transition: top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; padding: 20px; }
         #full-player.active { top: 0; }
         .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-top: 10px; }
@@ -101,7 +103,7 @@
         .fp-title { font-size: 24px; font-weight: 900; margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .fp-artist { font-size: 16px; color: var(--neon); font-weight: 700; margin: 5px 0 0 0; text-transform: uppercase; }
         .fp-progress { width: 100%; margin-bottom: 30px; }
-        .fp-seek { width: 100%; -webkit-appearance: none; background: #222; height: 6px; border-radius: 3px; }
+        .fp-seek { width: 100%; -webkit-appearance: none; background: #222; height: 6px; border-radius: 3px; cursor: pointer; }
         .fp-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
         .fp-time-row { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #888; font-weight: 700; }
         
@@ -219,6 +221,20 @@
 
     const filterBar = document.getElementById('filter-bar');
     const selectCat = document.getElementById('t-categoria');
+    
+    // SISTEMA DE ARRASTRE PARA PC (Mueve las categorías con el ratón)
+    let isDown = false; let startX; let scrollLeft;
+    filterBar.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - filterBar.offsetLeft; scrollLeft = filterBar.scrollLeft; });
+    filterBar.addEventListener('mouseleave', () => { isDown = false; });
+    filterBar.addEventListener('mouseup', () => { isDown = false; });
+    filterBar.addEventListener('mousemove', (e) => { 
+        if(!isDown) return; 
+        e.preventDefault(); 
+        const x = e.pageX - filterBar.offsetLeft; 
+        const walk = (x - startX) * 2; // Velocidad de arrastre
+        filterBar.scrollLeft = scrollLeft - walk; 
+    });
+
     categorias.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = 'filter-btn'; btn.innerText = cat;
