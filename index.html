@@ -18,14 +18,12 @@
                     receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, 
                     autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED 
                 });
-                
                 const player = new cast.framework.RemotePlayer();
                 const controller = new cast.framework.RemotePlayerController(player);
                 
                 controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
                     window.lastTvTime = player.currentTime;
                 });
-
                 castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
                     const media = document.getElementById('main-media');
                     if (event.sessionState === 'SESSION_STARTED') {
@@ -33,20 +31,13 @@
                         const session = castContext.getCurrentSession();
                         const info = new chrome.cast.media.MediaInfo(window.castUrl, 'audio/mp3');
                         const meta = new chrome.cast.media.MusicTrackMediaMetadata();
-                        meta.title = window.castTitle; 
-                        meta.artist = "Music Land";
-                        meta.images = [new chrome.cast.Image(window.castCover)];
+                        meta.title = window.castTitle; meta.artist = "Music Land"; meta.images = [new chrome.cast.Image(window.castCover)];
                         info.metadata = meta;
-                        const req = new chrome.cast.media.LoadRequest(info);
-                        req.currentTime = media.currentTime;
-                        session.loadMedia(req);
+                        const req = new chrome.cast.media.LoadRequest(info); req.currentTime = media.currentTime; session.loadMedia(req);
                     }
                     if (event.sessionState === 'SESSION_ENDED') {
                         if (window.lastTvTime > 0) media.currentTime = window.lastTvTime;
-                        setTimeout(() => { 
-                            media.play().catch(()=>{}); 
-                            if(window.actualizarUI) window.actualizarUI(); 
-                        }, 500);
+                        setTimeout(() => { media.play().catch(()=>{}); if(window.actualizarUI) window.actualizarUI(); }, 500);
                     }
                 });
             }
@@ -65,9 +56,9 @@
         .brand-title { color: var(--neon); font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         .btn-salir-app { background: transparent; border: 1.5px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
-        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px; background: #080808; border-bottom: 1px solid #222; scrollbar-width: none; }
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px; background: #080808; border-bottom: 1px solid #222; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .filter-bar::-webkit-scrollbar { display: none; }
-        .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .filter-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
         .filter-btn.active { background: var(--neon); color: black; border-color: var(--neon); }
 
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin: 15px; border: 1px dashed var(--neon); }
@@ -77,26 +68,49 @@
         .container { max-width: 600px; margin: auto; padding-bottom: 150px; }
         .track-card { background: var(--card); border-radius: 15px; margin: 10px 15px; padding: 12px; border: 1px solid #222; transition: 0.3s; }
         .track-card.is-playing { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
-        .track-main { display: flex; align-items: center; width: 100%; }
+        .track-main { display: flex; align-items: center; width: 100%; cursor: pointer; }
         .track-img { width: 65px; height: 65px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; border: 1px solid #333; }
         .track-info { flex: 1; margin: 0 15px; overflow: hidden; }
         .track-title { font-size: 15px; font-weight: 900; color: white; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .track-artist { font-size: 11px; color: #aaa; margin: 3px 0; font-weight: 700; text-transform: uppercase; }
         .track-tag { font-size: 9px; color: var(--neon); font-weight: 900; }
+        
         .btn-play-mini { width: 45px; height: 45px; border-radius: 50%; background: var(--neon); border: none; font-size: 20px; cursor: pointer; flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
         .btn-play-mini svg { width: 20px; height: 20px; fill: black; }
 
-        #login-screen { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: none; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--neon); padding: 15px; display: none; z-index: 1000; }
-        .btn-p-main { background: none; border: none; cursor: pointer; display:flex; align-items:center; justify-content:center; }
-        .btn-p-main svg { width: 35px; height: 35px; fill: var(--neon); }
-        #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; margin-bottom: 10px; }
-        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--neon); border-radius: 50%; }
+        /* REPRODUCTOR MINI (Barra inferior) */
+        #mini-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(8,8,8,0.95); backdrop-filter: blur(10px); border-top: 2px solid var(--neon); padding: 12px 15px; display: none; z-index: 1000; align-items: center; gap: 12px; }
+        .mini-art { width: 45px; height: 45px; border-radius: 8px; background-size: cover; border: 1px solid #333; cursor: pointer; }
+        .mini-info { flex: 1; overflow: hidden; cursor: pointer; }
+        .mini-title { margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; font-weight: 800; }
+        .mini-artist { font-size: 10px; color: var(--neon); margin-top: 2px; }
+        .btn-mini-play { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 10px; }
+        .btn-mini-play svg { width: 30px; height: 30px; fill: var(--neon); }
+
+        /* REPRODUCTOR GIGANTE (Modo Concierto) */
+        #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #111 0%, #000 100%); z-index: 2000; transition: top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; padding: 20px; }
+        #full-player.active { top: 0; }
+        .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-top: 10px; }
+        .btn-down { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .fp-art-container { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .fp-art { width: 85vw; max-width: 350px; height: 85vw; max-height: 350px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0, 210, 255, 0.15); background-size: cover; background-position: center; border: 1px solid #333; }
+        .fp-info { text-align: center; margin: 30px 0; }
+        .fp-title { font-size: 24px; font-weight: 900; margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fp-artist { font-size: 16px; color: var(--neon); font-weight: 700; margin: 5px 0 0 0; text-transform: uppercase; }
+        .fp-progress { width: 100%; margin-bottom: 30px; }
+        .fp-seek { width: 100%; -webkit-appearance: none; background: #222; height: 6px; border-radius: 3px; }
+        .fp-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
+        .fp-time-row { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: #888; font-weight: 700; }
         
-        /* ESTILO DEL BOTÓN CAST */
-        google-cast-launcher { width: 22px; height: 22px; --disconnected-color: var(--neon); cursor: pointer; display: inline-block; }
+        .fp-controls { display: flex; justify-content: space-around; align-items: center; padding-bottom: 40px; }
+        .fp-btn-main { width: 75px; height: 75px; border-radius: 50%; background: var(--neon); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px rgba(0,210,255,0.3); }
+        .fp-btn-main svg { width: 35px; height: 35px; fill: black; }
+        .fp-btn-sec { background: #1a1a1a; border: 1px solid #333; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        google-cast-launcher { width: 30px; height: 30px; --disconnected-color: var(--neon); cursor: pointer; display: inline-block; }
     </style>
 </head>
 <body>
@@ -120,8 +134,8 @@
 </header>
 
 <div class="filter-bar" id="filter-bar">
-    <button class="filter-btn active" onclick="window.filtrar('TODOS', this)">TODOS</button>
-    </div>
+    <button class="filter-btn active" id="btn-filtro-todos" onclick="window.filtrar('TODOS', this)">TODOS</button>
+</div>
 
 <div class="container">
     <div id="admin-panel">
@@ -134,27 +148,48 @@
         <button id="btn-guardar-pista" class="btn-subir">📻 SUBIR PISTA</button>
         <button onclick="window.salirAdmin()" style="width:100%; background:#222; color:#ff4444; border:none; padding:10px; border-radius:8px; margin-top:10px; font-weight:800; cursor:pointer;">CERRAR PANEL</button>
     </div>
-    
     <div id="tracks-feed"></div>
 </div>
 
-<div id="global-player">
-    <audio id="main-media" crossorigin="anonymous"></audio>
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-        <div id="p-art" style="width:45px; height:45px; border-radius:8px; background-size:cover; border:1px solid #333;"></div>
-        <div style="flex:1; overflow:hidden;">
-            <h4 id="p-title" style="margin:0; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:white;">...</h4>
-            <div id="p-time" style="font-size:10px; color:var(--neon); font-weight:900;">00:00 / 00:00</div>
-        </div>
-        <button onclick="window.toggleMainPlay()" id="p-play-btn" class="btn-p-main"></button>
-        <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#666; font-size:28px; cursor:pointer;">×</button>
+<audio id="main-media" crossorigin="anonymous"></audio>
+
+<div id="mini-player">
+    <div id="mini-art" class="mini-art" onclick="window.openFullPlayer()"></div>
+    <div class="mini-info" onclick="window.openFullPlayer()">
+        <h4 id="mini-title" class="mini-title">...</h4>
+        <div id="mini-artist" class="mini-artist">...</div>
     </div>
-    <input type="range" id="seek-bar" value="0" min="0" step="1">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div style="display:flex; align-items:center; gap:8px;">
-            <google-cast-launcher></google-cast-launcher><span style="color:var(--neon); font-size:10px; font-weight:800;">Google TV</span>
+    <button onclick="window.toggleMainPlay()" id="mini-play-btn" class="btn-mini-play"></button>
+</div>
+
+<div id="full-player">
+    <div class="fp-header">
+        <button onclick="window.closeFullPlayer()" class="btn-down">🔽</button>
+        <span style="font-size:10px; font-weight:800; letter-spacing:3px; color:var(--neon);">MUSIC LAND RADIO</span>
+        <div style="width:28px;"></div>
+    </div>
+    
+    <div class="fp-art-container">
+        <div id="fp-art" class="fp-art"></div>
+    </div>
+    
+    <div class="fp-info">
+        <h2 id="fp-title" class="fp-title">...</h2>
+        <p id="fp-artist" class="fp-artist">...</p>
+    </div>
+    
+    <div class="fp-progress">
+        <input type="range" id="fp-seek" class="fp-seek" value="0" min="0" step="1">
+        <div class="fp-time-row">
+            <span id="fp-time-current">00:00</span>
+            <span id="fp-time-total">00:00</span>
         </div>
-        <button onclick="window.toggleMute()" id="btn-mute" style="background:#1a1a1a; border:1px solid #333; color:white; font-size:10px; font-weight:800; padding:6px 12px; border-radius:8px; cursor:pointer;">🔊 VOL</button>
+    </div>
+    
+    <div class="fp-controls">
+        <button onclick="window.toggleMute()" id="fp-btn-mute" class="fp-btn-sec">🔊</button>
+        <button onclick="window.toggleMainPlay()" id="fp-play-btn" class="fp-btn-main"></button>
+        <google-cast-launcher></google-cast-launcher>
     </div>
 </div>
 
@@ -175,11 +210,11 @@
     const db = getFirestore(app);
     const coleccionDB = "musicland_canciones";
 
-    // 🌟 AQUÍ ESTÁ LA NUEVA CATEGORÍA "MIX" AGREGADA 🌟
     const categorias = ["MIX", "SALSA", "MERENGUE", "BALADAS EN ESPAÑOL", "BALADAS EN INGLES", "FUNK", "POP", "SOUL", "R&B", "ROCK", "MUSICA TROPICAL", "CLASICOS BAILABLES", "PODCAST", "I.A.", "HOUSE", "DANCE", "RANCHERAS", "LLANERAS", "ROCK EN ESPAÑOL"];
     
     let canciones = []; let idActual = null; let filtroActual = "TODOS"; let modoAdmin = false;
-    const media = document.getElementById('main-media'); const seekBar = document.getElementById('seek-bar');
+    const media = document.getElementById('main-media'); 
+    const fpSeek = document.getElementById('fp-seek');
     
     const SVG_PLAY = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
@@ -203,15 +238,13 @@
     window.filtrar = (cat, el) => {
         filtroActual = cat;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        if(el) el.classList.add('active');
-        else document.getElementById('btn-filtro-todos').classList.add('active');
+        if(el) el.classList.add('active'); else document.getElementById('btn-filtro-todos').classList.add('active');
         render();
     };
 
     let toques = 0, tiempoToque = 0;
     document.getElementById('sensor-btn').onclick = () => {
-        const ahora = new Date().getTime();
-        if (ahora - tiempoToque > 1000) toques = 0;
+        const ahora = new Date().getTime(); if (ahora - tiempoToque > 1000) toques = 0;
         tiempoToque = ahora; toques++;
         if (toques === 3) { toques = 0; document.getElementById('login-screen').style.display = 'flex'; }
     };
@@ -231,12 +264,9 @@
         btn.disabled = true; btn.innerText = "...";
         try {
             await addDoc(collection(db, coleccionDB), {
-                titulo: document.getElementById('t-titulo').value,
-                artista: document.getElementById('t-artista').value,
-                mp3Url: document.getElementById('t-url').value,
-                imagenUrl: document.getElementById('t-img').value || "logo.png",
-                categoria: document.getElementById('t-categoria').value,
-                fecha: new Date().getTime()
+                titulo: document.getElementById('t-titulo').value, artista: document.getElementById('t-artista').value,
+                mp3Url: document.getElementById('t-url').value, imagenUrl: document.getElementById('t-img').value || "logo.png",
+                categoria: document.getElementById('t-categoria').value, fecha: new Date().getTime()
             });
             alert("¡Canción subida!");
             document.getElementById('t-titulo').value = ""; document.getElementById('t-artista').value = "";
@@ -260,49 +290,67 @@
             const isPlaying = idActual === c.id && !media.paused;
             const div = document.createElement('div');
             div.className = `track-card ${isPlaying ? 'is-playing' : ''}`;
-            
             div.innerHTML = `
-                <div class="track-main">
+                <div class="track-main" onclick="window.gestionarPlay('${c.id}','${c.mp3Url}','${c.titulo}','${c.artista}','${c.imagenUrl}')">
                     <div class="track-img" style="background-image: url('${c.imagenUrl}')"></div>
                     <div class="track-info">
                         <div class="track-tag">${c.categoria}</div>
                         <h3 class="track-title">${c.titulo}</h3>
                         <p class="track-artist">${c.artista}</p>
                     </div>
-                    <button class="btn-play-mini" onclick="window.gestionarPlay('${c.id}','${c.mp3Url}','${c.titulo}','${c.imagenUrl}')">
-                        ${isPlaying ? SVG_PAUSE : SVG_PLAY}
-                    </button>
+                    <button class="btn-play-mini">${isPlaying ? SVG_PAUSE : SVG_PLAY}</button>
                 </div>
                 ${modoAdmin ? `<button onclick="window.borrarPista('${c.id}')" style="margin-top:12px; background:transparent; border:1px solid #ff4444; color:#ff4444; font-size:10px; font-weight:800; padding:6px; border-radius:8px; width:100%; cursor:pointer;">🗑️ BORRAR CANCIÓN</button>` : ''}
             `;
             feed.appendChild(div);
         });
 
-        const pBtn = document.getElementById('p-play-btn');
-        if(pBtn) pBtn.innerHTML = media.paused ? SVG_PLAY : SVG_PAUSE;
+        // Actualizar iconos de Play/Pausa en ambos reproductores
+        const miniBtn = document.getElementById('mini-play-btn');
+        const fpBtn = document.getElementById('fp-play-btn');
+        if(miniBtn) miniBtn.innerHTML = media.paused ? SVG_PLAY : SVG_PAUSE;
+        if(fpBtn) fpBtn.innerHTML = media.paused ? SVG_PLAY : SVG_PAUSE;
     }
 
-    window.gestionarPlay = (id, url, tit, img) => {
-        if(idActual === id) { window.toggleMainPlay(); } else {
+    // ABRIR Y CERRAR EL REPRODUCTOR GIGANTE
+    window.openFullPlayer = () => document.getElementById('full-player').classList.add('active');
+    window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
+
+    window.gestionarPlay = (id, url, tit, art, img) => {
+        if(idActual === id) { 
+            window.openFullPlayer(); 
+        } else {
             idActual = id; window.castUrl = url; window.castTitle = tit; window.castCover = img;
-            document.getElementById('p-title').innerText = tit;
-            document.getElementById('p-art').style.backgroundImage = `url('${img}')`;
-            document.getElementById('global-player').style.display = 'block';
+            
+            // Llenar datos Mini Player
+            document.getElementById('mini-title').innerText = tit;
+            document.getElementById('mini-artist').innerText = art;
+            document.getElementById('mini-art').style.backgroundImage = `url('${img}')`;
+            document.getElementById('mini-player').style.display = 'flex';
+            
+            // Llenar datos Full Player
+            document.getElementById('fp-title').innerText = tit;
+            document.getElementById('fp-artist').innerText = art;
+            document.getElementById('fp-art').style.backgroundImage = `url('${img}')`;
+            
             media.src = url;
             media.play().catch(err => alert("Error: El link de la canción está roto o es privado."));
+            window.openFullPlayer();
         }
         render();
     };
 
     window.toggleMainPlay = () => { if(media.paused) media.play(); else media.pause(); render(); };
-    window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
-    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
+    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('fp-btn-mute').innerText = media.muted ? "🔇" : "🔊"; };
 
     media.ontimeupdate = () => { 
-        seekBar.max = media.duration || 0; seekBar.value = media.currentTime;
-        document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration);
+        fpSeek.max = media.duration || 0; 
+        fpSeek.value = media.currentTime;
+        document.getElementById('fp-time-current').innerText = formatTime(media.currentTime);
+        document.getElementById('fp-time-total').innerText = formatTime(media.duration);
     };
-    seekBar.oninput = () => { media.currentTime = seekBar.value; };
+    
+    fpSeek.oninput = () => { media.currentTime = fpSeek.value; };
     function formatTime(s) { if(isNaN(s)) return "00:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
 </script>
 </body>
