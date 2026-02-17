@@ -5,7 +5,7 @@ const songs = [
     { title: "Earth, Wind & Fire Mix Vol. 1", artist: "Earth, Wind & Fire", cover: "Earth, Wind & Fire Mix Vol. 1.jpg", audio: "https://archive.org/download/music-land-proyect/Earth%2C%20Wind%20%26%20Fire%20Mix%20Vol.%201.mp3", likes: 0, category: "Soul" },
     { title: "Earth, Wind & Fire Mix Vol. 2", artist: "Earth, Wind & Fire Mix", cover: "Earth, Wind & Fire Mix Vol. 2.jpg", audio: "https://archive.org/download/music-land-proyect/Earth%2C%20Wind%20%26%20Fire%20Mix%20Vol.%202.mp3", likes: 0, category: "Soul" },
     { title: "Music Land Mix 1", artist: "Jose Luis Yajure", cover: "Music Land Mix 1.jpg", audio: "https://archive.org/download/music-land-proyect/Music%20Land%20Mix%201.mp3", likes: 0, category: "Mix" },
-    { title: "A Woman's Worth", artist: "Michael Jackson", cover: "Michael Jackson - A Woman's Worth.jpg", audio: "https://archive.org/download/music-land-proyect/Michael%20Jackson%20-%20A%20Woman%27s%20Worth%20%28I.A.%29.mp3", likes: 0, category: "I.A." },
+    { title: "A Woman's Worth", artist: "Michael Jackson", cover: "awomansworth.jpg", audio: "https://archive.org/download/music-land-proyect/Michael%20Jackson%20-%20A%20Woman%27s%20Worth%20%28I.A.%29.mp3", likes: 0, category: "I.A." },
     { title: "Guaco Mix Vol. 1", artist: "Guaco", cover: "Guaco Mix Vol. 1.jpg", audio: "https://archive.org/download/music-land-proyect/Guaco%20Mix%20Vol.%201.mp3", likes: 0, category: "Mix" },
     { title: "Guaco Mix Vol. 2", artist: "Guaco", cover: "Guaco Mix Vol. 2.jpg", audio: "https://archive.org/download/music-land-proyect/Guaco%20Mix%20Vol.%202.mp3", likes: 0, category: "Mix" },
     { title: "Guaco Mix Vol. 3", artist: "Guaco", cover: "Guaco Mix Vol. 3.jpg", audio: "https://archive.org/download/music-land-proyect/Guaco%20Mix%20Vol.%203.mp3", likes: 0, category: "Mix" },
@@ -450,6 +450,7 @@ function shareApp() {
         prompt("Copia este enlace para compartir:", window.location.href);
     }
 }
+
 
 
 
