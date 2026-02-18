@@ -12,37 +12,77 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
     <script>
         window.castUrl = ""; window.castTitle = ""; window.castCover = ""; window.lastTvTime = 0;
+        
+        // INICIALIZACIÓN DEL SISTEMA CAST
         window['__onGCastApiAvailable'] = function(isAvailable) {
             if (isAvailable) {
-                const castContext = cast.framework.CastContext.getInstance();
-                castContext.setOptions({ 
-                    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, 
-                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED 
-                });
+                try {
+                    const castContext = cast.framework.CastContext.getInstance();
+                    castContext.setOptions({ 
+                        receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, 
+                        autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED 
+                    });
 
-                const player = new cast.framework.RemotePlayer();
-                const controller = new cast.framework.RemotePlayerController(player);
-                
-                controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
-                    window.lastTvTime = player.currentTime;
-                });
+                    // MONITOR DE SESIÓN (Para cambiar el color del botón)
+                    castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
+                        const btn = document.getElementById('btn-cast-manual');
+                        const media = document.getElementById('main-media');
+                        
+                        switch (event.sessionState) {
+                            case cast.framework.SessionState.SESSION_STARTED:
+                            case cast.framework.SessionState.SESSION_RESUMED:
+                                if(btn) { btn.style.color = "var(--neon)"; btn.style.borderColor = "var(--neon)"; }
+                                media.pause(); // Pausar celular
+                                loadMediaOnCast(); // Cargar música en TV
+                                break;
+                            case cast.framework.SessionState.SESSION_ENDED:
+                                if(btn) { btn.style.color = "white"; btn.style.borderColor = "#333"; }
+                                if(window.lastTvTime > 0) media.currentTime = window.lastTvTime;
+                                break;
+                        }
+                    });
 
-                castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
-                    const media = document.getElementById('main-media');
-                    if (event.sessionState === 'SESSION_STARTED') {
-                        media.pause(); // Pausar celular al conectar
-                        const session = castContext.getCurrentSession();
-                        const info = new chrome.cast.media.MediaInfo(window.castUrl, 'audio/mp3');
-                        const meta = new chrome.cast.media.MusicTrackMediaMetadata();
-                        meta.title = window.castTitle; meta.artist = "Music Land"; meta.images = [new chrome.cast.Image(window.castCover)];
-                        info.metadata = meta;
-                        const req = new chrome.cast.media.LoadRequest(info); req.currentTime = media.currentTime; session.loadMedia(req);
-                    }
-                    if (event.sessionState === 'SESSION_ENDED') {
-                        if (window.lastTvTime > 0) media.currentTime = window.lastTvTime;
-                        setTimeout(() => { media.play().catch(()=>{}); if(window.actualizarUI) window.actualizarUI(); }, 500);
-                    }
-                });
+                    // CONTROL REMOTO (Sincronizar tiempo)
+                    const player = new cast.framework.RemotePlayer();
+                    const controller = new cast.framework.RemotePlayerController(player);
+                    controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
+                        window.lastTvTime = player.currentTime;
+                    });
+
+                } catch (e) { console.error("Error Cast Init", e); }
+            }
+        };
+
+        // FUNCIÓN PARA ENVIAR AL TV
+        function loadMediaOnCast() {
+            const castContext = cast.framework.CastContext.getInstance();
+            const session = castContext.getCurrentSession();
+            if (!session || !window.castUrl) return;
+
+            const mediaInfo = new chrome.cast.media.MediaInfo(window.castUrl, 'audio/mp3');
+            const meta = new chrome.cast.media.MusicTrackMediaMetadata();
+            meta.title = window.castTitle;
+            meta.artist = "Music Land";
+            meta.images = [new chrome.cast.Image(window.castCover)];
+            mediaInfo.metadata = meta;
+
+            const request = new chrome.cast.media.LoadRequest(mediaInfo);
+            const localMedia = document.getElementById('main-media');
+            request.currentTime = localMedia.currentTime;
+            request.autoplay = true;
+
+            session.loadMedia(request).then(
+                function() { console.log('Load succeed'); },
+                function(errorCode) { console.log('Error code: ' + errorCode); }
+            );
+        }
+
+        // FUNCIÓN MANUAL QUE TÚ ACTIVAS AL TOCAR EL BOTÓN
+        window.requestCastSession = () => {
+            try {
+                cast.framework.CastContext.getInstance().requestSession();
+            } catch (e) {
+                alert("Verifica que tu TV esté encendido y en la misma red Wi-Fi.");
             }
         };
     </script>
@@ -143,30 +183,21 @@
         .fp-seek { width: 100%; -webkit-appearance: none; background: #222; height: 6px; border-radius: 3px; cursor: pointer; }
         .fp-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
         
-        /* CONTROLES BLINDADOS (GRID 3 COLUMNAS) */
+        /* CONTROLES FLEX (MEJOR PARA MÓVILES) */
         .fp-controls { 
-            display: grid; 
-            grid-template-columns: 60px 1fr 60px; /* FIJO - FLEXIBLE - FIJO */
+            display: flex; /* CAMBIO A FLEX */
+            justify-content: space-around;
             align-items: center; 
             width: 100%; 
             padding-bottom: 40px; 
-            justify-items: center;
         }
         .fp-btn-main { width: 75px; height: 75px; border-radius: 50%; background: var(--neon); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px rgba(0,210,255,0.3); }
         .fp-btn-main svg { width: 35px; height: 35px; fill: black !important; margin-left: 3px; }
         .fp-btn-sec { background: #1a1a1a; border: 1px solid #333; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        /* ---------------------------------------------------- */
-        /* EL SECRETO DE JTBP PARA QUE EL BOTÓN SALGA SIEMPRE */
-        /* ---------------------------------------------------- */
-        google-cast-launcher { 
-            width: 40px; 
-            height: 40px; 
-            cursor: pointer; 
-            display: inline-block !important; /* IMPORTANTE */
-            --disconnected-color: #ffffff; /* Blanco cuando está desconectado */
-            --connected-color: var(--neon); /* Azul neón cuando conecta */
-        }
+        /* BOTÓN MANUAL DE CAST (ESTILO FIJO) */
+        #btn-cast-manual { background: #1a1a1a; border: 1px solid #333; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        #btn-cast-manual svg { width: 24px; height: 24px; fill: currentColor; }
     </style>
 </head>
 <body>
@@ -289,7 +320,10 @@
     <div class="fp-controls">
         <button onclick="window.toggleMute()" id="fp-btn-mute" class="fp-btn-sec">🔊</button>
         <button onclick="window.toggleMainPlay()" id="fp-play-btn" class="fp-btn-main"></button>
-        <google-cast-launcher id="cast-btn"></google-cast-launcher>
+        
+        <button onclick="window.requestCastSession()" id="btn-cast-manual">
+            <svg viewBox="0 0 24 24"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm9 11v-7l9 3.5-9 3.5z"/></svg>
+        </button>
     </div>
 </div>
 
