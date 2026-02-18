@@ -12,32 +12,34 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
     <script>
         window.castUrl = ""; window.castTitle = ""; window.castCover = ""; window.lastTvTime = 0;
-        
+        window.castContext = null;
+
         window['__onGCastApiAvailable'] = function(isAvailable) {
             if (isAvailable) {
                 try {
-                    const castContext = cast.framework.CastContext.getInstance();
-                    castContext.setOptions({ 
+                    window.castContext = cast.framework.CastContext.getInstance();
+                    window.castContext.setOptions({ 
                         receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, 
                         autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED 
                     });
 
-                    // MONITOR DE SESIÓN
-                    castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
+                    // MONITOR DE CONEXIÓN
+                    window.castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
                         const media = document.getElementById('main-media');
+                        const btn = document.getElementById('btn-cast-fijo');
                         
                         switch (event.sessionState) {
                             case cast.framework.SessionState.SESSION_STARTED:
                             case cast.framework.SessionState.SESSION_RESUMED:
-                                media.pause(); // Silenciar celular
-                                loadMediaOnCast(); // Enviar a TV
+                                media.pause(); // Pausar celular
+                                if(btn) { btn.classList.add('cast-active'); } // Poner botón AZUL
+                                loadMediaOnCast(); // Mandar música
                                 break;
                                 
                             case cast.framework.SessionState.SESSION_ENDED:
-                                // === AQUÍ ESTÁ LA CORRECCIÓN ===
-                                // Recuperar el tiempo del TV
+                                if(btn) { btn.classList.remove('cast-active'); } // Poner botón BLANCO
                                 if(window.lastTvTime > 0) media.currentTime = window.lastTvTime;
-                                // Esperar un poquito y DARLE PLAY AL CELULAR
+                                // REACTIVAR AUDIO EN CELULAR
                                 setTimeout(() => {
                                     media.play().catch(e => console.log("Play error:", e));
                                     if(window.actualizarUI) window.actualizarUI();
@@ -46,6 +48,7 @@
                         }
                     });
 
+                    // SINCRONIZAR TIEMPO
                     const player = new cast.framework.RemotePlayer();
                     const controller = new cast.framework.RemotePlayerController(player);
                     controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
@@ -56,9 +59,20 @@
             }
         };
 
+        // FUNCIÓN MANUAL PARA ACTIVAR EL MENÚ DE TV
+        window.startCast = () => {
+            if (window.castContext) {
+                window.castContext.requestSession().then(
+                    () => console.log("Conectando..."),
+                    (e) => { if(e.code !== 'cancel') alert("No se encontró TV. Verifica tu Wi-Fi."); }
+                );
+            } else {
+                alert("El sistema Cast aún está cargando...");
+            }
+        };
+
         function loadMediaOnCast() {
-            const castContext = cast.framework.CastContext.getInstance();
-            const session = castContext.getCurrentSession();
+            const session = window.castContext.getCurrentSession();
             if (!session || !window.castUrl) return;
 
             const mediaInfo = new chrome.cast.media.MediaInfo(window.castUrl, 'audio/mp3');
@@ -173,7 +187,7 @@
         .fp-seek { width: 100%; -webkit-appearance: none; background: #222; height: 6px; border-radius: 3px; cursor: pointer; }
         .fp-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 10px var(--neon); }
         
-        /* CONTROLES FLEX CON EL BOTÓN CAST VISIBLE */
+        /* CONTROLES FLEX (MEJOR PARA MÓVILES) */
         .fp-controls { 
             display: flex;
             justify-content: space-around;
@@ -185,15 +199,12 @@
         .fp-btn-main svg { width: 35px; height: 35px; fill: black !important; margin-left: 3px; }
         .fp-btn-sec { background: #1a1a1a; border: 1px solid #333; color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        /* EL SECRETO: FORZAR DISPLAY BLOCK */
-        google-cast-launcher { 
-            width: 40px; 
-            height: 40px; 
-            cursor: pointer; 
-            display: inline-block !important; /* MÁGICO */
-            --disconnected-color: #ffffff; 
-            --connected-color: var(--neon); 
-        }
+        /* BOTÓN DE CAST FIJO (IMPOSIBLE DE ESCONDER) */
+        #btn-cast-fijo { background: #1a1a1a; border: 1px solid #333; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        #btn-cast-fijo svg { width: 24px; height: 24px; fill: currentColor; }
+        
+        /* ESTADO ACTIVO (AZUL NEÓN CUANDO CONECTA) */
+        #btn-cast-fijo.cast-active { background: rgba(0, 210, 255, 0.2); border-color: var(--neon); color: var(--neon); box-shadow: 0 0 15px rgba(0, 210, 255, 0.3); }
     </style>
 </head>
 <body>
@@ -316,7 +327,10 @@
     <div class="fp-controls">
         <button onclick="window.toggleMute()" id="fp-btn-mute" class="fp-btn-sec">🔊</button>
         <button onclick="window.toggleMainPlay()" id="fp-play-btn" class="fp-btn-main"></button>
-        <google-cast-launcher id="cast-btn"></google-cast-launcher>
+        
+        <button onclick="window.startCast()" id="btn-cast-fijo">
+            <svg viewBox="0 0 24 24"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm9 11v-7l9 3.5-9 3.5z"/></svg>
+        </button>
     </div>
 </div>
 
