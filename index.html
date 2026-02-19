@@ -17,10 +17,30 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('App lista para instalarse', reg);
+                    console.log('Motor de instalación listo.');
                 });
             });
         }
+
+        // CAPTURA EL EVENTO DE INSTALACIÓN DE GOOGLE PARA NUESTRO BOTÓN
+        let letInstallPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            letInstallPrompt = e;
+            // Muestra el botón de instalar si Google da permiso
+            const btnInstalar = document.getElementById('btn-instalar');
+            if(btnInstalar) btnInstalar.style.display = 'block';
+        });
+
+        window.instalarAppFuerza = async () => {
+            if (!letInstallPrompt) return;
+            letInstallPrompt.prompt();
+            const { outcome } = await letInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('btn-instalar').style.display = 'none';
+            }
+            letInstallPrompt = null;
+        };
     </script>
 
     <script>
@@ -162,12 +182,15 @@
         .btn-cast-pc { transition: 0.3s; }
         .btn-cast-pc.cast-active { background: rgba(0, 210, 255, 0.1); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 20px var(--neon); }
 
+        /* PANTALLA DE SALIDA ELEGANTE */
+        #pantalla-salida { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#080808; z-index:99999; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+
         /* MÓVIL */
         @media (max-width: 768px) {
             header { padding: 10px 15px; height: 65px; }
             .logo-box { width: 38px; height: 38px; }
             .brand-title { font-size: 15px; margin-left: 8px; letter-spacing: 0.5px; }
-            header button { font-size: 12px; padding: 4px 10px; }
+            header button { font-size: 11px; padding: 6px 12px; }
             
             #home-view { padding-top: 80px; padding-bottom: 120px; }
             
@@ -205,13 +228,16 @@
     <div style="display:flex; align-items:center; cursor:pointer;" onclick="window.triggerAdmin()">
         <div class="logo-box">
             <svg class="logo-svg" id="svg-respaldo" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <img src="logo.jpg?v=97" class="header-logo" alt="ML" 
+            <img src="logo.jpg?v=98" class="header-logo" alt="ML" 
                  onload="document.getElementById('svg-respaldo').style.display='none'" 
-                 onerror="this.src='logo.png?v=97'; this.onerror=null;">
+                 onerror="this.src='logo.png?v=98'; this.onerror=null;">
         </div>
         <div class="brand-title">MUSIC LAND PROJECT</div>
     </div>
-    <button onclick="window.confirmarSalida()" style="background:transparent; border:1px solid #ff4444; color:#ff4444; padding:5px 15px; border-radius:20px; cursor:pointer;">SALIR</button>
+    <div style="display:flex; gap: 8px;">
+        <button id="btn-instalar" onclick="window.instalarAppFuerza()" style="display:none; background:var(--neon); color:black; border:none; padding:5px 12px; border-radius:20px; font-weight:bold; cursor:pointer;">📥 INSTALAR</button>
+        <button onclick="window.confirmarSalida()" style="background:transparent; border:1px solid #ff4444; color:#ff4444; padding:5px 12px; border-radius:20px; cursor:pointer;">SALIR</button>
+    </div>
 </header>
 
 <div id="home-view">
@@ -279,6 +305,14 @@
             <svg viewBox="0 0 24 24"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm9 11v-7l9 3.5-9 3.5z"/></svg>
         </button>
     </div>
+</div>
+
+<div id="pantalla-salida">
+    <img src="logo.jpg" alt="Logo" style="width:120px; height:120px; border-radius:20px; box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); margin-bottom: 25px;" onerror="this.src='logo.png'">
+    <h2 style="color:white; margin:0; font-size:28px;">Música Detenida</h2>
+    <p style="color:var(--neon); margin-top:10px; font-size:18px;">¡Gracias por escuchar!</p>
+    <p style="color:#888; font-size:14px; margin-top:20px; max-width:85%; line-height:1.6;">Ya puedes cerrar la aplicación deslizando esta pantalla o usando el botón de inicio de tu celular.</p>
+    <button onclick="location.reload()" style="margin-top:40px; background:transparent; border:1px solid var(--neon); color:var(--neon); padding:10px 25px; border-radius:30px; cursor:pointer; font-weight:bold;">VOLVER A LA RADIO</button>
 </div>
 
 <script type="module">
@@ -434,7 +468,16 @@
 
     window.openFullPlayer = () => document.getElementById('full-player').classList.add('active');
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
-    window.confirmarSalida = () => { if(confirm("¿Salir?")) window.location.href = "about:blank"; };
+    
+    // 🚪 FUNCIÓN DE SALIDA MEJORADA (ADIÓS PANTALLA NEGRA)
+    window.confirmarSalida = () => { 
+        if(confirm("¿Deseas detener la música y salir de la app?")) {
+            media.pause(); // Apagamos la música
+            media.src = ""; // Vaciamos el motor
+            window.actualizarBotonesPlay(true);
+            document.getElementById('pantalla-salida').style.display = 'flex'; // Mostramos la despedida
+        } 
+    };
 </script>
 </body>
 </html>
