@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Music Land Pro - Master V94</title>
+    <title>Music Land Pro - Master V95</title>
     
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <link rel="icon" href="logo.png" type="image/png">
@@ -118,7 +118,7 @@
         .hero-btn-play { background: var(--neon); border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--neon); color: black; transition: 0.3s; }
         .hero-btn-play:hover { transform: scale(1.05); }
 
-        /* CAROUSEL Y CORAZONCITOS EN TARJETAS */
+        /* CAROUSEL */
         .carousel { display: flex; overflow-x: auto; padding: 0 20px 30px 20px; gap: 20px; max-width: 1100px; margin: 0 auto; }
         .n-card { min-width: 155px; cursor: pointer; transition: 0.3s; position: relative; }
         .n-card:hover { transform: translateY(-5px); }
@@ -155,10 +155,7 @@
         .btn-cast-pc { transition: 0.3s; }
         .btn-cast-pc.cast-active { background: rgba(0, 210, 255, 0.1); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 20px var(--neon); }
 
-
-        /* =========================================
-           📱 MÓVIL
-           ========================================= */
+        /* MÓVIL */
         @media (max-width: 768px) {
             header { padding: 10px 15px; height: 65px; }
             .logo-box { width: 38px; height: 38px; }
@@ -201,9 +198,9 @@
     <div style="display:flex; align-items:center; cursor:pointer;" onclick="window.triggerAdmin()">
         <div class="logo-box">
             <svg class="logo-svg" id="svg-respaldo" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <img src="logo.jpg?v=94" class="header-logo" alt="ML" 
+            <img src="logo.jpg?v=95" class="header-logo" alt="ML" 
                  onload="document.getElementById('svg-respaldo').style.display='none'" 
-                 onerror="this.src='logo.png?v=94'; this.onerror=null;">
+                 onerror="this.src='logo.png?v=95'; this.onerror=null;">
         </div>
         <div class="brand-title">Music Land</div>
     </div>
@@ -226,11 +223,16 @@
             </div>
         </div>
     </div>
+    
     <div id="feed-container">
+        <h3 style="margin-left:20px; color: var(--neon);">💡 Sugerencias para ti</h3>
+        <div id="carousel-sug" class="carousel"></div>
+
         <h3 id="title-fav" style="margin-left:20px; display:none; color: #ff4444;">❤️ Tus Favoritos</h3>
         <div id="carousel-fav" class="carousel" style="display:none;"></div>
 
         <h3 style="margin-left:20px;">🔥 Novedades</h3><div id="carousel-new" class="carousel"></div>
+        
         <h3 style="margin-left:20px;">📂 Todo el Catálogo</h3><div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
 </div>
@@ -264,7 +266,6 @@
         </button>
         
         <button onclick="window.toggleFavoritoActual()" class="btn-round" id="fp-fav-btn" style="width:55px; height:55px; font-size: 26px; border:none; background:transparent;">🤍</button>
-        
         <button onclick="window.toggleMainPlay()" id="fp-play-btn" class="fp-btn-main"></button>
         
         <button onclick="window.startCast()" id="btn-cast-fijo" class="btn-round btn-cast-pc" style="width:55px; height:55px;">
@@ -282,8 +283,6 @@
     const db = getFirestore(app);
     const media = document.getElementById('main-media');
     let canciones = []; let idActual = null;
-    
-    // CARGAR FAVORITOS DE LA MEMORIA
     let misFavoritos = JSON.parse(localStorage.getItem('ml_favoritos')) || [];
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
@@ -295,7 +294,6 @@
         document.getElementById('mini-vol-btn').style.display = 'flex';
     }
 
-    // LÓGICA DE FAVORITOS (AGREGAR O QUITAR)
     window.toggleFavorito = (id) => {
         if(misFavoritos.includes(id)) {
             misFavoritos = misFavoritos.filter(favId => favId !== id);
@@ -340,7 +338,6 @@
         document.getElementById('hero-play-btn').innerHTML = (idActual === f.id && !media.paused) ? SVG_PAUSE : SVG_PLAY;
         document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(f.id);
         
-        // Corazón Hero
         const btnHeroFav = document.getElementById('hero-fav-btn');
         btnHeroFav.innerText = misFavoritos.includes(f.id) ? '❤️' : '🤍';
         btnHeroFav.onclick = () => window.toggleFavorito(f.id);
@@ -360,10 +357,32 @@
             </div>`;
         };
         
+        // NOVEDADES Y CATÁLOGO
         document.getElementById('carousel-new').innerHTML = canciones.slice(0, 10).map(c => createCard(c)).join('');
         document.getElementById('carousel-all').innerHTML = canciones.map(c => createCard(c)).join('');
 
-        // RENDERIZAR LA FILA DE FAVORITOS
+        // 🧠 CEREBRO SPOTIFY: SUGERENCIAS INTELIGENTES
+        let sugerencias = [];
+        if (misFavoritos.length > 0) {
+            // 1. Extrae los artistas que le gustan al usuario
+            const artistasFavoritos = canciones.filter(c => misFavoritos.includes(c.id)).map(c => c.artista);
+            // 2. Busca canciones de esos artistas que NO estén en sus favoritos
+            const recomendadas = canciones.filter(c => artistasFavoritos.includes(c.artista) && !misFavoritos.includes(c.id));
+            // 3. Las mezcla
+            sugerencias = recomendadas.sort(() => 0.5 - Math.random());
+        }
+
+        // Si no hay suficientes recomendaciones por gustos, rellena con aleatorias para que descubra
+        if (sugerencias.length < 10) {
+            const extra = canciones.filter(c => !misFavoritos.includes(c.id) && !sugerencias.includes(c)).sort(() => 0.5 - Math.random());
+            sugerencias = [...sugerencias, ...extra].slice(0, 10);
+        } else {
+            sugerencias = sugerencias.slice(0, 10);
+        }
+        
+        document.getElementById('carousel-sug').innerHTML = sugerencias.map(c => createCard(c)).join('');
+
+        // RENDERIZAR FAVORITOS
         const listaFavs = canciones.filter(c => misFavoritos.includes(c.id));
         const favTitle = document.getElementById('title-fav');
         const favCarousel = document.getElementById('carousel-fav');
