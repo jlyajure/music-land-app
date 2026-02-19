@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Music Land Pro - Master V93</title>
+    <title>Music Land Pro - Master V94</title>
     
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <link rel="icon" href="logo.png" type="image/png">
@@ -46,11 +46,7 @@
                         else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
                             if(btnCast) btnCast.classList.remove('cast-active');
                             clearInterval(window.tvSyncInterval); 
-                            
-                            if(window.lastTvTime > 0) {
-                                media.currentTime = window.lastTvTime;
-                            }
-                            
+                            if(window.lastTvTime > 0) media.currentTime = window.lastTvTime;
                             media.play(); 
                             if(window.actualizarBotonesPlay) window.actualizarBotonesPlay(false);
                         }
@@ -72,20 +68,15 @@
                 context.requestSession().then(function() {
                     if (media && media.src) {
                         const mediaInfo = new chrome.cast.media.MediaInfo(media.src, 'audio/mp3');
-                        
                         const meta = new chrome.cast.media.MusicTrackMediaMetadata();
                         meta.title = window.castTitle || "En vivo";
                         meta.artist = "🔹 Music Land 🔹"; 
-                        
-                        if(window.castCover) {
-                            meta.images = [new chrome.cast.Image(window.castCover)];
-                        }
+                        if(window.castCover) meta.images = [new chrome.cast.Image(window.castCover)];
                         mediaInfo.metadata = meta;
 
                         const request = new chrome.cast.media.LoadRequest(mediaInfo);
                         request.autoplay = true;
                         request.currentTime = media.currentTime; 
-                        
                         context.getCurrentSession().loadMedia(request);
                     }
                 }, function(e) {
@@ -127,14 +118,17 @@
         .hero-btn-play { background: var(--neon); border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--neon); color: black; transition: 0.3s; }
         .hero-btn-play:hover { transform: scale(1.05); }
 
-        /* CAROUSEL PC */
+        /* CAROUSEL Y CORAZONCITOS EN TARJETAS */
         .carousel { display: flex; overflow-x: auto; padding: 0 20px 30px 20px; gap: 20px; max-width: 1100px; margin: 0 auto; }
-        .n-card { min-width: 155px; cursor: pointer; transition: 0.3s; }
+        .n-card { min-width: 155px; cursor: pointer; transition: 0.3s; position: relative; }
         .n-card:hover { transform: translateY(-5px); }
-        .n-img { width: 155px; height: 155px; border-radius: 15px; background-size: cover; background-position: center; border: 1px solid #222; position: relative; }
-        .n-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; border-radius: 15px; }
+        .n-img { width: 155px; height: 155px; border-radius: 15px; background-size: cover; background-position: center; border: 1px solid #222; position: relative; overflow: hidden; }
+        .n-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; border-radius: 15px; z-index: 1; }
         .n-card:hover .n-overlay { opacity: 1; }
         .n-play-icon { width: 45px; height: 45px; background: var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; }
+        
+        .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
+        .btn-fav-card:hover { transform: scale(1.2); }
 
         /* MINI PLAYER PC */
         #mini-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); backdrop-filter: blur(20px); border-top: 1px solid #222; padding: 12px 40px; display: none; z-index: 5000; align-items: center; justify-content: space-between; gap: 15px; }
@@ -155,7 +149,7 @@
         .btn-modern-down { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; align-self: flex-start; flex-shrink: 0; }
         .btn-modern-down svg { width: 26px; height: 26px; fill: currentColor; }
         .fp-art { width: 350px; height: 350px; border-radius: 30px; background-size: cover; box-shadow: 0 30px 60px rgba(0,0,0,0.8); border: 2px solid #333; flex-shrink: 0; }
-        .fp-controls { display: flex; align-items: center; gap: 45px; margin-top: 30px; }
+        .fp-controls { display: flex; align-items: center; gap: 30px; margin-top: 30px; }
         .fp-btn-main { width: 85px; height: 85px; border-radius: 50%; background: var(--neon); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 30px var(--neon); color: black; flex-shrink: 0; }
         
         .btn-cast-pc { transition: 0.3s; }
@@ -163,7 +157,7 @@
 
 
         /* =========================================
-           📱 EL "TRANSFORMER" PARA CELULARES (MAGIA RESPONSIVE)
+           📱 MÓVIL
            ========================================= */
         @media (max-width: 768px) {
             header { padding: 10px 15px; height: 65px; }
@@ -173,34 +167,30 @@
             
             #home-view { padding-top: 80px; padding-bottom: 120px; }
             
-            /* HERO MÓVIL: Apilado hacia abajo */
             #hero-section { min-height: auto; padding: 30px 10px; border-radius: 0 0 25px 25px; }
             .hero-content { flex-direction: column; text-align: center; gap: 20px; padding: 10px; }
             .hero-cover { width: 220px; height: 220px; margin: 0 auto; }
             .hero-title { font-size: 28px; }
             .hero-artist { font-size: 18px; }
             .hero-bio { border-left: none; border-bottom: 2px solid var(--neon); padding-left: 0; padding-bottom: 15px; max-height: none; }
-            .hero-actions { justify-content: center; width: 100%; }
+            .hero-actions { justify-content: center; width: 100%; gap: 30px; }
             
-            /* CATÁLOGO MÓVIL: Tarjetas ajustadas */
             .carousel { padding: 0 10px 20px 10px; gap: 12px; }
             .n-card { min-width: 140px; width: 140px; }
             .n-img { width: 140px; height: 140px; }
             #carousel-all { gap: 15px; padding-bottom: 50px; }
             
-            /* MINI REPRODUCTOR MÓVIL */
             #mini-player { padding: 10px 15px; gap: 10px; }
             .mini-art { width: 45px; height: 45px; }
             .mini-controls { gap: 12px; }
             .btn-round { width: 38px; height: 38px; }
             .btn-round svg { width: 20px; height: 20px; }
             
-            /* FULL PLAYER MÓVIL */
             #full-player { padding: 25px 20px; }
             .fp-art { width: 280px; height: 280px; margin-top: 15px; }
             #fp-title { font-size: 26px !important; text-align: center; }
             #fp-artist { font-size: 18px !important; text-align: center; }
-            .fp-controls { gap: 25px; width: 100%; justify-content: center; }
+            .fp-controls { gap: 20px; width: 100%; justify-content: center; }
             .fp-btn-main { width: 75px; height: 75px; }
         }
     </style>
@@ -211,9 +201,9 @@
     <div style="display:flex; align-items:center; cursor:pointer;" onclick="window.triggerAdmin()">
         <div class="logo-box">
             <svg class="logo-svg" id="svg-respaldo" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <img src="logo.jpg?v=93" class="header-logo" alt="ML" 
+            <img src="logo.jpg?v=94" class="header-logo" alt="ML" 
                  onload="document.getElementById('svg-respaldo').style.display='none'" 
-                 onerror="this.src='logo.png?v=93'; this.onerror=null;">
+                 onerror="this.src='logo.png?v=94'; this.onerror=null;">
         </div>
         <div class="brand-title">Music Land</div>
     </div>
@@ -231,12 +221,15 @@
                 <div id="hero-bio" class="hero-bio"></div>
                 <div class="hero-actions">
                     <button id="hero-play-btn" class="hero-btn-play"></button>
-                    <button id="hero-fav-btn" style="background:none;border:none;font-size:32px;cursor:pointer;padding:0;">🤍</button>
+                    <button id="hero-fav-btn" style="background:none;border:none;font-size:35px;cursor:pointer;padding:0;transition:0.3s;">🤍</button>
                 </div>
             </div>
         </div>
     </div>
     <div id="feed-container">
+        <h3 id="title-fav" style="margin-left:20px; display:none; color: #ff4444;">❤️ Tus Favoritos</h3>
+        <div id="carousel-fav" class="carousel" style="display:none;"></div>
+
         <h3 style="margin-left:20px;">🔥 Novedades</h3><div id="carousel-new" class="carousel"></div>
         <h3 style="margin-left:20px;">📂 Todo el Catálogo</h3><div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
@@ -264,10 +257,14 @@
     <button onclick="window.closeFullPlayer()" class="btn-modern-down"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></button>
     <div id="fp-art" class="fp-art"></div>
     <div class="fp-info" style="width:100%;"><div id="fp-title" style="font-size:32px;font-weight:900;color:white;text-align:center;">...</div><div id="fp-artist" style="font-size:20px;color:var(--neon);font-weight:700;margin-top:10px;text-align:center;">...</div></div>
+    
     <div class="fp-controls">
         <button onclick="window.toggleMute()" class="btn-round" style="width:55px; height:55px;" id="btn-vol-full">
             <svg viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>
         </button>
+        
+        <button onclick="window.toggleFavoritoActual()" class="btn-round" id="fp-fav-btn" style="width:55px; height:55px; font-size: 26px; border:none; background:transparent;">🤍</button>
+        
         <button onclick="window.toggleMainPlay()" id="fp-play-btn" class="fp-btn-main"></button>
         
         <button onclick="window.startCast()" id="btn-cast-fijo" class="btn-round btn-cast-pc" style="width:55px; height:55px;">
@@ -285,16 +282,41 @@
     const db = getFirestore(app);
     const media = document.getElementById('main-media');
     let canciones = []; let idActual = null;
+    
+    // CARGAR FAVORITOS DE LA MEMORIA
+    let misFavoritos = JSON.parse(localStorage.getItem('ml_favoritos')) || [];
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
     const SVG_VOL_ON = `<path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>`;
     const SVG_VOL_OFF = `<path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
 
-    // Script para ocultar el botón de volumen en móviles (se controla con botones físicos)
     if(window.innerWidth > 768) {
         document.getElementById('mini-vol-btn').style.display = 'flex';
     }
+
+    // LÓGICA DE FAVORITOS (AGREGAR O QUITAR)
+    window.toggleFavorito = (id) => {
+        if(misFavoritos.includes(id)) {
+            misFavoritos = misFavoritos.filter(favId => favId !== id);
+        } else {
+            misFavoritos.push(id);
+        }
+        localStorage.setItem('ml_favoritos', JSON.stringify(misFavoritos));
+        renderFeeds();
+        renderHero();
+        if(idActual === id) window.actualizarCorazonPlayer();
+    };
+
+    window.toggleFavoritoActual = () => {
+        if(idActual) window.toggleFavorito(idActual);
+    };
+
+    window.actualizarCorazonPlayer = () => {
+        if(!idActual) return;
+        const fpFavBtn = document.getElementById('fp-fav-btn');
+        if(fpFavBtn) fpFavBtn.innerText = misFavoritos.includes(idActual) ? '❤️' : '🤍';
+    };
 
     window.actualizarBotonesPlay = (isPaused) => {
         const icon = isPaused ? SVG_PLAY : SVG_PAUSE;
@@ -317,21 +339,43 @@
         document.getElementById('hero-bio').innerText = f.bio || "Descubre Music Land Radio.";
         document.getElementById('hero-play-btn').innerHTML = (idActual === f.id && !media.paused) ? SVG_PAUSE : SVG_PLAY;
         document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(f.id);
+        
+        // Corazón Hero
+        const btnHeroFav = document.getElementById('hero-fav-btn');
+        btnHeroFav.innerText = misFavoritos.includes(f.id) ? '❤️' : '🤍';
+        btnHeroFav.onclick = () => window.toggleFavorito(f.id);
     }
 
     function renderFeeds() {
         const createCard = (c) => {
             const isPlaying = idActual === c.id && !media.paused;
+            const isFav = misFavoritos.includes(c.id);
             return `<div class="n-card" onclick="window.gestionarPlay('${c.id}')">
                 <div class="n-img" style="background-image:url('${c.imagenUrl}')">
+                    <button class="btn-fav-card" onclick="event.stopPropagation(); window.toggleFavorito('${c.id}')">${isFav ? '❤️' : '🤍'}</button>
                     <div class="n-overlay"><div class="n-play-icon">${isPlaying ? SVG_PAUSE : SVG_PLAY}</div></div>
                 </div>
                 <div style="font-size:14px; font-weight:700; color:white; margin-top:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.titulo}</div>
                 <div style="font-size:12px; color:var(--neon); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.artista}</div>
             </div>`;
         };
+        
         document.getElementById('carousel-new').innerHTML = canciones.slice(0, 10).map(c => createCard(c)).join('');
         document.getElementById('carousel-all').innerHTML = canciones.map(c => createCard(c)).join('');
+
+        // RENDERIZAR LA FILA DE FAVORITOS
+        const listaFavs = canciones.filter(c => misFavoritos.includes(c.id));
+        const favTitle = document.getElementById('title-fav');
+        const favCarousel = document.getElementById('carousel-fav');
+        
+        if(listaFavs.length > 0) {
+            favTitle.style.display = 'block';
+            favCarousel.style.display = 'flex';
+            favCarousel.innerHTML = listaFavs.map(c => createCard(c)).join('');
+        } else {
+            favTitle.style.display = 'none';
+            favCarousel.style.display = 'none';
+        }
     }
 
     window.gestionarPlay = (id) => {
@@ -348,9 +392,11 @@
             document.getElementById('fp-title').innerText = s.titulo; 
             document.getElementById('fp-artist').innerText = s.artista;
             document.getElementById('fp-art').style.backgroundImage = `url('${s.imagenUrl}')`;
+            
+            window.actualizarCorazonPlayer();
+
             media.src = s.mp3Url; 
             media.play();
-            // Solo abre en grande automático en la PC, en celular es molesto si estás bajando rápido
             if(window.innerWidth > 768) { window.openFullPlayer(); }
         } else {
             window.toggleMainPlay();
