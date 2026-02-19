@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Music Land Project</title>
+    <title>MUSIC LAND PROJECT</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
@@ -22,14 +22,38 @@
             });
         }
 
-        // CAPTURA EL EVENTO DE INSTALACIÓN DE GOOGLE PARA NUESTRO BOTÓN
         let letInstallPrompt;
+        
+        // Detectar si es un dispositivo de Apple (iPhone/iPad)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        // Detectar si ya está instalada (pantalla completa)
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        window.addEventListener('load', () => {
+            const btnInstalar = document.getElementById('btn-instalar');
+            if(isPWA) {
+                // Si ya está instalada, esconde el botón
+                if(btnInstalar) btnInstalar.style.display = 'none';
+            } else if (isIOS) {
+                // Si es un iPhone y no está instalada, muestra el botón con instrucciones de Apple
+                if(btnInstalar) {
+                    btnInstalar.style.display = 'block';
+                    btnInstalar.onclick = () => {
+                        alert("🍏 Para instalar en tu iPhone o iPad:\n\n1. Toca el ícono de 'Compartir' (el cuadrado con la flecha hacia arriba) en el menú de Safari.\n\n2. Selecciona 'Agregar a la pantalla de inicio' 📱.");
+                    };
+                }
+            }
+        });
+
+        // Evento exclusivo de Android/Chrome para instalación directa
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             letInstallPrompt = e;
-            // Muestra el botón de instalar si Google da permiso
             const btnInstalar = document.getElementById('btn-instalar');
-            if(btnInstalar) btnInstalar.style.display = 'block';
+            if(btnInstalar && !isPWA) {
+                btnInstalar.style.display = 'block';
+                btnInstalar.onclick = window.instalarAppFuerza;
+            }
         });
 
         window.instalarAppFuerza = async () => {
@@ -228,14 +252,14 @@
     <div style="display:flex; align-items:center; cursor:pointer;" onclick="window.triggerAdmin()">
         <div class="logo-box">
             <svg class="logo-svg" id="svg-respaldo" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <img src="logo.jpg?v=98" class="header-logo" alt="ML" 
+            <img src="logo.jpg?v=99" class="header-logo" alt="ML" 
                  onload="document.getElementById('svg-respaldo').style.display='none'" 
-                 onerror="this.src='logo.png?v=98'; this.onerror=null;">
+                 onerror="this.src='logo.png?v=99'; this.onerror=null;">
         </div>
         <div class="brand-title">MUSIC LAND PROJECT</div>
     </div>
     <div style="display:flex; gap: 8px;">
-        <button id="btn-instalar" onclick="window.instalarAppFuerza()" style="display:none; background:var(--neon); color:black; border:none; padding:5px 12px; border-radius:20px; font-weight:bold; cursor:pointer;">📥 INSTALAR</button>
+        <button id="btn-instalar" style="display:none; background:var(--neon); color:black; border:none; padding:5px 12px; border-radius:20px; font-weight:bold; cursor:pointer;">📥 INSTALAR</button>
         <button onclick="window.confirmarSalida()" style="background:transparent; border:1px solid #ff4444; color:#ff4444; padding:5px 12px; border-radius:20px; cursor:pointer;">SALIR</button>
     </div>
 </header>
@@ -472,13 +496,12 @@
     // 🚪 FUNCIÓN DE SALIDA MEJORADA (ADIÓS PANTALLA NEGRA)
     window.confirmarSalida = () => { 
         if(confirm("¿Deseas detener la música y salir de la app?")) {
-            media.pause(); // Apagamos la música
-            media.src = ""; // Vaciamos el motor
+            media.pause(); 
+            media.src = ""; 
             window.actualizarBotonesPlay(true);
-            document.getElementById('pantalla-salida').style.display = 'flex'; // Mostramos la despedida
+            document.getElementById('pantalla-salida').style.display = 'flex'; 
         } 
     };
 </script>
 </body>
 </html>
-
