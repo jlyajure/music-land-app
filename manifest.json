@@ -1,6 +1,6 @@
 {
-  "name": "Music Land Pro",
-  "short_name": "Music Land",
+  "name": "MUSIC LAND PROJECT",
+  "short_name": "MUSIC LAND PROJECT",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
@@ -13,8 +13,20 @@
       "purpose": "any maskable"
     },
     {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "logo.jpg",
       "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
     }
