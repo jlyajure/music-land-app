@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Music Land Pro - V96 App</title>
+    <title>MUSIC LAND PROJECT</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
@@ -82,7 +82,7 @@
                         const mediaInfo = new chrome.cast.media.MediaInfo(media.src, 'audio/mp3');
                         const meta = new chrome.cast.media.MusicTrackMediaMetadata();
                         meta.title = window.castTitle || "En vivo";
-                        meta.artist = "🔹 Music Land 🔹"; 
+                        meta.artist = "🔹 MUSIC LAND PROJECT 🔹"; 
                         if(window.castCover) meta.images = [new chrome.cast.Image(window.castCover)];
                         mediaInfo.metadata = meta;
 
@@ -112,7 +112,7 @@
         .logo-box { width: 45px; height: 45px; background: #000; border: 2px solid var(--neon); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); cursor: pointer; overflow: hidden; position: relative; flex-shrink: 0; }
         .header-logo { width: 100%; height: 100%; object-fit: cover; z-index: 2; position: relative; }
         .logo-svg { position: absolute; width: 26px; height: 26px; fill: var(--neon); z-index: 1; filter: drop-shadow(0 0 5px var(--neon)); }
-        .brand-title { color: var(--neon); font-size: 22px; font-weight: 900; text-transform: uppercase; margin-left: 12px; letter-spacing: 2px; white-space: nowrap; }
+        .brand-title { color: var(--neon); font-size: 20px; font-weight: 900; text-transform: uppercase; margin-left: 12px; letter-spacing: 1px; white-space: nowrap; }
 
         #home-view { padding-top: 130px; padding-bottom: 150px; }
         
@@ -166,7 +166,7 @@
         @media (max-width: 768px) {
             header { padding: 10px 15px; height: 65px; }
             .logo-box { width: 38px; height: 38px; }
-            .brand-title { font-size: 18px; margin-left: 10px; }
+            .brand-title { font-size: 15px; margin-left: 8px; letter-spacing: 0.5px; }
             header button { font-size: 12px; padding: 4px 10px; }
             
             #home-view { padding-top: 80px; padding-bottom: 120px; }
@@ -205,11 +205,11 @@
     <div style="display:flex; align-items:center; cursor:pointer;" onclick="window.triggerAdmin()">
         <div class="logo-box">
             <svg class="logo-svg" id="svg-respaldo" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <img src="logo.jpg?v=96" class="header-logo" alt="ML" 
+            <img src="logo.jpg?v=97" class="header-logo" alt="ML" 
                  onload="document.getElementById('svg-respaldo').style.display='none'" 
-                 onerror="this.src='logo.png?v=96'; this.onerror=null;">
+                 onerror="this.src='logo.png?v=97'; this.onerror=null;">
         </div>
-        <div class="brand-title">Music Land</div>
+        <div class="brand-title">MUSIC LAND PROJECT</div>
     </div>
     <button onclick="window.confirmarSalida()" style="background:transparent; border:1px solid #ff4444; color:#ff4444; padding:5px 15px; border-radius:20px; cursor:pointer;">SALIR</button>
 </header>
@@ -341,7 +341,7 @@
         document.getElementById('hero-cover').style.backgroundImage = `url('${f.imagenUrl}')`;
         document.getElementById('hero-title').innerText = f.titulo;
         document.getElementById('hero-artist').innerText = f.artista;
-        document.getElementById('hero-bio').innerText = f.bio || "Descubre Music Land Radio.";
+        document.getElementById('hero-bio').innerText = f.bio || "Descubre MUSIC LAND PROJECT.";
         document.getElementById('hero-play-btn').innerHTML = (idActual === f.id && !media.paused) ? SVG_PAUSE : SVG_PLAY;
         document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(f.id);
         
