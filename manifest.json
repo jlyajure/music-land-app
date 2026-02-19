@@ -1,6 +1,6 @@
 {
-  "name": "MUSIC LAND PROJECT",
-  "short_name": "MUSIC LAND PROJECT",
+  "name": "Music Land Project",
+  "short_name": "Music Land Project",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
