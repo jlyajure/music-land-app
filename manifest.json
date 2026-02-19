@@ -1,21 +1,22 @@
 {
-  "name": "Music Land App",
-"short_name": "Music Land",
+  "name": "Music Land Pro",
+  "short_name": "Music Land",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#222222",
-  "theme_color": "#00e5ff",
-  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#00d2ff",
   "icons": [
     {
       "src": "logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }
