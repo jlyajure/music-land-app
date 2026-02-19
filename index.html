@@ -3,14 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Music Land Pro - Master V95</title>
+    <title>Music Land Pro - V96 App</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.jpg">
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('App lista para instalarse', reg);
+                });
+            });
+        }
+    </script>
+
     <script>
         window.castTitle = "";
         window.castCover = "";
@@ -89,14 +101,13 @@
     
     <style>
         :root { --neon: #00d2ff; --bg: #080808; --card: #121212; --red: #ff4444; }
-        * { box-sizing: border-box; outline: none; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #e2e8f0; margin: 0; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
         
         ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 10px; box-shadow: 0 0 15px var(--neon); border: 2px solid #000; }
         
-        /* HEADER PC */
         header { background: rgba(0,0,0,0.98); backdrop-filter: blur(10px); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 2000; border-bottom: 1px solid #222; height: 75px; }
         .logo-box { width: 45px; height: 45px; background: #000; border: 2px solid var(--neon); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); cursor: pointer; overflow: hidden; position: relative; flex-shrink: 0; }
         .header-logo { width: 100%; height: 100%; object-fit: cover; z-index: 2; position: relative; }
@@ -105,7 +116,6 @@
 
         #home-view { padding-top: 130px; padding-bottom: 150px; }
         
-        /* HERO PC */
         #hero-section { min-height: 480px; width: 100%; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 0 0 40px 40px; border-bottom: 1px solid #222; background: #000; }
         .hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(60px) brightness(0.2); }
         .hero-content { position: relative; z-index: 2; width: 90%; max-width: 1000px; display: flex; flex-direction: row; align-items: center; gap: 50px; padding: 20px; }
@@ -118,7 +128,6 @@
         .hero-btn-play { background: var(--neon); border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--neon); color: black; transition: 0.3s; }
         .hero-btn-play:hover { transform: scale(1.05); }
 
-        /* CAROUSEL */
         .carousel { display: flex; overflow-x: auto; padding: 0 20px 30px 20px; gap: 20px; max-width: 1100px; margin: 0 auto; }
         .n-card { min-width: 155px; cursor: pointer; transition: 0.3s; position: relative; }
         .n-card:hover { transform: translateY(-5px); }
@@ -130,7 +139,6 @@
         .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
         .btn-fav-card:hover { transform: scale(1.2); }
 
-        /* MINI PLAYER PC */
         #mini-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); backdrop-filter: blur(20px); border-top: 1px solid #222; padding: 12px 40px; display: none; z-index: 5000; align-items: center; justify-content: space-between; gap: 15px; }
         .mini-main { display: flex; align-items: center; gap: 15px; flex: 1; cursor: pointer; min-width: 0; }
         .mini-art { width: 50px; height: 50px; border-radius: 8px; border: 1px solid #333; background-size: cover; flex-shrink: 0; }
@@ -143,7 +151,6 @@
         .btn-round:hover { transform: scale(1.1); color: var(--neon); border-color: var(--neon); }
         .btn-round svg { width: 22px; height: 22px; fill: currentColor; }
 
-        /* FULL PLAYER PC */
         #full-player { position: fixed; top: 100%; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a1a1a, #000); z-index: 6000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); display: flex; flex-direction: column; padding: 40px; align-items: center; overflow-y: auto; }
         #full-player.active { top: 0; }
         .btn-modern-down { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; align-self: flex-start; flex-shrink: 0; }
@@ -198,9 +205,9 @@
     <div style="display:flex; align-items:center; cursor:pointer;" onclick="window.triggerAdmin()">
         <div class="logo-box">
             <svg class="logo-svg" id="svg-respaldo" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <img src="logo.jpg?v=95" class="header-logo" alt="ML" 
+            <img src="logo.jpg?v=96" class="header-logo" alt="ML" 
                  onload="document.getElementById('svg-respaldo').style.display='none'" 
-                 onerror="this.src='logo.png?v=95'; this.onerror=null;">
+                 onerror="this.src='logo.png?v=96'; this.onerror=null;">
         </div>
         <div class="brand-title">Music Land</div>
     </div>
@@ -357,22 +364,16 @@
             </div>`;
         };
         
-        // NOVEDADES Y CATÁLOGO
         document.getElementById('carousel-new').innerHTML = canciones.slice(0, 10).map(c => createCard(c)).join('');
         document.getElementById('carousel-all').innerHTML = canciones.map(c => createCard(c)).join('');
 
-        // 🧠 CEREBRO SPOTIFY: SUGERENCIAS INTELIGENTES
         let sugerencias = [];
         if (misFavoritos.length > 0) {
-            // 1. Extrae los artistas que le gustan al usuario
             const artistasFavoritos = canciones.filter(c => misFavoritos.includes(c.id)).map(c => c.artista);
-            // 2. Busca canciones de esos artistas que NO estén en sus favoritos
             const recomendadas = canciones.filter(c => artistasFavoritos.includes(c.artista) && !misFavoritos.includes(c.id));
-            // 3. Las mezcla
             sugerencias = recomendadas.sort(() => 0.5 - Math.random());
         }
 
-        // Si no hay suficientes recomendaciones por gustos, rellena con aleatorias para que descubra
         if (sugerencias.length < 10) {
             const extra = canciones.filter(c => !misFavoritos.includes(c.id) && !sugerencias.includes(c)).sort(() => 0.5 - Math.random());
             sugerencias = [...sugerencias, ...extra].slice(0, 10);
@@ -382,7 +383,6 @@
         
         document.getElementById('carousel-sug').innerHTML = sugerencias.map(c => createCard(c)).join('');
 
-        // RENDERIZAR FAVORITOS
         const listaFavs = canciones.filter(c => misFavoritos.includes(c.id));
         const favTitle = document.getElementById('title-fav');
         const favCarousel = document.getElementById('carousel-fav');
