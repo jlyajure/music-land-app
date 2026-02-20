@@ -24,18 +24,14 @@
 
         let letInstallPrompt;
         
-        // Detectar si es un dispositivo de Apple (iPhone/iPad)
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        // Detectar si ya está instalada (pantalla completa)
         const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
         window.addEventListener('load', () => {
             const btnInstalar = document.getElementById('btn-instalar');
             if(isPWA) {
-                // Si ya está instalada, esconde el botón
                 if(btnInstalar) btnInstalar.style.display = 'none';
             } else if (isIOS) {
-                // Si es un iPhone y no está instalada, muestra el botón con instrucciones de Apple
                 if(btnInstalar) {
                     btnInstalar.style.display = 'block';
                     btnInstalar.onclick = () => {
@@ -45,7 +41,6 @@
             }
         });
 
-        // Evento exclusivo de Android/Chrome para instalación directa
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             letInstallPrompt = e;
@@ -206,8 +201,12 @@
         .btn-cast-pc { transition: 0.3s; }
         .btn-cast-pc.cast-active { background: rgba(0, 210, 255, 0.1); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 20px var(--neon); }
 
-        /* PANTALLA DE SALIDA ELEGANTE */
         #pantalla-salida { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#080808; z-index:99999; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+
+        /* 🟢 BOTÓN WHATSAPP FLOTANTE */
+        .btn-wa { position: fixed; bottom: 95px; right: 25px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 4000; transition: 0.3s; }
+        .btn-wa:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
+        .btn-wa svg { width: 35px; height: 35px; fill: currentColor; }
 
         /* MÓVIL */
         @media (max-width: 768px) {
@@ -243,6 +242,10 @@
             #fp-artist { font-size: 18px !important; text-align: center; }
             .fp-controls { gap: 20px; width: 100%; justify-content: center; }
             .fp-btn-main { width: 75px; height: 75px; }
+
+            /* 🟢 WA MÓVIL (Ajustado para no chocar con el reproductor mini) */
+            .btn-wa { bottom: 85px; right: 20px; width: 55px; height: 55px; }
+            .btn-wa svg { width: 30px; height: 30px; }
         }
     </style>
 </head>
@@ -252,9 +255,9 @@
     <div style="display:flex; align-items:center; cursor:pointer;" onclick="window.triggerAdmin()">
         <div class="logo-box">
             <svg class="logo-svg" id="svg-respaldo" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <img src="logo.jpg?v=99" class="header-logo" alt="ML" 
+            <img src="logo.jpg?v=100" class="header-logo" alt="ML" 
                  onload="document.getElementById('svg-respaldo').style.display='none'" 
-                 onerror="this.src='logo.png?v=99'; this.onerror=null;">
+                 onerror="this.src='logo.png?v=100'; this.onerror=null;">
         </div>
         <div class="brand-title">MUSIC LAND PROJECT</div>
     </div>
@@ -319,7 +322,8 @@
     
     <div class="fp-controls">
         <button onclick="window.toggleMute()" class="btn-round" style="width:55px; height:55px;" id="btn-vol-full">
-            <svg viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
+    const SVG_VOL_OFF = `<path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/></svg>
         </button>
         
         <button onclick="window.toggleFavoritoActual()" class="btn-round" id="fp-fav-btn" style="width:55px; height:55px; font-size: 26px; border:none; background:transparent;">🤍</button>
@@ -338,6 +342,10 @@
     <p style="color:#888; font-size:14px; margin-top:20px; max-width:85%; line-height:1.6;">Ya puedes cerrar la aplicación deslizando esta pantalla o usando el botón de inicio de tu celular.</p>
     <button onclick="location.reload()" style="margin-top:40px; background:transparent; border:1px solid var(--neon); color:var(--neon); padding:10px 25px; border-radius:30px; cursor:pointer; font-weight:bold;">VOLVER A LA RADIO</button>
 </div>
+
+<a href="https://wa.me/584125852879" target="_blank" class="btn-wa" title="Escríbenos al WhatsApp">
+    <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 19.84C10.57 19.84 9.14 19.45 7.9 18.71L7.61 18.54L4.47 19.36L5.31 16.3L5.12 16C4.33 14.78 3.91 13.36 3.91 11.91C3.91 7.43 7.56 3.79 12.05 3.79C14.22 3.79 16.27 4.64 17.8 6.18C19.34 7.71 20.19 9.76 20.19 11.92C20.19 16.4 16.54 20.04 12.05 20.04M16.52 13.79C16.27 13.67 15.06 13.07 14.83 12.99C14.6 12.91 14.43 12.87 14.27 13.11C14.1 13.36 13.64 13.92 13.5 14.09C13.36 14.27 13.21 14.29 12.96 14.17C12.72 14.04 11.92 13.78 10.97 12.94C10.23 12.28 9.72 11.45 9.58 11.2C9.43 10.96 9.56 10.82 9.69 10.7C9.8 10.59 9.94 10.42 10.06 10.28C10.18 10.13 10.23 10.03 10.3 9.87C10.39 9.7 10.34 9.56 10.28 9.44C10.22 9.32 9.72 8.1 9.52 7.6C9.32 7.12 9.12 7.18 8.97 7.18C8.83 7.18 8.66 7.18 8.5 7.18C8.34 7.18 8.08 7.24 7.85 7.5C7.63 7.76 7 8.35 7 9.55C7 10.75 7.88 11.91 8 12.08C8.13 12.25 9.73 14.71 12.18 15.76C12.76 16.01 13.22 16.16 13.58 16.27C14.16 16.45 14.69 16.41 15.11 16.35C15.58 16.28 16.52 15.78 16.72 15.22C16.92 14.66 16.92 14.18 16.85 14.09C16.78 13.99 16.63 13.93 16.38 13.8L16.52 13.79Z"/></svg>
+</a>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -493,7 +501,6 @@
     window.openFullPlayer = () => document.getElementById('full-player').classList.add('active');
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
     
-    // 🚪 FUNCIÓN DE SALIDA MEJORADA (ADIÓS PANTALLA NEGRA)
     window.confirmarSalida = () => { 
         if(confirm("¿Deseas detener la música y salir de la app?")) {
             media.pause(); 
