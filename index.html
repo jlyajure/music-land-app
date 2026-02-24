@@ -43,6 +43,11 @@
         .hero-btn-play { background: var(--neon); border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--neon); color: black; transition: 0.3s; }
         .hero-btn-play:hover { transform: scale(1.05); }
 
+        .filter-scroll { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; margin-bottom: 20px; scrollbar-width: none; }
+        .filter-scroll::-webkit-scrollbar { display: none; }
+        .filter-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .filter-btn.active { background: var(--neon); color: black; border-color: var(--neon); box-shadow: 0 0 15px rgba(0,210,255,0.3); }
+
         .carousel { display: flex; overflow-x: auto; padding: 0 20px 30px 20px; gap: 20px; max-width: 1100px; margin: 0 auto; }
         .n-card { min-width: 155px; cursor: pointer; transition: 0.3s; position: relative; }
         .n-card:hover { transform: translateY(-5px); }
@@ -52,6 +57,10 @@
         .n-play-icon { width: 45px; height: 45px; background: var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; }
         .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
         .btn-fav-card:hover { transform: scale(1.2); }
+        
+        /* 🔥 BOTÓN DE BORRAR (SOLO ADMIN) */
+        .btn-delete-card { display: none; position: absolute; top: 8px; left: 8px; background: #ff4444; border: 1px solid white; border-radius: 50%; width: 32px; height: 32px; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 4; color: white; box-shadow: 0 0 10px black; }
+        body.admin-mode .btn-delete-card { display: flex; }
 
         #mini-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); backdrop-filter: blur(20px); border-top: 1px solid #222; padding: 12px 40px; display: none; z-index: 5000; align-items: center; justify-content: space-between; gap: 15px; }
         .mini-main { display: flex; align-items: center; gap: 15px; flex: 1; cursor: pointer; min-width: 0; }
@@ -82,7 +91,7 @@
         /* 🔥 ADMIN PANEL */
         #admin-panel { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; overflow-y:auto; padding:20px; }
         .admin-box { background:#111; border:1px solid var(--neon); max-width:500px; margin:50px auto; padding:20px; border-radius:20px; }
-        .admin-input { width:100%; background:#222; border:1px solid #444; color:white; padding:10px; margin-bottom:10px; border-radius:10px; }
+        .admin-input, .admin-select { width:100%; background:#222; border:1px solid #444; color:white; padding:10px; margin-bottom:10px; border-radius:10px; outline:none; }
         .admin-btn { width:100%; background:var(--neon); color:black; font-weight:bold; padding:12px; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
         .tab-btn { background: #333; color: white; border: none; padding: 10px; flex: 1; cursor: pointer; border-radius: 8px; font-weight: bold; }
         .tab-btn.active { background: var(--neon); color: black; }
@@ -150,6 +159,18 @@
             <input type="text" id="up-titulo" class="admin-input" placeholder="Título de la Canción">
             <input type="text" id="up-artista" class="admin-input" placeholder="Nombre del Artista">
             
+            <label style="color:#ccc; display:block; margin-top:5px;">📁 Categoría / Género:</label>
+            <select id="up-categoria" class="admin-select">
+                <option value="Salsa">Salsa</option>
+                <option value="Merengue">Merengue</option>
+                <option value="Balada">Balada / Romántico</option>
+                <option value="PopRock">Pop & Rock</option>
+                <option value="Urbano">Urbano / Reggaetón</option>
+                <option value="Llanera">Música Llanera</option>
+                <option value="Vallenato">Vallenato</option>
+                <option value="Varios">Varios / Otro</option>
+            </select>
+
             <label style="color:#ccc; display:block; margin-top:10px;">📸 Portada Canción (JPG/PNG)</label>
             <input type="file" id="up-img" class="admin-input" accept="image/*">
             
@@ -161,7 +182,7 @@
 
         <div id="tab-perfil" style="display:none;">
             <p style="color:#aaa; font-size:13px; text-align:center;">Cambia la Portada Principal y su canción.</p>
-            <input type="text" id="prof-titulo" class="admin-input" placeholder="Título Principal (Ej: MUSIC LAND)">
+            <input type="text" id="prof-titulo" class="admin-input" placeholder="Título Principal">
             <input type="text" id="prof-subtitulo" class="admin-input" placeholder="Subtítulo / Artista">
             <textarea id="prof-bio" class="admin-input" rows="4" placeholder="Escribe la Biografía..."></textarea>
             
@@ -197,6 +218,18 @@
     </div>
     
     <div id="feed-container">
+        <div class="filter-scroll">
+            <button class="filter-btn active" onclick="filtrar('Todo', this)">Todo</button>
+            <button class="filter-btn" onclick="filtrar('Salsa', this)">Salsa</button>
+            <button class="filter-btn" onclick="filtrar('Merengue', this)">Merengue</button>
+            <button class="filter-btn" onclick="filtrar('Balada', this)">Baladas</button>
+            <button class="filter-btn" onclick="filtrar('PopRock', this)">Pop/Rock</button>
+            <button class="filter-btn" onclick="filtrar('Urbano', this)">Urbano</button>
+            <button class="filter-btn" onclick="filtrar('Llanera', this)">Llanera</button>
+            <button class="filter-btn" onclick="filtrar('Vallenato', this)">Vallenato</button>
+            <button class="filter-btn" onclick="filtrar('Varios', this)">Varios</button>
+        </div>
+
         <h3 style="margin-left:20px; color: var(--neon);">💡 Sugerencias para ti</h3>
         <div id="carousel-sug" class="carousel"></div>
 
@@ -205,7 +238,7 @@
 
         <h3 style="margin-left:20px;">🔥 Novedades</h3><div id="carousel-new" class="carousel"></div>
         
-        <h3 style="margin-left:20px;">📂 Todo el Catálogo</h3><div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
+        <h3 style="margin-left:20px;">📂 Catálogo Completo</h3><div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
 </div>
 
@@ -346,7 +379,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, addDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, addDoc, setDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
     const app = initializeApp(firebaseConfig);
@@ -354,7 +387,7 @@
     const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8";
 
     const media = document.getElementById('main-media');
-    let canciones = []; let idActual = null; let perfilData = null;
+    let canciones = []; let idActual = null; let perfilData = null; let filtroActual = 'Todo';
     let misFavoritos = JSON.parse(localStorage.getItem('ml_favoritos')) || [];
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
@@ -364,13 +397,15 @@
 
     if(window.innerWidth > 768) { document.getElementById('mini-vol-btn').style.display = 'flex'; }
 
-    // 🔥 LOGICA ADMIN
     let adminClicks = 0; let adminTimer;
     window.triggerAdmin = () => {
         adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 1000);
         if (adminClicks === 3) {
             const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Acceso:");
-            if (pass === "ticoadmin2026") { document.getElementById('admin-panel').style.display = 'block'; } 
+            if (pass === "ticoadmin2026") { 
+                document.getElementById('admin-panel').style.display = 'block'; 
+                document.body.classList.add('admin-mode'); // 🔥 ACTIVA BOTONES DE BORRAR
+            } 
             else { alert("❌ Clave incorrecta"); }
             adminClicks = 0;
         }
@@ -383,10 +418,17 @@
         document.getElementById('tab-perfil').style.display = tab === 'perfil' ? 'block' : 'none';
     };
 
-    // 🚀 SUBIR CANCIÓN (LISTA NORMAL) - CON FECHA CORRECTA
+    window.filtrar = (cat, btn) => {
+        filtroActual = cat;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderFeeds();
+    };
+
     window.subirCancion = async () => {
         const tit = document.getElementById('up-titulo').value;
         const art = document.getElementById('up-artista').value;
+        const cat = document.getElementById('up-categoria').value;
         const fileImg = document.getElementById('up-img').files[0];
         const mp3Link = document.getElementById('up-mp3-link').value; 
         const status = document.getElementById('upload-status');
@@ -401,14 +443,13 @@
 
             status.innerHTML = "📝 Guardando en lista...";
             await addDoc(collection(db, "musicland_canciones"), {
-                titulo: tit, artista: art, imagenUrl: urlImg, mp3Url: mp3Link, fecha: new Date()
+                titulo: tit, artista: art, categoria: cat, imagenUrl: urlImg, mp3Url: mp3Link, fecha: new Date()
             });
             status.innerHTML = "✅ ¡CANCION SUBIDA!";
             setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
-    // 🖼️ ACTUALIZAR PERFIL
     window.actualizarPerfil = async () => {
         const tit = document.getElementById('prof-titulo').value;
         const sub = document.getElementById('prof-subtitulo').value;
@@ -418,7 +459,6 @@
         const status = document.getElementById('upload-status');
 
         if(!tit || !sub || !fileImg || !mp3Link) { alert("Faltan datos"); return; }
-        
         status.innerHTML = "⏳ Actualizando Portada...";
         try {
             const compressedImg = await compressImage(fileImg);
@@ -435,41 +475,35 @@
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
+    // 🔥 BORRAR CANCIÓN (NUEVA FUNCIÓN)
+    window.borrarCancion = async (id) => {
+        if(confirm("¿Seguro que quieres eliminar esta canción de la lista?")) {
+            try {
+                await deleteDoc(doc(db, "musicland_canciones", id));
+                alert("🗑️ Canción eliminada");
+            } catch(e) { alert("Error al borrar: " + e.message); }
+        }
+    };
+
     async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 800) { h *= 800 / w; w = 800; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8); }; }; }); }
 
-    // 🔥 LEER Y ORDENAR DATOS (CORREGIDO EL ORDEN 🐛)
     onSnapshot(query(collection(db, "musicland_canciones")), (snap) => {
-        canciones = [];
-        perfilData = null;
-        
+        canciones = []; perfilData = null;
         snap.forEach(d => {
             const data = {id: d.id, ...d.data()};
-            if(d.id === "PERFIL_MAIN") {
-                perfilData = data; 
-            } else {
-                canciones.push(data);
-            }
+            if(d.id === "PERFIL_MAIN") { perfilData = data; } else { canciones.push(data); }
         });
         
-        // 🔥 AQUÍ ESTÁ EL ARREGLO DEL ORDEN:
         canciones.sort((a, b) => {
-            const getMs = (obj) => {
-                if(!obj) return 0;
-                if(obj.seconds) return obj.seconds; // Es Timestamp de Firestore
-                if(obj instanceof Date) return obj.getTime() / 1000; // Es Date Local (recién subido)
-                return 0;
-            };
-            return getMs(b.fecha) - getMs(a.fecha); // De Mayor (Nuevo) a Menor (Viejo)
+            const getMs = (obj) => { if(!obj) return 0; if(obj.seconds) return obj.seconds; if(obj instanceof Date) return obj.getTime() / 1000; return 0; };
+            return getMs(b.fecha) - getMs(a.fecha);
         });
 
-        renderHero(); 
-        renderFeeds(); 
+        renderHero(); renderFeeds(); 
     });
 
     function renderHero() {
-        const f = perfilData || canciones[0]; 
-        if(!f) return;
-
+        const f = perfilData || canciones[0]; if(!f) return;
         document.getElementById('hero-bg').style.backgroundImage = `url('${f.imagenUrl}')`;
         document.getElementById('hero-cover').style.backgroundImage = `url('${f.imagenUrl}')`;
         document.getElementById('hero-title').innerText = f.titulo;
@@ -481,8 +515,7 @@
         document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(idParaPlay);
         
         const btnHeroFav = document.getElementById('hero-fav-btn');
-        if(perfilData) { btnHeroFav.style.display = 'none'; } 
-        else {
+        if(perfilData) { btnHeroFav.style.display = 'none'; } else {
             btnHeroFav.style.display = 'block';
             btnHeroFav.innerText = misFavoritos.includes(f.id) ? '❤️' : '🤍';
             btnHeroFav.onclick = () => window.toggleFavorito(f.id);
@@ -507,14 +540,34 @@
         const createCard = (c) => {
             const isPlaying = idActual === c.id && !media.paused;
             const isFav = misFavoritos.includes(c.id);
+            // 🔥 BOTÓN BORRAR (Solo visible en admin-mode)
             return `<div class="n-card" onclick="window.gestionarPlay('${c.id}')">
-                <div class="n-img" style="background-image:url('${c.imagenUrl}')"><button class="btn-fav-card" onclick="event.stopPropagation(); window.toggleFavorito('${c.id}')">${isFav ? '❤️' : '🤍'}</button><div class="n-overlay"><div class="n-play-icon">${isPlaying ? SVG_PAUSE : SVG_PLAY}</div></div></div>
+                <div class="n-img" style="background-image:url('${c.imagenUrl}')">
+                    <div class="btn-delete-card" onclick="event.stopPropagation(); window.borrarCancion('${c.id}')">🗑️</div>
+                    <button class="btn-fav-card" onclick="event.stopPropagation(); window.toggleFavorito('${c.id}')">${isFav ? '❤️' : '🤍'}</button>
+                    <div class="n-overlay"><div class="n-play-icon">${isPlaying ? SVG_PAUSE : SVG_PLAY}</div></div>
+                </div>
                 <div style="font-size:14px; font-weight:700; color:white; margin-top:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.titulo}</div>
                 <div style="font-size:12px; color:var(--neon); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.artista}</div>
             </div>`;
         };
+
+        let cancionesFiltradas = canciones;
+        if(filtroActual !== 'Todo') {
+            cancionesFiltradas = canciones.filter(c => {
+                if(!c.categoria && filtroActual === 'Varios') return true;
+                return c.categoria === filtroActual;
+            });
+        }
+
         document.getElementById('carousel-new').innerHTML = canciones.slice(0, 10).map(c => createCard(c)).join('');
-        document.getElementById('carousel-all').innerHTML = canciones.map(c => createCard(c)).join('');
+        
+        if(cancionesFiltradas.length === 0) {
+            document.getElementById('carousel-all').innerHTML = `<div style="color:#666; width:100%; text-align:center; padding:20px;">No hay canciones en "${filtroActual}" aún.</div>`;
+        } else {
+            document.getElementById('carousel-all').innerHTML = cancionesFiltradas.map(c => createCard(c)).join('');
+        }
+
         let sugerencias = [];
         if (misFavoritos.length > 0) {
             const artistasFavoritos = canciones.filter(c => misFavoritos.includes(c.id)).map(c => c.artista);
