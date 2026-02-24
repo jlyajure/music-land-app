@@ -58,7 +58,6 @@
         .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
         .btn-fav-card:hover { transform: scale(1.2); }
         
-        /* 🔥 BOTONES DE ADMIN (BORRAR Y EDITAR) */
         .btn-delete-card { display: none; position: absolute; top: 8px; left: 8px; background: #ff4444; border: 1px solid white; border-radius: 50%; width: 32px; height: 32px; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 4; color: white; box-shadow: 0 0 10px black; }
         .btn-edit-card { display: none; position: absolute; top: 8px; left: 45px; background: var(--yellow); border: 1px solid black; border-radius: 50%; width: 32px; height: 32px; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 4; color: black; box-shadow: 0 0 10px black; font-weight: bold; }
         
@@ -241,7 +240,7 @@
             <button class="filter-btn" onclick="filtrar('RockEsp', this)">Rock Español</button>
             <button class="filter-btn" onclick="filtrar('BaladaEsp', this)">Baladas Español</button>
             <button class="filter-btn" onclick="filtrar('BaladaIng', this)">Baladas Inglés</button>
-            <button class="filter-btn" onclick="filtrar('PopRock', this)">Pop/Rock</button>
+            <button class="filter-btn" onclick="filtrar('PopRock', this)">Pop & Rock</button>
             <button class="filter-btn" onclick="filtrar('Rancheras', this)">Rancheras</button>
             <button class="filter-btn" onclick="filtrar('Llanera', this)">Llanera</button>
             <button class="filter-btn" onclick="filtrar('Jazz', this)">Jazz</button>
@@ -266,6 +265,8 @@
         <h3 id="titulo-catalogo" style="margin-left:20px;">📂 Catálogo Completo</h3>
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
+    
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v10.0</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
@@ -418,7 +419,7 @@
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-    const SVG_VOL_ON = `<path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
+    const SVG_VOL_ON = `<path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>`;
     const SVG_VOL_OFF = `<path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
 
     if(window.innerWidth > 768) { document.getElementById('mini-vol-btn').style.display = 'flex'; }
@@ -449,7 +450,6 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        // 🔥 OCULTAR O MOSTRAR SECCIONES EXTRA
         const seccionesExtra = document.getElementById('secciones-extra');
         const tituloCatalogo = document.getElementById('titulo-catalogo');
         
@@ -520,7 +520,7 @@
         }
     };
 
-    // 🔥 EDITAR CATEGORÍA RÁPIDO (LISTA COMPLETA)
+    // 🔥 EDITAR CATEGORÍA RÁPIDO (LISTA V10.0)
     window.editarCategoria = async (id) => {
         const opciones = `
 1. Salsa | 2. Merengue | 3. Tropical
