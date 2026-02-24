@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root { --neon: #00d2ff; --bg: #080808; --card: #121212; --red: #ff4444; }
+        :root { --neon: #00d2ff; --bg: #080808; --card: #121212; --red: #ff4444; --yellow: #ffdd00; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #e2e8f0; margin: 0; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
         
@@ -58,9 +58,12 @@
         .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
         .btn-fav-card:hover { transform: scale(1.2); }
         
-        /* 🔥 BOTÓN DE BORRAR (SOLO ADMIN) */
+        /* 🔥 BOTONES DE ADMIN (BORRAR Y EDITAR) */
         .btn-delete-card { display: none; position: absolute; top: 8px; left: 8px; background: #ff4444; border: 1px solid white; border-radius: 50%; width: 32px; height: 32px; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 4; color: white; box-shadow: 0 0 10px black; }
+        .btn-edit-card { display: none; position: absolute; top: 8px; left: 45px; background: var(--yellow); border: 1px solid black; border-radius: 50%; width: 32px; height: 32px; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 4; color: black; box-shadow: 0 0 10px black; font-weight: bold; }
+        
         body.admin-mode .btn-delete-card { display: flex; }
+        body.admin-mode .btn-edit-card { display: flex; }
 
         #mini-player { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(5,5,5,0.98); backdrop-filter: blur(20px); border-top: 1px solid #222; padding: 12px 40px; display: none; z-index: 5000; align-items: center; justify-content: space-between; gap: 15px; }
         .mini-main { display: flex; align-items: center; gap: 15px; flex: 1; cursor: pointer; min-width: 0; }
@@ -379,7 +382,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, addDoc, setDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, addDoc, setDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
     const app = initializeApp(firebaseConfig);
@@ -404,7 +407,7 @@
             const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Acceso:");
             if (pass === "ticoadmin2026") { 
                 document.getElementById('admin-panel').style.display = 'block'; 
-                document.body.classList.add('admin-mode'); // 🔥 ACTIVA BOTONES DE BORRAR
+                document.body.classList.add('admin-mode'); 
             } 
             else { alert("❌ Clave incorrecta"); }
             adminClicks = 0;
@@ -475,14 +478,32 @@
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
-    // 🔥 BORRAR CANCIÓN (NUEVA FUNCIÓN)
+    // 🔥 BORRAR CANCIÓN
     window.borrarCancion = async (id) => {
         if(confirm("¿Seguro que quieres eliminar esta canción de la lista?")) {
-            try {
-                await deleteDoc(doc(db, "musicland_canciones", id));
-                alert("🗑️ Canción eliminada");
-            } catch(e) { alert("Error al borrar: " + e.message); }
+            try { await deleteDoc(doc(db, "musicland_canciones", id)); alert("🗑️ Canción eliminada"); } catch(e) { alert("Error al borrar: " + e.message); }
         }
+    };
+
+    // 🔥 EDITAR CATEGORÍA RÁPIDO
+    window.editarCategoria = async (id) => {
+        const num = prompt("✏️ EDITAR CATEGORÍA\n\nEscribe el NÚMERO:\n1. Salsa\n2. Merengue\n3. Balada\n4. PopRock\n5. Urbano\n6. Llanera\n7. Vallenato\n8. Varios");
+        
+        let nuevaCat = "";
+        if(num === "1") nuevaCat = "Salsa";
+        else if(num === "2") nuevaCat = "Merengue";
+        else if(num === "3") nuevaCat = "Balada";
+        else if(num === "4") nuevaCat = "PopRock";
+        else if(num === "5") nuevaCat = "Urbano";
+        else if(num === "6") nuevaCat = "Llanera";
+        else if(num === "7") nuevaCat = "Vallenato";
+        else if(num === "8") nuevaCat = "Varios";
+        else return; // Cancelado
+
+        try {
+            await updateDoc(doc(db, "musicland_canciones", id), { categoria: nuevaCat });
+            alert("✅ ¡Categoría cambiada a " + nuevaCat + "!");
+        } catch(e) { alert("Error al editar: " + e.message); }
     };
 
     async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 800) { h *= 800 / w; w = 800; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8); }; }; }); }
@@ -540,10 +561,11 @@
         const createCard = (c) => {
             const isPlaying = idActual === c.id && !media.paused;
             const isFav = misFavoritos.includes(c.id);
-            // 🔥 BOTÓN BORRAR (Solo visible en admin-mode)
+            // 🔥 BOTÓN EDITAR + BORRAR
             return `<div class="n-card" onclick="window.gestionarPlay('${c.id}')">
                 <div class="n-img" style="background-image:url('${c.imagenUrl}')">
                     <div class="btn-delete-card" onclick="event.stopPropagation(); window.borrarCancion('${c.id}')">🗑️</div>
+                    <div class="btn-edit-card" onclick="event.stopPropagation(); window.editarCategoria('${c.id}')">✏️</div>
                     <button class="btn-fav-card" onclick="event.stopPropagation(); window.toggleFavorito('${c.id}')">${isFav ? '❤️' : '🤍'}</button>
                     <div class="n-overlay"><div class="n-play-icon">${isPlaying ? SVG_PAUSE : SVG_PLAY}</div></div>
                 </div>
