@@ -418,7 +418,7 @@
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-    const SVG_VOL_ON = `<path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>`;
+    const SVG_VOL_ON = `<path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
     const SVG_VOL_OFF = `<path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
 
     if(window.innerWidth > 768) { document.getElementById('mini-vol-btn').style.display = 'flex'; }
@@ -520,9 +520,17 @@
         }
     };
 
+    // 🔥 EDITAR CATEGORÍA RÁPIDO (LISTA COMPLETA)
     window.editarCategoria = async (id) => {
-        const opciones = "1. Salsa\n2. Merengue\n3. Tropical\n4. Funk\n5. Disco\n6. RockEsp\n7. BaladaEsp\n8. BaladaIng\n9. PopRock\n10. Rancheras\n11. Llanera\n12. Jazz\n13. Soul\n14. Remixes\n15. Mix\n16. Podcast\n17. IA\n18. Varios";
-        const num = prompt("✏️ EDITAR CATEGORÍA\n\nEscribe el NÚMERO:\n" + opciones);
+        const opciones = `
+1. Salsa | 2. Merengue | 3. Tropical
+4. Funk | 5. Disco | 6. Rock Español
+7. Balada Esp | 8. Balada Ing | 9. Pop/Rock
+10. Rancheras | 11. Llanera | 12. Jazz
+13. Soul | 14. Remixes | 15. Mix
+16. Podcast | 17. IA | 18. Varios
+        `;
+        const num = prompt("✏️ ESCRIBE EL NÚMERO:\n" + opciones);
         
         let nuevaCat = "";
         if(num === "1") nuevaCat = "Salsa";
@@ -607,6 +615,7 @@
         const createCard = (c) => {
             const isPlaying = idActual === c.id && !media.paused;
             const isFav = misFavoritos.includes(c.id);
+            // 🔥 BOTÓN EDITAR + BORRAR
             return `<div class="n-card" onclick="window.gestionarPlay('${c.id}')">
                 <div class="n-img" style="background-image:url('${c.imagenUrl}')">
                     <div class="btn-delete-card" onclick="event.stopPropagation(); window.borrarCancion('${c.id}')">🗑️</div>
