@@ -84,6 +84,8 @@
         .admin-box { background:#111; border:1px solid var(--neon); max-width:500px; margin:50px auto; padding:20px; border-radius:20px; }
         .admin-input { width:100%; background:#222; border:1px solid #444; color:white; padding:10px; margin-bottom:10px; border-radius:10px; }
         .admin-btn { width:100%; background:var(--neon); color:black; font-weight:bold; padding:12px; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
+        .tab-btn { background: #333; color: white; border: none; padding: 10px; flex: 1; cursor: pointer; border-radius: 8px; font-weight: bold; }
+        .tab-btn.active { background: var(--neon); color: black; }
 
         @media (max-width: 768px) {
             header { padding: 10px 15px; height: 65px; }
@@ -138,19 +140,38 @@
 <div id="admin-panel">
     <div class="admin-box">
         <h2 style="color:var(--neon); text-align:center;">PANEL DE DIRECTOR 🛠️</h2>
-        <input type="text" id="up-titulo" class="admin-input" placeholder="Título de la Canción">
-        <input type="text" id="up-artista" class="admin-input" placeholder="Nombre del Artista">
-        <textarea id="up-bio" class="admin-input" rows="3" placeholder="Bio / Descripción (Esto actualizará la portada principal)"></textarea>
         
-        <label style="color:#ccc; display:block; margin-top:10px;">📸 Portada (JPG/PNG)</label>
-        <input type="file" id="up-img" class="admin-input" accept="image/*">
-        
-        <label style="color:#ccc; display:block; margin-top:10px;">🎵 Audio (MP3)</label>
-        <input type="file" id="up-mp3" class="admin-input" accept="audio/*">
-        
-        <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 PUBLICAR</button>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <button class="tab-btn active" onclick="verTab('cancion', this)">🎵 Subir Canción</button>
+            <button class="tab-btn" onclick="verTab('perfil', this)">🖼️ Portada/Bio</button>
+        </div>
+
+        <div id="tab-cancion">
+            <input type="text" id="up-titulo" class="admin-input" placeholder="Título de la Canción">
+            <input type="text" id="up-artista" class="admin-input" placeholder="Nombre del Artista">
+            
+            <label style="color:#ccc; display:block; margin-top:10px;">📸 Portada Canción (JPG/PNG)</label>
+            <input type="file" id="up-img" class="admin-input" accept="image/*">
+            
+            <label style="color:#ccc; display:block; margin-top:10px;">🎵 Audio (MP3)</label>
+            <input type="file" id="up-mp3" class="admin-input" accept="audio/*">
+            
+            <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 SUBIR MÚSICA</button>
+        </div>
+
+        <div id="tab-perfil" style="display:none;">
+            <p style="color:#aaa; font-size:13px; text-align:center;">Esto cambia la imagen grande y el texto principal. No sube música.</p>
+            <input type="text" id="prof-titulo" class="admin-input" placeholder="Título Principal (Ej: MUSIC LAND)">
+            <input type="text" id="prof-subtitulo" class="admin-input" placeholder="Subtítulo (Ej: Project)">
+            <textarea id="prof-bio" class="admin-input" rows="4" placeholder="Escribe la Biografía o Descripción del proyecto aquí..."></textarea>
+            
+            <label style="color:#ccc; display:block; margin-top:10px;">📸 Nueva Portada Principal</label>
+            <input type="file" id="prof-img" class="admin-input" accept="image/*">
+            
+            <button onclick="window.actualizarPerfil()" class="admin-btn" style="background:#ffdd00;">💾 GUARDAR CAMBIOS</button>
+        </div>
+
         <div id="upload-status" style="color:white; text-align:center; margin-top:10px;"></div>
-        
         <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; width:100%; padding:10px; border:none; border-radius:10px; margin-top:10px; cursor:pointer;">CERRAR</button>
     </div>
 </div>
@@ -163,7 +184,7 @@
             <div class="hero-info">
                 <div id="hero-title" class="hero-title">...</div>
                 <div id="hero-artist" class="hero-artist">...</div>
-                <div id="hero-bio" class="hero-bio"></div>
+                <div id="hero-bio" class="hero-bio">Cargando...</div>
                 <div class="hero-actions">
                     <button id="hero-play-btn" class="hero-btn-play"></button>
                     <button id="hero-fav-btn" style="background:none;border:none;font-size:35px;cursor:pointer;padding:0;transition:0.3s;">🤍</button>
@@ -322,7 +343,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, addDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
     const app = initializeApp(firebaseConfig);
@@ -330,7 +351,7 @@
     const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8";
 
     const media = document.getElementById('main-media');
-    let canciones = []; let idActual = null;
+    let canciones = []; let idActual = null; let perfilData = null;
     let misFavoritos = JSON.parse(localStorage.getItem('ml_favoritos')) || [];
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
@@ -340,89 +361,145 @@
 
     if(window.innerWidth > 768) { document.getElementById('mini-vol-btn').style.display = 'flex'; }
 
-    // 🔥 LOGICA DE ADMIN (TRIPLE CLICK)
-    let adminClicks = 0;
-    let adminTimer;
+    // 🔥 LOGICA ADMIN
+    let adminClicks = 0; let adminTimer;
     window.triggerAdmin = () => {
-        adminClicks++;
-        clearTimeout(adminTimer);
-        adminTimer = setTimeout(() => { adminClicks = 0; }, 1000); // 1 segundo para dar 3 clicks
-        
+        adminClicks++; clearTimeout(adminTimer); adminTimer = setTimeout(() => { adminClicks = 0; }, 1000);
         if (adminClicks === 3) {
             const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Acceso:");
-            if (pass === "ticoadmin2026") {
-                document.getElementById('admin-panel').style.display = 'block';
-                alert("✅ Modo Director Activado\n\n- Sube canciones nuevas.\n- La canción más reciente definirá la Portada Principal y la Bio.");
-            } else {
-                alert("❌ Clave incorrecta");
-            }
+            if (pass === "ticoadmin2026") { document.getElementById('admin-panel').style.display = 'block'; } 
+            else { alert("❌ Clave incorrecta"); }
             adminClicks = 0;
         }
     };
 
-    // 🔥 LOGICA SUBIR CANCIÓN
+    window.verTab = (tab, btn) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-cancion').style.display = tab === 'cancion' ? 'block' : 'none';
+        document.getElementById('tab-perfil').style.display = tab === 'perfil' ? 'block' : 'none';
+    };
+
+    // 🚀 SUBIR CANCIÓN (SOLO A LA LISTA)
     window.subirCancion = async () => {
         const tit = document.getElementById('up-titulo').value;
         const art = document.getElementById('up-artista').value;
-        const bio = document.getElementById('up-bio').value;
         const fileImg = document.getElementById('up-img').files[0];
         const fileMp3 = document.getElementById('up-mp3').files[0];
         const status = document.getElementById('upload-status');
 
         if(!tit || !art || !fileImg || !fileMp3) { alert("Faltan datos"); return; }
-        
         status.innerHTML = "⏳ Subiendo portada...";
-        
         try {
-            // 1. Subir Imagen
             const compressedImg = await compressImage(fileImg);
             const formData = new FormData(); formData.append("image", compressedImg);
             const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-            const dataImg = await resImg.json();
-            const urlImg = dataImg.data.url;
+            const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
 
-            // 2. Procesar MP3 (A Base64 para Firestore)
-            status.innerHTML = "⏳ Procesando audio (esto puede tardar)...";
+            status.innerHTML = "⏳ Procesando audio...";
             const reader = new FileReader();
             reader.readAsDataURL(fileMp3);
             reader.onload = async () => {
                 const base64Mp3 = reader.result;
-                
-                // 3. Guardar en Firestore
-                status.innerHTML = "📝 Guardando en base de datos...";
+                status.innerHTML = "📝 Guardando en lista...";
                 await addDoc(collection(db, "musicland_canciones"), {
-                    titulo: tit,
-                    artista: art,
-                    bio: bio || "", // Guardamos la bio nueva
-                    imagenUrl: urlImg,
-                    mp3Url: base64Mp3,
-                    fecha: new Date()
+                    titulo: tit, artista: art, imagenUrl: urlImg, mp3Url: base64Mp3, fecha: new Date()
                 });
-                
-                status.innerHTML = "✅ ¡LISTO! Canción publicada.";
-                setTimeout(() => { 
-                    document.getElementById('admin-panel').style.display = 'none'; 
-                    status.innerHTML = "";
-                    // Limpiar campos
-                    document.getElementById('up-titulo').value = "";
-                    document.getElementById('up-artista').value = "";
-                    document.getElementById('up-bio').value = "";
-                    document.getElementById('up-img').value = "";
-                    document.getElementById('up-mp3').value = "";
-                }, 2000);
+                status.innerHTML = "✅ ¡CANCION SUBIDA!";
+                setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
             };
-        } catch (e) {
-            status.innerHTML = "❌ Error: " + e.message;
-        }
+        } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
+    };
+
+    // 🖼️ ACTUALIZAR PERFIL (PORTADA GRANDE Y BIO)
+    window.actualizarPerfil = async () => {
+        const tit = document.getElementById('prof-titulo').value;
+        const sub = document.getElementById('prof-subtitulo').value;
+        const bio = document.getElementById('prof-bio').value;
+        const fileImg = document.getElementById('prof-img').files[0];
+        const status = document.getElementById('upload-status');
+
+        if(!tit || !sub || !fileImg) { alert("Faltan datos para el perfil"); return; }
+        status.innerHTML = "⏳ Actualizando Portada...";
+        try {
+            const compressedImg = await compressImage(fileImg);
+            const formData = new FormData(); formData.append("image", compressedImg);
+            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+            const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
+
+            status.innerHTML = "📝 Guardando Perfil...";
+            // Guardamos en un documento ESPECIAL con ID fijo "PERFIL_MAIN"
+            await setDoc(doc(db, "musicland_canciones", "PERFIL_MAIN"), {
+                titulo: tit, artista: sub, bio: bio, imagenUrl: urlImg, esPerfil: true
+            });
+            status.innerHTML = "✅ ¡PERFIL ACTUALIZADO!";
+            setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
+        } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
     async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 800) { h *= 800 / w; w = 800; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8); }; }; }); }
 
+    // 🔥 LEER DATOS (SEPARANDO PERFIL DE CANCIONES)
+    onSnapshot(query(collection(db, "musicland_canciones")), (snap) => {
+        canciones = [];
+        perfilData = null;
+        
+        snap.forEach(d => {
+            const data = {id: d.id, ...d.data()};
+            if(d.id === "PERFIL_MAIN") {
+                perfilData = data; // Encontramos el perfil fijo
+            } else {
+                canciones.push(data); // Es una canción normal
+            }
+        });
+        
+        // Ordenamos las canciones por fecha (ya que el query general no ordena si filtramos manualmente)
+        canciones.sort((a, b) => {
+            const dateA = a.fecha ? new Date(a.fecha.seconds * 1000) : new Date(0);
+            const dateB = b.fecha ? new Date(b.fecha.seconds * 1000) : new Date(0);
+            return dateB - dateA;
+        });
 
+        renderHero(); 
+        renderFeeds(); 
+    });
+
+    function renderHero() {
+        // Usamos el PERFIL_MAIN si existe, si no, usamos la última canción (backup)
+        const f = perfilData || canciones[0]; 
+        if(!f) return;
+
+        document.getElementById('hero-bg').style.backgroundImage = `url('${f.imagenUrl}')`;
+        document.getElementById('hero-cover').style.backgroundImage = `url('${f.imagenUrl}')`;
+        document.getElementById('hero-title').innerText = f.titulo;
+        document.getElementById('hero-artist').innerText = f.artista;
+        document.getElementById('hero-bio').innerText = f.bio || "Bienvenidos a MUSIC LAND PROJECT.";
+        
+        // Si lo que se muestra es el Perfil Principal, el botón de Play reproduce la última canción
+        // Si es una canción, reproduce esa canción.
+        const idParaPlay = perfilData ? (canciones[0] ? canciones[0].id : null) : f.id;
+        
+        if(idParaPlay) {
+            document.getElementById('hero-play-btn').innerHTML = (idActual === idParaPlay && !media.paused) ? SVG_PAUSE : SVG_PLAY;
+            document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(idParaPlay);
+        }
+        
+        // El corazón del Hero se oculta si es el Perfil General (porque no es una canción)
+        const btnHeroFav = document.getElementById('hero-fav-btn');
+        if(perfilData) {
+            btnHeroFav.style.display = 'none';
+        } else {
+            btnHeroFav.style.display = 'block';
+            btnHeroFav.innerText = misFavoritos.includes(f.id) ? '❤️' : '🤍';
+            btnHeroFav.onclick = () => window.toggleFavorito(f.id);
+        }
+    }
+
+    // ... (El resto de funciones siguen igual: toggleFavorito, gestionarPlay, etc.)
     window.toggleFavorito = (id) => {
         if(misFavoritos.includes(id)) { misFavoritos = misFavoritos.filter(favId => favId !== id); } else { misFavoritos.push(id); }
         localStorage.setItem('ml_favoritos', JSON.stringify(misFavoritos));
-        renderFeeds(); renderHero(); if(idActual === id) window.actualizarCorazonPlayer();
+        renderFeeds(); if(!perfilData) renderHero(); if(idActual === id) window.actualizarCorazonPlayer();
     };
     window.toggleFavoritoActual = () => { if(idActual) window.toggleFavorito(idActual); };
     window.actualizarCorazonPlayer = () => { if(!idActual) return; const fpFavBtn = document.getElementById('fp-fav-btn'); if(fpFavBtn) fpFavBtn.innerText = misFavoritos.includes(idActual) ? '❤️' : '🤍'; };
@@ -432,26 +509,6 @@
         const btns = [document.getElementById('mini-play-btn'), document.getElementById('fp-play-btn'), document.getElementById('hero-play-btn')];
         btns.forEach(b => { if(b) b.innerHTML = icon; });
     };
-
-    onSnapshot(query(collection(db, "musicland_canciones"), orderBy("fecha", "desc")), (snap) => {
-        canciones = []; snap.forEach(d => canciones.push({id: d.id, ...d.data()})); 
-        renderHero(); renderFeeds(); 
-    });
-
-    function renderHero() {
-        if(!canciones.length) return;
-        const f = canciones[0]; // LA ÚLTIMA CANCIÓN DEFINE EL HERO
-        document.getElementById('hero-bg').style.backgroundImage = `url('${f.imagenUrl}')`;
-        document.getElementById('hero-cover').style.backgroundImage = `url('${f.imagenUrl}')`;
-        document.getElementById('hero-title').innerText = f.titulo;
-        document.getElementById('hero-artist').innerText = f.artista;
-        document.getElementById('hero-bio').innerText = f.bio || "Descubre MUSIC LAND PROJECT."; // AQUI SE PONE LA BIO
-        document.getElementById('hero-play-btn').innerHTML = (idActual === f.id && !media.paused) ? SVG_PAUSE : SVG_PLAY;
-        document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(f.id);
-        const btnHeroFav = document.getElementById('hero-fav-btn');
-        btnHeroFav.innerText = misFavoritos.includes(f.id) ? '❤️' : '🤍';
-        btnHeroFav.onclick = () => window.toggleFavorito(f.id);
-    }
 
     function renderFeeds() {
         const createCard = (c) => {
