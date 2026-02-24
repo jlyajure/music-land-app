@@ -166,11 +166,21 @@
             <select id="up-categoria" class="admin-select">
                 <option value="Salsa">Salsa</option>
                 <option value="Merengue">Merengue</option>
-                <option value="Balada">Balada / Romántico</option>
+                <option value="Tropical">Tropical</option>
+                <option value="Funk">Funk</option>
+                <option value="Disco">Disco</option>
                 <option value="PopRock">Pop & Rock</option>
-                <option value="Urbano">Urbano / Reggaetón</option>
+                <option value="RockEsp">Rock en Español</option>
+                <option value="BaladaEsp">Baladas en Español</option>
+                <option value="BaladaIng">Baladas en Inglés</option>
+                <option value="Rancheras">Rancheras</option>
                 <option value="Llanera">Música Llanera</option>
-                <option value="Vallenato">Vallenato</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Soul">R&B / Soul</option>
+                <option value="Remixes">Remixes</option>
+                <option value="Mix">Mix</option>
+                <option value="Podcast">Podcast</option>
+                <option value="IA">I.A.</option>
                 <option value="Varios">Varios / Otro</option>
             </select>
 
@@ -225,11 +235,21 @@
             <button class="filter-btn active" onclick="filtrar('Todo', this)">Todo</button>
             <button class="filter-btn" onclick="filtrar('Salsa', this)">Salsa</button>
             <button class="filter-btn" onclick="filtrar('Merengue', this)">Merengue</button>
-            <button class="filter-btn" onclick="filtrar('Balada', this)">Baladas</button>
+            <button class="filter-btn" onclick="filtrar('Tropical', this)">Tropical</button>
+            <button class="filter-btn" onclick="filtrar('Funk', this)">Funk</button>
+            <button class="filter-btn" onclick="filtrar('Disco', this)">Disco</button>
             <button class="filter-btn" onclick="filtrar('PopRock', this)">Pop/Rock</button>
-            <button class="filter-btn" onclick="filtrar('Urbano', this)">Urbano</button>
+            <button class="filter-btn" onclick="filtrar('RockEsp', this)">Rock en Español</button>
+            <button class="filter-btn" onclick="filtrar('BaladaEsp', this)">Baladas Español</button>
+            <button class="filter-btn" onclick="filtrar('BaladaIng', this)">Baladas Inglés</button>
+            <button class="filter-btn" onclick="filtrar('Rancheras', this)">Rancheras</button>
             <button class="filter-btn" onclick="filtrar('Llanera', this)">Llanera</button>
-            <button class="filter-btn" onclick="filtrar('Vallenato', this)">Vallenato</button>
+            <button class="filter-btn" onclick="filtrar('Jazz', this)">Jazz</button>
+            <button class="filter-btn" onclick="filtrar('Soul', this)">R&B/Soul</button>
+            <button class="filter-btn" onclick="filtrar('Remixes', this)">Remixes</button>
+            <button class="filter-btn" onclick="filtrar('Mix', this)">Mix</button>
+            <button class="filter-btn" onclick="filtrar('Podcast', this)">Podcast</button>
+            <button class="filter-btn" onclick="filtrar('IA', this)">I.A.</button>
             <button class="filter-btn" onclick="filtrar('Varios', this)">Varios</button>
         </div>
 
@@ -485,20 +505,31 @@
         }
     };
 
-    // 🔥 EDITAR CATEGORÍA RÁPIDO
+    // 🔥 EDITAR CATEGORÍA RÁPIDO (Actualizado con tu lista nueva)
     window.editarCategoria = async (id) => {
-        const num = prompt("✏️ EDITAR CATEGORÍA\n\nEscribe el NÚMERO:\n1. Salsa\n2. Merengue\n3. Balada\n4. PopRock\n5. Urbano\n6. Llanera\n7. Vallenato\n8. Varios");
+        const opciones = "1. Salsa\n2. Merengue\n3. Tropical\n4. Funk\n5. Disco\n6. PopRock\n7. RockEsp\n8. BaladaEsp\n9. BaladaIng\n10. Rancheras\n11. Llanera\n12. Jazz\n13. Soul\n14. Remixes\n15. Mix\n16. Podcast\n17. IA\n18. Varios";
+        const num = prompt("✏️ EDITAR CATEGORÍA\n\nEscribe el NÚMERO:\n" + opciones);
         
         let nuevaCat = "";
         if(num === "1") nuevaCat = "Salsa";
         else if(num === "2") nuevaCat = "Merengue";
-        else if(num === "3") nuevaCat = "Balada";
-        else if(num === "4") nuevaCat = "PopRock";
-        else if(num === "5") nuevaCat = "Urbano";
-        else if(num === "6") nuevaCat = "Llanera";
-        else if(num === "7") nuevaCat = "Vallenato";
-        else if(num === "8") nuevaCat = "Varios";
-        else return; // Cancelado
+        else if(num === "3") nuevaCat = "Tropical";
+        else if(num === "4") nuevaCat = "Funk";
+        else if(num === "5") nuevaCat = "Disco";
+        else if(num === "6") nuevaCat = "PopRock";
+        else if(num === "7") nuevaCat = "RockEsp";
+        else if(num === "8") nuevaCat = "BaladaEsp";
+        else if(num === "9") nuevaCat = "BaladaIng";
+        else if(num === "10") nuevaCat = "Rancheras";
+        else if(num === "11") nuevaCat = "Llanera";
+        else if(num === "12") nuevaCat = "Jazz";
+        else if(num === "13") nuevaCat = "Soul";
+        else if(num === "14") nuevaCat = "Remixes";
+        else if(num === "15") nuevaCat = "Mix";
+        else if(num === "16") nuevaCat = "Podcast";
+        else if(num === "17") nuevaCat = "IA";
+        else if(num === "18") nuevaCat = "Varios";
+        else return;
 
         try {
             await updateDoc(doc(db, "musicland_canciones", id), { categoria: nuevaCat });
