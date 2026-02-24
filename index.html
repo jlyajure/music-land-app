@@ -153,8 +153,8 @@
             <label style="color:#ccc; display:block; margin-top:10px;">📸 Portada Canción (JPG/PNG)</label>
             <input type="file" id="up-img" class="admin-input" accept="image/*">
             
-            <label style="color:#ccc; display:block; margin-top:10px;">🎵 Audio (MP3)</label>
-            <input type="file" id="up-mp3" class="admin-input" accept="audio/*">
+            <label style="color:#ccc; display:block; margin-top:10px;">🔗 Enlace Audio (Archive.org o similar)</label>
+            <input type="text" id="up-mp3-link" class="admin-input" placeholder="Pega aquí el link del MP3 (https://...)">
             
             <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 SUBIR A LA LISTA</button>
         </div>
@@ -168,8 +168,8 @@
             <label style="color:#ccc; display:block; margin-top:10px;">📸 Imagen Portada (JPG/PNG)</label>
             <input type="file" id="prof-img" class="admin-input" accept="image/*">
 
-            <label style="color:#ccc; display:block; margin-top:10px;">🎵 Audio Destacado (MP3)</label>
-            <input type="file" id="prof-mp3" class="admin-input" accept="audio/*">
+            <label style="color:#ccc; display:block; margin-top:10px;">🔗 Audio Destacado (Enlace MP3)</label>
+            <input type="text" id="prof-mp3-link" class="admin-input" placeholder="Pega aquí el link del MP3 (https://...)">
             
             <button onclick="window.actualizarPerfil()" class="admin-btn" style="background:#ffdd00;">💾 ACTUALIZAR PORTADA</button>
         </div>
@@ -383,15 +383,15 @@
         document.getElementById('tab-perfil').style.display = tab === 'perfil' ? 'block' : 'none';
     };
 
-    // 🚀 SUBIR CANCIÓN (SOLO A LA LISTA)
+    // 🚀 SUBIR CANCIÓN (LISTA NORMAL)
     window.subirCancion = async () => {
         const tit = document.getElementById('up-titulo').value;
         const art = document.getElementById('up-artista').value;
         const fileImg = document.getElementById('up-img').files[0];
-        const fileMp3 = document.getElementById('up-mp3').files[0];
+        const mp3Link = document.getElementById('up-mp3-link').value; // AHORA LEE EL LINK
         const status = document.getElementById('upload-status');
 
-        if(!tit || !art || !fileImg || !fileMp3) { alert("Faltan datos"); return; }
+        if(!tit || !art || !fileImg || !mp3Link) { alert("Faltan datos"); return; }
         status.innerHTML = "⏳ Subiendo portada...";
         try {
             const compressedImg = await compressImage(fileImg);
@@ -399,31 +399,26 @@
             const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
             const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
 
-            status.innerHTML = "⏳ Procesando audio...";
-            const reader = new FileReader();
-            reader.readAsDataURL(fileMp3);
-            reader.onload = async () => {
-                const base64Mp3 = reader.result;
-                status.innerHTML = "📝 Guardando en lista...";
-                await addDoc(collection(db, "musicland_canciones"), {
-                    titulo: tit, artista: art, imagenUrl: urlImg, mp3Url: base64Mp3, fecha: new Date()
-                });
-                status.innerHTML = "✅ ¡CANCION SUBIDA!";
-                setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
-            };
+            status.innerHTML = "📝 Guardando en lista...";
+            // Guardamos el LINK en vez del Base64
+            await addDoc(collection(db, "musicland_canciones"), {
+                titulo: tit, artista: art, imagenUrl: urlImg, mp3Url: mp3Link, fecha: new Date()
+            });
+            status.innerHTML = "✅ ¡CANCION SUBIDA!";
+            setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
-    // 🖼️ ACTUALIZAR PERFIL (PORTADA, BIO Y AUDIO DESTACADO)
+    // 🖼️ ACTUALIZAR PERFIL
     window.actualizarPerfil = async () => {
         const tit = document.getElementById('prof-titulo').value;
         const sub = document.getElementById('prof-subtitulo').value;
         const bio = document.getElementById('prof-bio').value;
         const fileImg = document.getElementById('prof-img').files[0];
-        const fileMp3 = document.getElementById('prof-mp3').files[0];
+        const mp3Link = document.getElementById('prof-mp3-link').value; // AHORA LEE EL LINK
         const status = document.getElementById('upload-status');
 
-        if(!tit || !sub || !fileImg || !fileMp3) { alert("Faltan datos (Título, Subtítulo, Foto o MP3)"); return; }
+        if(!tit || !sub || !fileImg || !mp3Link) { alert("Faltan datos"); return; }
         
         status.innerHTML = "⏳ Actualizando Portada...";
         try {
@@ -432,19 +427,13 @@
             const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
             const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
 
-            status.innerHTML = "⏳ Procesando Audio Destacado...";
-            const reader = new FileReader();
-            reader.readAsDataURL(fileMp3);
-            reader.onload = async () => {
-                const base64Mp3 = reader.result;
-                status.innerHTML = "📝 Guardando Perfil...";
-                // Guardamos en un documento ESPECIAL con ID fijo "PERFIL_MAIN"
-                await setDoc(doc(db, "musicland_canciones", "PERFIL_MAIN"), {
-                    titulo: tit, artista: sub, bio: bio, imagenUrl: urlImg, mp3Url: base64Mp3, esPerfil: true
-                });
-                status.innerHTML = "✅ ¡PERFIL ACTUALIZADO!";
-                setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
-            };
+            status.innerHTML = "📝 Guardando Perfil...";
+            // Guardamos el LINK en vez del Base64
+            await setDoc(doc(db, "musicland_canciones", "PERFIL_MAIN"), {
+                titulo: tit, artista: sub, bio: bio, imagenUrl: urlImg, mp3Url: mp3Link, esPerfil: true
+            });
+            status.innerHTML = "✅ ¡PERFIL ACTUALIZADO!";
+            setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
