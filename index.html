@@ -143,7 +143,7 @@
         
         <div style="display:flex; gap:10px; margin-bottom:20px;">
             <button class="tab-btn active" onclick="verTab('cancion', this)">🎵 Subir Canción</button>
-            <button class="tab-btn" onclick="verTab('perfil', this)">🖼️ Portada/Bio</button>
+            <button class="tab-btn" onclick="verTab('perfil', this)">🖼️ Portada/Destacado</button>
         </div>
 
         <div id="tab-cancion">
@@ -156,19 +156,22 @@
             <label style="color:#ccc; display:block; margin-top:10px;">🎵 Audio (MP3)</label>
             <input type="file" id="up-mp3" class="admin-input" accept="audio/*">
             
-            <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 SUBIR MÚSICA</button>
+            <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 SUBIR A LA LISTA</button>
         </div>
 
         <div id="tab-perfil" style="display:none;">
-            <p style="color:#aaa; font-size:13px; text-align:center;">Esto cambia la imagen grande y el texto principal. No sube música.</p>
+            <p style="color:#aaa; font-size:13px; text-align:center;">Esto cambia la Portada Principal y su canción asociada.</p>
             <input type="text" id="prof-titulo" class="admin-input" placeholder="Título Principal (Ej: MUSIC LAND)">
-            <input type="text" id="prof-subtitulo" class="admin-input" placeholder="Subtítulo (Ej: Project)">
+            <input type="text" id="prof-subtitulo" class="admin-input" placeholder="Subtítulo / Artista">
             <textarea id="prof-bio" class="admin-input" rows="4" placeholder="Escribe la Biografía o Descripción del proyecto aquí..."></textarea>
             
-            <label style="color:#ccc; display:block; margin-top:10px;">📸 Nueva Portada Principal</label>
+            <label style="color:#ccc; display:block; margin-top:10px;">📸 Imagen Portada (JPG/PNG)</label>
             <input type="file" id="prof-img" class="admin-input" accept="image/*">
+
+            <label style="color:#ccc; display:block; margin-top:10px;">🎵 Audio Destacado (MP3)</label>
+            <input type="file" id="prof-mp3" class="admin-input" accept="audio/*">
             
-            <button onclick="window.actualizarPerfil()" class="admin-btn" style="background:#ffdd00;">💾 GUARDAR CAMBIOS</button>
+            <button onclick="window.actualizarPerfil()" class="admin-btn" style="background:#ffdd00;">💾 ACTUALIZAR PORTADA</button>
         </div>
 
         <div id="upload-status" style="color:white; text-align:center; margin-top:10px;"></div>
@@ -411,15 +414,17 @@
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
-    // 🖼️ ACTUALIZAR PERFIL (PORTADA GRANDE Y BIO)
+    // 🖼️ ACTUALIZAR PERFIL (PORTADA, BIO Y AUDIO DESTACADO)
     window.actualizarPerfil = async () => {
         const tit = document.getElementById('prof-titulo').value;
         const sub = document.getElementById('prof-subtitulo').value;
         const bio = document.getElementById('prof-bio').value;
         const fileImg = document.getElementById('prof-img').files[0];
+        const fileMp3 = document.getElementById('prof-mp3').files[0];
         const status = document.getElementById('upload-status');
 
-        if(!tit || !sub || !fileImg) { alert("Faltan datos para el perfil"); return; }
+        if(!tit || !sub || !fileImg || !fileMp3) { alert("Faltan datos (Título, Subtítulo, Foto o MP3)"); return; }
+        
         status.innerHTML = "⏳ Actualizando Portada...";
         try {
             const compressedImg = await compressImage(fileImg);
@@ -427,13 +432,19 @@
             const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
             const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
 
-            status.innerHTML = "📝 Guardando Perfil...";
-            // Guardamos en un documento ESPECIAL con ID fijo "PERFIL_MAIN"
-            await setDoc(doc(db, "musicland_canciones", "PERFIL_MAIN"), {
-                titulo: tit, artista: sub, bio: bio, imagenUrl: urlImg, esPerfil: true
-            });
-            status.innerHTML = "✅ ¡PERFIL ACTUALIZADO!";
-            setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
+            status.innerHTML = "⏳ Procesando Audio Destacado...";
+            const reader = new FileReader();
+            reader.readAsDataURL(fileMp3);
+            reader.onload = async () => {
+                const base64Mp3 = reader.result;
+                status.innerHTML = "📝 Guardando Perfil...";
+                // Guardamos en un documento ESPECIAL con ID fijo "PERFIL_MAIN"
+                await setDoc(doc(db, "musicland_canciones", "PERFIL_MAIN"), {
+                    titulo: tit, artista: sub, bio: bio, imagenUrl: urlImg, mp3Url: base64Mp3, esPerfil: true
+                });
+                status.innerHTML = "✅ ¡PERFIL ACTUALIZADO!";
+                setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; status.innerHTML = ""; }, 2000);
+            };
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
@@ -447,13 +458,12 @@
         snap.forEach(d => {
             const data = {id: d.id, ...d.data()};
             if(d.id === "PERFIL_MAIN") {
-                perfilData = data; // Encontramos el perfil fijo
+                perfilData = data; 
             } else {
-                canciones.push(data); // Es una canción normal
+                canciones.push(data);
             }
         });
         
-        // Ordenamos las canciones por fecha (ya que el query general no ordena si filtramos manualmente)
         canciones.sort((a, b) => {
             const dateA = a.fecha ? new Date(a.fecha.seconds * 1000) : new Date(0);
             const dateB = b.fecha ? new Date(b.fecha.seconds * 1000) : new Date(0);
@@ -465,7 +475,6 @@
     });
 
     function renderHero() {
-        // Usamos el PERFIL_MAIN si existe, si no, usamos la última canción (backup)
         const f = perfilData || canciones[0]; 
         if(!f) return;
 
@@ -475,19 +484,15 @@
         document.getElementById('hero-artist').innerText = f.artista;
         document.getElementById('hero-bio').innerText = f.bio || "Bienvenidos a MUSIC LAND PROJECT.";
         
-        // Si lo que se muestra es el Perfil Principal, el botón de Play reproduce la última canción
-        // Si es una canción, reproduce esa canción.
-        const idParaPlay = perfilData ? (canciones[0] ? canciones[0].id : null) : f.id;
+        // 🔥 LÓGICA DE PLAY DEL HERO (Ahora sí toca la canción del perfil)
+        let idParaPlay = f.id; 
         
-        if(idParaPlay) {
-            document.getElementById('hero-play-btn').innerHTML = (idActual === idParaPlay && !media.paused) ? SVG_PAUSE : SVG_PLAY;
-            document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(idParaPlay);
-        }
+        document.getElementById('hero-play-btn').innerHTML = (idActual === idParaPlay && !media.paused) ? SVG_PAUSE : SVG_PLAY;
+        document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(idParaPlay);
         
-        // El corazón del Hero se oculta si es el Perfil General (porque no es una canción)
         const btnHeroFav = document.getElementById('hero-fav-btn');
         if(perfilData) {
-            btnHeroFav.style.display = 'none';
+            btnHeroFav.style.display = 'none'; // El perfil no se agrega a favoritos
         } else {
             btnHeroFav.style.display = 'block';
             btnHeroFav.innerText = misFavoritos.includes(f.id) ? '❤️' : '🤍';
@@ -495,7 +500,6 @@
         }
     }
 
-    // ... (El resto de funciones siguen igual: toggleFavorito, gestionarPlay, etc.)
     window.toggleFavorito = (id) => {
         if(misFavoritos.includes(id)) { misFavoritos = misFavoritos.filter(favId => favId !== id); } else { misFavoritos.push(id); }
         localStorage.setItem('ml_favoritos', JSON.stringify(misFavoritos));
@@ -539,19 +543,29 @@
         if(listaFavs.length > 0) { favTitle.style.display = 'block'; favCarousel.style.display = 'flex'; favCarousel.innerHTML = listaFavs.map(c => createCard(c)).join(''); } else { favTitle.style.display = 'none'; favCarousel.style.display = 'none'; }
     }
 
+    // 🔥 GESTIONAR PLAY (AHORA SOPORTA EL PERFIL)
     window.gestionarPlay = (id) => {
-        const s = canciones.find(c => c.id === id);
-        if(idActual !== id) {
-            idActual = id; window.castTitle = s.titulo; window.castCover = s.imagenUrl;
-            document.getElementById('mini-title').innerText = s.titulo; document.getElementById('mini-artist').innerText = s.artista;
-            document.getElementById('mini-art').style.backgroundImage = `url('${s.imagenUrl}')`;
-            document.getElementById('mini-player').style.display = 'flex';
-            document.getElementById('fp-title').innerText = s.titulo; document.getElementById('fp-artist').innerText = s.artista;
-            document.getElementById('fp-art').style.backgroundImage = `url('${s.imagenUrl}')`;
-            window.actualizarCorazonPlayer();
-            media.src = s.mp3Url; media.play();
-            if(window.innerWidth > 768) { window.openFullPlayer(); }
-        } else { window.toggleMainPlay(); }
+        let s = canciones.find(c => c.id === id);
+        
+        // Si no está en la lista normal, revisamos si es el PERFIL PRINCIPAL
+        if (!s && id === 'PERFIL_MAIN' && perfilData) {
+            s = perfilData; 
+            s.id = 'PERFIL_MAIN'; // Aseguramos que tenga ID
+        }
+
+        if(s) {
+            if(idActual !== id) {
+                idActual = id; window.castTitle = s.titulo; window.castCover = s.imagenUrl;
+                document.getElementById('mini-title').innerText = s.titulo; document.getElementById('mini-artist').innerText = s.artista;
+                document.getElementById('mini-art').style.backgroundImage = `url('${s.imagenUrl}')`;
+                document.getElementById('mini-player').style.display = 'flex';
+                document.getElementById('fp-title').innerText = s.titulo; document.getElementById('fp-artist').innerText = s.artista;
+                document.getElementById('fp-art').style.backgroundImage = `url('${s.imagenUrl}')`;
+                window.actualizarCorazonPlayer();
+                media.src = s.mp3Url; media.play();
+                if(window.innerWidth > 768) { window.openFullPlayer(); }
+            } else { window.toggleMainPlay(); }
+        }
         window.actualizarBotonesPlay(media.paused);
     };
 
