@@ -169,10 +169,10 @@
                 <option value="Tropical">Tropical</option>
                 <option value="Funk">Funk</option>
                 <option value="Disco">Disco</option>
-                <option value="PopRock">Pop & Rock</option>
                 <option value="RockEsp">Rock en Español</option>
                 <option value="BaladaEsp">Baladas en Español</option>
                 <option value="BaladaIng">Baladas en Inglés</option>
+                <option value="PopRock">Pop & Rock (Anglo)</option>
                 <option value="Rancheras">Rancheras</option>
                 <option value="Llanera">Música Llanera</option>
                 <option value="Jazz">Jazz</option>
@@ -238,10 +238,10 @@
             <button class="filter-btn" onclick="filtrar('Tropical', this)">Tropical</button>
             <button class="filter-btn" onclick="filtrar('Funk', this)">Funk</button>
             <button class="filter-btn" onclick="filtrar('Disco', this)">Disco</button>
-            <button class="filter-btn" onclick="filtrar('PopRock', this)">Pop/Rock</button>
-            <button class="filter-btn" onclick="filtrar('RockEsp', this)">Rock en Español</button>
+            <button class="filter-btn" onclick="filtrar('RockEsp', this)">Rock Español</button>
             <button class="filter-btn" onclick="filtrar('BaladaEsp', this)">Baladas Español</button>
             <button class="filter-btn" onclick="filtrar('BaladaIng', this)">Baladas Inglés</button>
+            <button class="filter-btn" onclick="filtrar('PopRock', this)">Pop/Rock</button>
             <button class="filter-btn" onclick="filtrar('Rancheras', this)">Rancheras</button>
             <button class="filter-btn" onclick="filtrar('Llanera', this)">Llanera</button>
             <button class="filter-btn" onclick="filtrar('Jazz', this)">Jazz</button>
@@ -253,15 +253,18 @@
             <button class="filter-btn" onclick="filtrar('Varios', this)">Varios</button>
         </div>
 
-        <h3 style="margin-left:20px; color: var(--neon);">💡 Sugerencias para ti</h3>
-        <div id="carousel-sug" class="carousel"></div>
+        <div id="secciones-extra">
+            <h3 style="margin-left:20px; color: var(--neon);">💡 Sugerencias para ti</h3>
+            <div id="carousel-sug" class="carousel"></div>
 
-        <h3 id="title-fav" style="margin-left:20px; display:none; color: #ff4444;">❤️ Tus Favoritos</h3>
-        <div id="carousel-fav" class="carousel" style="display:none;"></div>
+            <h3 id="title-fav" style="margin-left:20px; display:none; color: #ff4444;">❤️ Tus Favoritos</h3>
+            <div id="carousel-fav" class="carousel" style="display:none;"></div>
 
-        <h3 style="margin-left:20px;">🔥 Novedades</h3><div id="carousel-new" class="carousel"></div>
+            <h3 style="margin-left:20px;">🔥 Novedades</h3><div id="carousel-new" class="carousel"></div>
+        </div>
         
-        <h3 style="margin-left:20px;">📂 Catálogo Completo</h3><div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
+        <h3 id="titulo-catalogo" style="margin-left:20px;">📂 Catálogo Completo</h3>
+        <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
 </div>
 
@@ -445,6 +448,19 @@
         filtroActual = cat;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        
+        // 🔥 OCULTAR O MOSTRAR SECCIONES EXTRA
+        const seccionesExtra = document.getElementById('secciones-extra');
+        const tituloCatalogo = document.getElementById('titulo-catalogo');
+        
+        if(cat === 'Todo') {
+            seccionesExtra.style.display = 'block';
+            tituloCatalogo.innerText = '📂 Catálogo Completo';
+        } else {
+            seccionesExtra.style.display = 'none';
+            tituloCatalogo.innerText = '📂 Filtrado: ' + cat;
+        }
+        
         renderFeeds();
     };
 
@@ -498,16 +514,14 @@
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
     };
 
-    // 🔥 BORRAR CANCIÓN
     window.borrarCancion = async (id) => {
         if(confirm("¿Seguro que quieres eliminar esta canción de la lista?")) {
             try { await deleteDoc(doc(db, "musicland_canciones", id)); alert("🗑️ Canción eliminada"); } catch(e) { alert("Error al borrar: " + e.message); }
         }
     };
 
-    // 🔥 EDITAR CATEGORÍA RÁPIDO (Actualizado con tu lista nueva)
     window.editarCategoria = async (id) => {
-        const opciones = "1. Salsa\n2. Merengue\n3. Tropical\n4. Funk\n5. Disco\n6. PopRock\n7. RockEsp\n8. BaladaEsp\n9. BaladaIng\n10. Rancheras\n11. Llanera\n12. Jazz\n13. Soul\n14. Remixes\n15. Mix\n16. Podcast\n17. IA\n18. Varios";
+        const opciones = "1. Salsa\n2. Merengue\n3. Tropical\n4. Funk\n5. Disco\n6. RockEsp\n7. BaladaEsp\n8. BaladaIng\n9. PopRock\n10. Rancheras\n11. Llanera\n12. Jazz\n13. Soul\n14. Remixes\n15. Mix\n16. Podcast\n17. IA\n18. Varios";
         const num = prompt("✏️ EDITAR CATEGORÍA\n\nEscribe el NÚMERO:\n" + opciones);
         
         let nuevaCat = "";
@@ -516,10 +530,10 @@
         else if(num === "3") nuevaCat = "Tropical";
         else if(num === "4") nuevaCat = "Funk";
         else if(num === "5") nuevaCat = "Disco";
-        else if(num === "6") nuevaCat = "PopRock";
-        else if(num === "7") nuevaCat = "RockEsp";
-        else if(num === "8") nuevaCat = "BaladaEsp";
-        else if(num === "9") nuevaCat = "BaladaIng";
+        else if(num === "6") nuevaCat = "RockEsp";
+        else if(num === "7") nuevaCat = "BaladaEsp";
+        else if(num === "8") nuevaCat = "BaladaIng";
+        else if(num === "9") nuevaCat = "PopRock";
         else if(num === "10") nuevaCat = "Rancheras";
         else if(num === "11") nuevaCat = "Llanera";
         else if(num === "12") nuevaCat = "Jazz";
@@ -534,6 +548,7 @@
         try {
             await updateDoc(doc(db, "musicland_canciones", id), { categoria: nuevaCat });
             alert("✅ ¡Categoría cambiada a " + nuevaCat + "!");
+            renderFeeds(); // Actualizar pantalla
         } catch(e) { alert("Error al editar: " + e.message); }
     };
 
@@ -592,7 +607,6 @@
         const createCard = (c) => {
             const isPlaying = idActual === c.id && !media.paused;
             const isFav = misFavoritos.includes(c.id);
-            // 🔥 BOTÓN EDITAR + BORRAR
             return `<div class="n-card" onclick="window.gestionarPlay('${c.id}')">
                 <div class="n-img" style="background-image:url('${c.imagenUrl}')">
                     <div class="btn-delete-card" onclick="event.stopPropagation(); window.borrarCancion('${c.id}')">🗑️</div>
