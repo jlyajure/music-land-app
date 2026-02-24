@@ -13,131 +13,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('Motor de instalación listo.');
-                });
-            });
-        }
-
-        let letInstallPrompt;
-        
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-        window.addEventListener('load', () => {
-            const btnInstalar = document.getElementById('btn-instalar');
-            if(isPWA) {
-                if(btnInstalar) btnInstalar.style.display = 'none';
-            } else if (isIOS) {
-                if(btnInstalar) {
-                    btnInstalar.style.display = 'block';
-                    btnInstalar.onclick = () => {
-                        alert("🍏 Para instalar en tu iPhone o iPad:\n\n1. Toca el ícono de 'Compartir' (el cuadrado con la flecha hacia arriba) en el menú de Safari.\n\n2. Selecciona 'Agregar a la pantalla de inicio' 📱.");
-                    };
-                }
-            }
-        });
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            letInstallPrompt = e;
-            const btnInstalar = document.getElementById('btn-instalar');
-            if(btnInstalar && !isPWA) {
-                btnInstalar.style.display = 'block';
-                btnInstalar.onclick = window.instalarAppFuerza;
-            }
-        });
-
-        window.instalarAppFuerza = async () => {
-            if (!letInstallPrompt) return;
-            letInstallPrompt.prompt();
-            const { outcome } = await letInstallPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('btn-instalar').style.display = 'none';
-            }
-            letInstallPrompt = null;
-        };
-    </script>
-
-    <script>
-        window.castTitle = "";
-        window.castCover = "";
-        window.lastTvTime = 0;
-        window.tvSyncInterval = null;
-
-        window['__onGCastApiAvailable'] = function(isAvailable) {
-            if (isAvailable) {
-                cast.framework.CastContext.getInstance().setOptions({ 
-                    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, 
-                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED 
-                });
-
-                cast.framework.CastContext.getInstance().addEventListener(
-                    cast.framework.CastContextEventType.SESSION_STATE_CHANGED, 
-                    function(event) {
-                        const media = document.getElementById('main-media');
-                        const btnCast = document.getElementById('btn-cast-fijo');
-
-                        if (event.sessionState === cast.framework.SessionState.SESSION_STARTED || event.sessionState === cast.framework.SessionState.SESSION_RESUMED) {
-                            media.pause(); 
-                            if(btnCast) btnCast.classList.add('cast-active');
-                            if(window.actualizarBotonesPlay) window.actualizarBotonesPlay(true);
-                            
-                            window.tvSyncInterval = setInterval(() => {
-                                const session = cast.framework.CastContext.getInstance().getCurrentSession();
-                                if(session) {
-                                    const castMedia = session.getMediaSession();
-                                    if(castMedia) window.lastTvTime = castMedia.getEstimatedTime();
-                                }
-                            }, 1000);
-                        } 
-                        else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
-                            if(btnCast) btnCast.classList.remove('cast-active');
-                            clearInterval(window.tvSyncInterval); 
-                            if(window.lastTvTime > 0) media.currentTime = window.lastTvTime;
-                            media.play(); 
-                            if(window.actualizarBotonesPlay) window.actualizarBotonesPlay(false);
-                        }
-                    }
-                );
-            }
-        };
-
-        window.startCast = () => {
-            const context = cast.framework.CastContext.getInstance();
-            const session = context.getCurrentSession();
-            const media = document.getElementById('main-media');
-            
-            if (session) {
-                if(confirm("¿Desconectar la TV?")) {
-                    session.endSession(true);
-                }
-            } else {
-                context.requestSession().then(function() {
-                    if (media && media.src) {
-                        const mediaInfo = new chrome.cast.media.MediaInfo(media.src, 'audio/mp3');
-                        const meta = new chrome.cast.media.MusicTrackMediaMetadata();
-                        meta.title = window.castTitle || "En vivo";
-                        meta.artist = "🔹 MUSIC LAND PROJECT 🔹"; 
-                        if(window.castCover) meta.images = [new chrome.cast.Image(window.castCover)];
-                        mediaInfo.metadata = meta;
-
-                        const request = new chrome.cast.media.LoadRequest(mediaInfo);
-                        request.autoplay = true;
-                        request.currentTime = media.currentTime; 
-                        context.getCurrentSession().loadMedia(request);
-                    }
-                }, function(e) {
-                    if(e.code !== 'cancel') console.log("Cancelado.");
-                });
-            }
-        };
-    </script>
-    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-    
     <style>
         :root { --neon: #00d2ff; --bg: #080808; --card: #121212; --red: #ff4444; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -148,7 +23,8 @@
         ::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 10px; box-shadow: 0 0 15px var(--neon); border: 2px solid #000; }
         
         header { background: rgba(0,0,0,0.98); backdrop-filter: blur(10px); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 2000; border-bottom: 1px solid #222; height: 75px; }
-        .logo-box { width: 45px; height: 45px; background: #000; border: 2px solid var(--neon); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); cursor: pointer; overflow: hidden; position: relative; flex-shrink: 0; }
+        .logo-box { width: 45px; height: 45px; background: #000; border: 2px solid var(--neon); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); cursor: pointer; overflow: hidden; position: relative; flex-shrink: 0; transition: transform 0.1s; }
+        .logo-box:active { transform: scale(0.9); }
         .header-logo { width: 100%; height: 100%; object-fit: cover; z-index: 2; position: relative; }
         .logo-svg { position: absolute; width: 26px; height: 26px; fill: var(--neon); z-index: 1; filter: drop-shadow(0 0 5px var(--neon)); }
         .brand-title { color: var(--neon); font-size: 20px; font-weight: 900; text-transform: uppercase; margin-left: 12px; letter-spacing: 1px; white-space: nowrap; }
@@ -174,7 +50,6 @@
         .n-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; border-radius: 15px; z-index: 1; }
         .n-card:hover .n-overlay { opacity: 1; }
         .n-play-icon { width: 45px; height: 45px; background: var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; }
-        
         .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
         .btn-fav-card:hover { transform: scale(1.2); }
 
@@ -184,7 +59,6 @@
         .mini-text { flex: 1; min-width: 0; }
         .mini-title { font-size: 15px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .mini-artist { font-size: 12px; color: var(--neon); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
         .mini-controls { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
         .btn-round { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.2); color: white; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; flex-shrink: 0; }
         .btn-round:hover { transform: scale(1.1); color: var(--neon); border-color: var(--neon); }
@@ -200,23 +74,22 @@
         
         .btn-cast-pc { transition: 0.3s; }
         .btn-cast-pc.cast-active { background: rgba(0, 210, 255, 0.1); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 20px var(--neon); }
-
         #pantalla-salida { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#080808; z-index:99999; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
-
-        /* 🟢 BOTÓN WHATSAPP FLOTANTE */
         .btn-wa { position: fixed; bottom: 95px; right: 25px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 0 20px rgba(37,211,102,0.4); z-index: 4000; transition: 0.3s; }
         .btn-wa:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
         .btn-wa svg { width: 35px; height: 35px; fill: currentColor; }
 
-        /* MÓVIL */
+        /* 🔥 ADMIN PANEL */
+        #admin-panel { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; overflow-y:auto; padding:20px; }
+        .admin-box { background:#111; border:1px solid var(--neon); max-width:500px; margin:50px auto; padding:20px; border-radius:20px; }
+        .admin-input { width:100%; background:#222; border:1px solid #444; color:white; padding:10px; margin-bottom:10px; border-radius:10px; }
+        .admin-btn { width:100%; background:var(--neon); color:black; font-weight:bold; padding:12px; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
+
         @media (max-width: 768px) {
             header { padding: 10px 15px; height: 65px; }
             .logo-box { width: 38px; height: 38px; }
             .brand-title { font-size: 15px; margin-left: 8px; letter-spacing: 0.5px; }
-            header button { font-size: 11px; padding: 6px 12px; }
-            
             #home-view { padding-top: 80px; padding-bottom: 120px; }
-            
             #hero-section { min-height: auto; padding: 30px 10px; border-radius: 0 0 25px 25px; }
             .hero-content { flex-direction: column; text-align: center; gap: 20px; padding: 10px; }
             .hero-cover { width: 220px; height: 220px; margin: 0 auto; }
@@ -224,26 +97,21 @@
             .hero-artist { font-size: 18px; }
             .hero-bio { border-left: none; border-bottom: 2px solid var(--neon); padding-left: 0; padding-bottom: 15px; max-height: none; }
             .hero-actions { justify-content: center; width: 100%; gap: 30px; }
-            
             .carousel { padding: 0 10px 20px 10px; gap: 12px; }
             .n-card { min-width: 140px; width: 140px; }
             .n-img { width: 140px; height: 140px; }
             #carousel-all { gap: 15px; padding-bottom: 50px; }
-            
             #mini-player { padding: 10px 15px; gap: 10px; }
             .mini-art { width: 45px; height: 45px; }
             .mini-controls { gap: 12px; }
             .btn-round { width: 38px; height: 38px; }
             .btn-round svg { width: 20px; height: 20px; }
-            
             #full-player { padding: 25px 20px; }
             .fp-art { width: 280px; height: 280px; margin-top: 15px; }
             #fp-title { font-size: 26px !important; text-align: center; }
             #fp-artist { font-size: 18px !important; text-align: center; }
             .fp-controls { gap: 20px; width: 100%; justify-content: center; }
             .fp-btn-main { width: 75px; height: 75px; }
-
-            /* 🟢 WA MÓVIL (Ajustado para no chocar con el reproductor mini) */
             .btn-wa { bottom: 85px; right: 20px; width: 55px; height: 55px; }
             .btn-wa svg { width: 30px; height: 30px; }
         }
@@ -266,6 +134,26 @@
         <button onclick="window.confirmarSalida()" style="background:transparent; border:1px solid #ff4444; color:#ff4444; padding:5px 12px; border-radius:20px; cursor:pointer;">SALIR</button>
     </div>
 </header>
+
+<div id="admin-panel">
+    <div class="admin-box">
+        <h2 style="color:var(--neon); text-align:center;">PANEL DE DIRECTOR 🛠️</h2>
+        <input type="text" id="up-titulo" class="admin-input" placeholder="Título de la Canción">
+        <input type="text" id="up-artista" class="admin-input" placeholder="Nombre del Artista">
+        <textarea id="up-bio" class="admin-input" rows="3" placeholder="Bio / Descripción (Esto actualizará la portada principal)"></textarea>
+        
+        <label style="color:#ccc; display:block; margin-top:10px;">📸 Portada (JPG/PNG)</label>
+        <input type="file" id="up-img" class="admin-input" accept="image/*">
+        
+        <label style="color:#ccc; display:block; margin-top:10px;">🎵 Audio (MP3)</label>
+        <input type="file" id="up-mp3" class="admin-input" accept="audio/*">
+        
+        <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 PUBLICAR</button>
+        <div id="upload-status" style="color:white; text-align:center; margin-top:10px;"></div>
+        
+        <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; width:100%; padding:10px; border:none; border-radius:10px; margin-top:10px; cursor:pointer;">CERRAR</button>
+    </div>
+</div>
 
 <div id="home-view">
     <div id="hero-section">
@@ -322,8 +210,7 @@
     
     <div class="fp-controls">
         <button onclick="window.toggleMute()" class="btn-round" style="width:55px; height:55px;" id="btn-vol-full">
-            <svg viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
-    const SVG_VOL_OFF = `<path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/></svg>
         </button>
         
         <button onclick="window.toggleFavoritoActual()" class="btn-round" id="fp-fav-btn" style="width:55px; height:55px; font-size: 26px; border:none; background:transparent;">🤍</button>
@@ -347,13 +234,101 @@
     <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 19.84C10.57 19.84 9.14 19.45 7.9 18.71L7.61 18.54L4.47 19.36L5.31 16.3L5.12 16C4.33 14.78 3.91 13.36 3.91 11.91C3.91 7.43 7.56 3.79 12.05 3.79C14.22 3.79 16.27 4.64 17.8 6.18C19.34 7.71 20.19 9.76 20.19 11.92C20.19 16.4 16.54 20.04 12.05 20.04M16.52 13.79C16.27 13.67 15.06 13.07 14.83 12.99C14.6 12.91 14.43 12.87 14.27 13.11C14.1 13.36 13.64 13.92 13.5 14.09C13.36 14.27 13.21 14.29 12.96 14.17C12.72 14.04 11.92 13.78 10.97 12.94C10.23 12.28 9.72 11.45 9.58 11.2C9.43 10.96 9.56 10.82 9.69 10.7C9.8 10.59 9.94 10.42 10.06 10.28C10.18 10.13 10.23 10.03 10.3 9.87C10.39 9.7 10.34 9.56 10.28 9.44C10.22 9.32 9.72 8.1 9.52 7.6C9.32 7.12 9.12 7.18 8.97 7.18C8.83 7.18 8.66 7.18 8.5 7.18C8.34 7.18 8.08 7.24 7.85 7.5C7.63 7.76 7 8.35 7 9.55C7 10.75 7.88 11.91 8 12.08C8.13 12.25 9.73 14.71 12.18 15.76C12.76 16.01 13.22 16.16 13.58 16.27C14.16 16.45 14.69 16.41 15.11 16.35C15.58 16.28 16.52 15.78 16.72 15.22C16.92 14.66 16.92 14.18 16.85 14.09C16.78 13.99 16.63 13.93 16.38 13.8L16.52 13.79Z"/></svg>
 </a>
 
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(reg => { console.log('Motor de instalación listo.'); });
+        });
+    }
+
+    let letInstallPrompt;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    window.addEventListener('load', () => {
+        const btnInstalar = document.getElementById('btn-instalar');
+        if(isPWA) {
+            if(btnInstalar) btnInstalar.style.display = 'none';
+        } else if (isIOS) {
+            if(btnInstalar) {
+                btnInstalar.style.display = 'block';
+                btnInstalar.onclick = () => { alert("🍏 Para instalar en tu iPhone o iPad:\n\n1. Toca el ícono de 'Compartir' (el cuadrado con la flecha hacia arriba) en el menú de Safari.\n\n2. Selecciona 'Agregar a la pantalla de inicio' 📱."); };
+            }
+        }
+    });
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        letInstallPrompt = e;
+        const btnInstalar = document.getElementById('btn-instalar');
+        if(btnInstalar && !isPWA) {
+            btnInstalar.style.display = 'block';
+            btnInstalar.onclick = window.instalarAppFuerza;
+        }
+    });
+
+    window.instalarAppFuerza = async () => {
+        if (!letInstallPrompt) return;
+        letInstallPrompt.prompt();
+        const { outcome } = await letInstallPrompt.userChoice;
+        if (outcome === 'accepted') { document.getElementById('btn-instalar').style.display = 'none'; }
+        letInstallPrompt = null;
+    };
+</script>
+
+<script>
+    window.castTitle = ""; window.castCover = ""; window.lastTvTime = 0; window.tvSyncInterval = null;
+    window['__onGCastApiAvailable'] = function(isAvailable) {
+        if (isAvailable) {
+            cast.framework.CastContext.getInstance().setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
+            cast.framework.CastContext.getInstance().addEventListener(
+                cast.framework.CastContextEventType.SESSION_STATE_CHANGED, 
+                function(event) {
+                    const media = document.getElementById('main-media');
+                    const btnCast = document.getElementById('btn-cast-fijo');
+                    if (event.sessionState === cast.framework.SessionState.SESSION_STARTED || event.sessionState === cast.framework.SessionState.SESSION_RESUMED) {
+                        media.pause(); if(btnCast) btnCast.classList.add('cast-active'); if(window.actualizarBotonesPlay) window.actualizarBotonesPlay(true);
+                        window.tvSyncInterval = setInterval(() => {
+                            const session = cast.framework.CastContext.getInstance().getCurrentSession();
+                            if(session) { const castMedia = session.getMediaSession(); if(castMedia) window.lastTvTime = castMedia.getEstimatedTime(); }
+                        }, 1000);
+                    } else if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
+                        if(btnCast) btnCast.classList.remove('cast-active'); clearInterval(window.tvSyncInterval); if(window.lastTvTime > 0) media.currentTime = window.lastTvTime; media.play(); if(window.actualizarBotonesPlay) window.actualizarBotonesPlay(false);
+                    }
+                }
+            );
+        }
+    };
+    window.startCast = () => {
+        const context = cast.framework.CastContext.getInstance();
+        const session = context.getCurrentSession();
+        const media = document.getElementById('main-media');
+        if (session) {
+            if(confirm("¿Desconectar la TV?")) { session.endSession(true); }
+        } else {
+            context.requestSession().then(function() {
+                if (media && media.src) {
+                    const mediaInfo = new chrome.cast.media.MediaInfo(media.src, 'audio/mp3');
+                    const meta = new chrome.cast.media.MusicTrackMediaMetadata();
+                    meta.title = window.castTitle || "En vivo"; meta.artist = "🔹 MUSIC LAND PROJECT 🔹"; if(window.castCover) meta.images = [new chrome.cast.Image(window.castCover)];
+                    mediaInfo.metadata = meta;
+                    const request = new chrome.cast.media.LoadRequest(mediaInfo); request.autoplay = true; request.currentTime = media.currentTime; context.getCurrentSession().loadMedia(request);
+                }
+            }, function(e) { if(e.code !== 'cancel') console.log("Cancelado."); });
+        }
+    };
+</script>
+<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", authDomain: "familia-yajure-app.firebaseapp.com", projectId: "familia-yajure-app", storageBucket: "familia-yajure-app.firebasestorage.app", messagingSenderId: "692035727386", appId: "1:692035727386:web:dfa3e39a481d56368a61a3" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const IMGBB_KEY = "07dd4f0a1180673510c5047ae8b5eec8";
+
     const media = document.getElementById('main-media');
     let canciones = []; let idActual = null;
     let misFavoritos = JSON.parse(localStorage.getItem('ml_favoritos')) || [];
@@ -363,31 +338,94 @@
     const SVG_VOL_ON = `<path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>`;
     const SVG_VOL_OFF = `<path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
 
-    if(window.innerWidth > 768) {
-        document.getElementById('mini-vol-btn').style.display = 'flex';
-    }
+    if(window.innerWidth > 768) { document.getElementById('mini-vol-btn').style.display = 'flex'; }
+
+    // 🔥 LOGICA DE ADMIN (TRIPLE CLICK)
+    let adminClicks = 0;
+    let adminTimer;
+    window.triggerAdmin = () => {
+        adminClicks++;
+        clearTimeout(adminTimer);
+        adminTimer = setTimeout(() => { adminClicks = 0; }, 1000); // 1 segundo para dar 3 clicks
+        
+        if (adminClicks === 3) {
+            const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Acceso:");
+            if (pass === "ticoadmin2026") {
+                document.getElementById('admin-panel').style.display = 'block';
+                alert("✅ Modo Director Activado\n\n- Sube canciones nuevas.\n- La canción más reciente definirá la Portada Principal y la Bio.");
+            } else {
+                alert("❌ Clave incorrecta");
+            }
+            adminClicks = 0;
+        }
+    };
+
+    // 🔥 LOGICA SUBIR CANCIÓN
+    window.subirCancion = async () => {
+        const tit = document.getElementById('up-titulo').value;
+        const art = document.getElementById('up-artista').value;
+        const bio = document.getElementById('up-bio').value;
+        const fileImg = document.getElementById('up-img').files[0];
+        const fileMp3 = document.getElementById('up-mp3').files[0];
+        const status = document.getElementById('upload-status');
+
+        if(!tit || !art || !fileImg || !fileMp3) { alert("Faltan datos"); return; }
+        
+        status.innerHTML = "⏳ Subiendo portada...";
+        
+        try {
+            // 1. Subir Imagen
+            const compressedImg = await compressImage(fileImg);
+            const formData = new FormData(); formData.append("image", compressedImg);
+            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+            const dataImg = await resImg.json();
+            const urlImg = dataImg.data.url;
+
+            // 2. Procesar MP3 (A Base64 para Firestore)
+            status.innerHTML = "⏳ Procesando audio (esto puede tardar)...";
+            const reader = new FileReader();
+            reader.readAsDataURL(fileMp3);
+            reader.onload = async () => {
+                const base64Mp3 = reader.result;
+                
+                // 3. Guardar en Firestore
+                status.innerHTML = "📝 Guardando en base de datos...";
+                await addDoc(collection(db, "musicland_canciones"), {
+                    titulo: tit,
+                    artista: art,
+                    bio: bio || "", // Guardamos la bio nueva
+                    imagenUrl: urlImg,
+                    mp3Url: base64Mp3,
+                    fecha: new Date()
+                });
+                
+                status.innerHTML = "✅ ¡LISTO! Canción publicada.";
+                setTimeout(() => { 
+                    document.getElementById('admin-panel').style.display = 'none'; 
+                    status.innerHTML = "";
+                    // Limpiar campos
+                    document.getElementById('up-titulo').value = "";
+                    document.getElementById('up-artista').value = "";
+                    document.getElementById('up-bio').value = "";
+                    document.getElementById('up-img').value = "";
+                    document.getElementById('up-mp3').value = "";
+                }, 2000);
+            };
+        } catch (e) {
+            status.innerHTML = "❌ Error: " + e.message;
+        }
+    };
+
+    async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 800) { h *= 800 / w; w = 800; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8); }; }; }); }
+
 
     window.toggleFavorito = (id) => {
-        if(misFavoritos.includes(id)) {
-            misFavoritos = misFavoritos.filter(favId => favId !== id);
-        } else {
-            misFavoritos.push(id);
-        }
+        if(misFavoritos.includes(id)) { misFavoritos = misFavoritos.filter(favId => favId !== id); } else { misFavoritos.push(id); }
         localStorage.setItem('ml_favoritos', JSON.stringify(misFavoritos));
-        renderFeeds();
-        renderHero();
-        if(idActual === id) window.actualizarCorazonPlayer();
+        renderFeeds(); renderHero(); if(idActual === id) window.actualizarCorazonPlayer();
     };
-
-    window.toggleFavoritoActual = () => {
-        if(idActual) window.toggleFavorito(idActual);
-    };
-
-    window.actualizarCorazonPlayer = () => {
-        if(!idActual) return;
-        const fpFavBtn = document.getElementById('fp-fav-btn');
-        if(fpFavBtn) fpFavBtn.innerText = misFavoritos.includes(idActual) ? '❤️' : '🤍';
-    };
+    window.toggleFavoritoActual = () => { if(idActual) window.toggleFavorito(idActual); };
+    window.actualizarCorazonPlayer = () => { if(!idActual) return; const fpFavBtn = document.getElementById('fp-fav-btn'); if(fpFavBtn) fpFavBtn.innerText = misFavoritos.includes(idActual) ? '❤️' : '🤍'; };
 
     window.actualizarBotonesPlay = (isPaused) => {
         const icon = isPaused ? SVG_PLAY : SVG_PAUSE;
@@ -402,15 +440,14 @@
 
     function renderHero() {
         if(!canciones.length) return;
-        const f = canciones[0];
+        const f = canciones[0]; // LA ÚLTIMA CANCIÓN DEFINE EL HERO
         document.getElementById('hero-bg').style.backgroundImage = `url('${f.imagenUrl}')`;
         document.getElementById('hero-cover').style.backgroundImage = `url('${f.imagenUrl}')`;
         document.getElementById('hero-title').innerText = f.titulo;
         document.getElementById('hero-artist').innerText = f.artista;
-        document.getElementById('hero-bio').innerText = f.bio || "Descubre MUSIC LAND PROJECT.";
+        document.getElementById('hero-bio').innerText = f.bio || "Descubre MUSIC LAND PROJECT."; // AQUI SE PONE LA BIO
         document.getElementById('hero-play-btn').innerHTML = (idActual === f.id && !media.paused) ? SVG_PAUSE : SVG_PLAY;
         document.getElementById('hero-play-btn').onclick = () => window.gestionarPlay(f.id);
-        
         const btnHeroFav = document.getElementById('hero-fav-btn');
         btnHeroFav.innerText = misFavoritos.includes(f.id) ? '❤️' : '🤍';
         btnHeroFav.onclick = () => window.toggleFavorito(f.id);
@@ -421,94 +458,51 @@
             const isPlaying = idActual === c.id && !media.paused;
             const isFav = misFavoritos.includes(c.id);
             return `<div class="n-card" onclick="window.gestionarPlay('${c.id}')">
-                <div class="n-img" style="background-image:url('${c.imagenUrl}')">
-                    <button class="btn-fav-card" onclick="event.stopPropagation(); window.toggleFavorito('${c.id}')">${isFav ? '❤️' : '🤍'}</button>
-                    <div class="n-overlay"><div class="n-play-icon">${isPlaying ? SVG_PAUSE : SVG_PLAY}</div></div>
-                </div>
+                <div class="n-img" style="background-image:url('${c.imagenUrl}')"><button class="btn-fav-card" onclick="event.stopPropagation(); window.toggleFavorito('${c.id}')">${isFav ? '❤️' : '🤍'}</button><div class="n-overlay"><div class="n-play-icon">${isPlaying ? SVG_PAUSE : SVG_PLAY}</div></div></div>
                 <div style="font-size:14px; font-weight:700; color:white; margin-top:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.titulo}</div>
                 <div style="font-size:12px; color:var(--neon); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.artista}</div>
             </div>`;
         };
-        
         document.getElementById('carousel-new').innerHTML = canciones.slice(0, 10).map(c => createCard(c)).join('');
         document.getElementById('carousel-all').innerHTML = canciones.map(c => createCard(c)).join('');
-
         let sugerencias = [];
         if (misFavoritos.length > 0) {
             const artistasFavoritos = canciones.filter(c => misFavoritos.includes(c.id)).map(c => c.artista);
             const recomendadas = canciones.filter(c => artistasFavoritos.includes(c.artista) && !misFavoritos.includes(c.id));
             sugerencias = recomendadas.sort(() => 0.5 - Math.random());
         }
-
         if (sugerencias.length < 10) {
             const extra = canciones.filter(c => !misFavoritos.includes(c.id) && !sugerencias.includes(c)).sort(() => 0.5 - Math.random());
             sugerencias = [...sugerencias, ...extra].slice(0, 10);
-        } else {
-            sugerencias = sugerencias.slice(0, 10);
-        }
-        
+        } else { sugerencias = sugerencias.slice(0, 10); }
         document.getElementById('carousel-sug').innerHTML = sugerencias.map(c => createCard(c)).join('');
-
         const listaFavs = canciones.filter(c => misFavoritos.includes(c.id));
         const favTitle = document.getElementById('title-fav');
         const favCarousel = document.getElementById('carousel-fav');
-        
-        if(listaFavs.length > 0) {
-            favTitle.style.display = 'block';
-            favCarousel.style.display = 'flex';
-            favCarousel.innerHTML = listaFavs.map(c => createCard(c)).join('');
-        } else {
-            favTitle.style.display = 'none';
-            favCarousel.style.display = 'none';
-        }
+        if(listaFavs.length > 0) { favTitle.style.display = 'block'; favCarousel.style.display = 'flex'; favCarousel.innerHTML = listaFavs.map(c => createCard(c)).join(''); } else { favTitle.style.display = 'none'; favCarousel.style.display = 'none'; }
     }
 
     window.gestionarPlay = (id) => {
         const s = canciones.find(c => c.id === id);
         if(idActual !== id) {
-            idActual = id; 
-            window.castTitle = s.titulo; 
-            window.castCover = s.imagenUrl; 
-            
-            document.getElementById('mini-title').innerText = s.titulo; 
-            document.getElementById('mini-artist').innerText = s.artista;
+            idActual = id; window.castTitle = s.titulo; window.castCover = s.imagenUrl;
+            document.getElementById('mini-title').innerText = s.titulo; document.getElementById('mini-artist').innerText = s.artista;
             document.getElementById('mini-art').style.backgroundImage = `url('${s.imagenUrl}')`;
             document.getElementById('mini-player').style.display = 'flex';
-            document.getElementById('fp-title').innerText = s.titulo; 
-            document.getElementById('fp-artist').innerText = s.artista;
+            document.getElementById('fp-title').innerText = s.titulo; document.getElementById('fp-artist').innerText = s.artista;
             document.getElementById('fp-art').style.backgroundImage = `url('${s.imagenUrl}')`;
-            
             window.actualizarCorazonPlayer();
-
-            media.src = s.mp3Url; 
-            media.play();
+            media.src = s.mp3Url; media.play();
             if(window.innerWidth > 768) { window.openFullPlayer(); }
-        } else {
-            window.toggleMainPlay();
-        }
+        } else { window.toggleMainPlay(); }
         window.actualizarBotonesPlay(media.paused);
     };
 
     window.toggleMainPlay = () => { media.paused ? media.play() : media.pause(); window.actualizarBotonesPlay(media.paused); };
-    
-    window.toggleMute = () => { 
-        media.muted = !media.muted; 
-        const iconPath = media.muted ? SVG_VOL_OFF : SVG_VOL_ON;
-        document.getElementById('vol-svg').innerHTML = iconPath;
-        document.getElementById('btn-vol-full').querySelector('svg').innerHTML = iconPath;
-    };
-
+    window.toggleMute = () => { media.muted = !media.muted; const iconPath = media.muted ? SVG_VOL_OFF : SVG_VOL_ON; document.getElementById('vol-svg').innerHTML = iconPath; document.getElementById('btn-vol-full').querySelector('svg').innerHTML = iconPath; };
     window.openFullPlayer = () => document.getElementById('full-player').classList.add('active');
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
-    
-    window.confirmarSalida = () => { 
-        if(confirm("¿Deseas detener la música y salir de la app?")) {
-            media.pause(); 
-            media.src = ""; 
-            window.actualizarBotonesPlay(true);
-            document.getElementById('pantalla-salida').style.display = 'flex'; 
-        } 
-    };
+    window.confirmarSalida = () => { if(confirm("¿Deseas detener la música y salir de la app?")) { media.pause(); media.src = ""; window.actualizarBotonesPlay(true); document.getElementById('pantalla-salida').style.display = 'flex'; } };
 </script>
 </body>
 </html>
