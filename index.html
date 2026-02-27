@@ -83,6 +83,10 @@
         .fp-controls { display: flex; align-items: center; gap: 30px; margin-top: 30px; }
         .fp-btn-main { width: 85px; height: 85px; border-radius: 50%; background: var(--neon); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 30px var(--neon); color: black; flex-shrink: 0; }
         
+        /* 🔥 ESTILOS PARA LA BARRA DE PROGRESO NEÓN */
+        #seek-bar { flex: 1; -webkit-appearance: none; background: #333; height: 6px; border-radius: 5px; cursor: pointer; outline: none; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 12px var(--neon); cursor: pointer; }
+
         .btn-cast-pc { transition: 0.3s; }
         .btn-cast-pc.cast-active { background: rgba(0, 210, 255, 0.1); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 20px var(--neon); }
         #pantalla-salida { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#080808; z-index:99999; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
@@ -266,12 +270,16 @@
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
     
-    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.5 - Piloto Activo</div>
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.6 - Piloto y Reloj</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
 
 <div id="mini-player">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #222;">
+        <div id="mini-progress" style="height: 100%; width: 0%; background: var(--neon); box-shadow: 0 0 5px var(--neon);"></div>
+    </div>
+
     <div class="mini-main" onclick="window.openFullPlayer()">
         <div id="mini-art" class="mini-art"></div>
         <div class="mini-text">
@@ -290,8 +298,17 @@
 <div id="full-player">
     <button onclick="window.closeFullPlayer()" class="btn-modern-down"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></button>
     <div id="fp-art" class="fp-art"></div>
-    <div class="fp-info" style="width:100%;"><div id="fp-title" style="font-size:32px;font-weight:900;color:white;text-align:center;">...</div><div id="fp-artist" style="font-size:20px;color:var(--neon);font-weight:700;margin-top:10px;text-align:center;">...</div></div>
+    <div class="fp-info" style="width:100%;">
+        <div id="fp-title" style="font-size:32px;font-weight:900;color:white;text-align:center;">...</div>
+        <div id="fp-artist" style="font-size:20px;color:var(--neon);font-weight:700;margin-top:10px;text-align:center;">...</div>
+    </div>
     
+    <div style="width: 100%; max-width: 350px; margin-top: 25px; display: flex; align-items: center; gap: 15px;">
+        <span id="time-current" style="font-size: 13px; color: #aaa; font-weight: 600; width: 40px; text-align: right;">0:00</span>
+        <input type="range" id="seek-bar" value="0" min="0" step="1">
+        <span id="time-total" style="font-size: 13px; color: #aaa; font-weight: 600; width: 40px; text-align: left;">0:00</span>
+    </div>
+
     <div class="fp-controls">
         <button onclick="window.toggleMute()" class="btn-round" style="width:55px; height:55px;" id="btn-vol-full">
             <svg viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/></svg>
@@ -560,7 +577,7 @@
         else if(num === "9") nuevaCat = "PopRock";
         else if(num === "10") nuevaCat = "Rancheras";
         else if(num === "11") nuevaCat = "Llanera";
-        else if(num === "12") nuevaCat = "Jazz";
+        else if(num === "12") parseInt("Jazz");
         else if(num === "13") nuevaCat = "Soul";
         else if(num === "14") nuevaCat = "Remixes";
         else if(num === "15") nuevaCat = "Mix";
@@ -702,9 +719,47 @@
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
     window.confirmarSalida = () => { if(confirm("¿Deseas detener la música y salir de la app?")) { media.pause(); media.src = ""; window.actualizarBotonesPlay(true); document.getElementById('pantalla-salida').style.display = 'flex'; } };
 
-    // 🔥 INSTALACIÓN DEL PILOTO AUTOMÁTICO (Auto-Play Siguiente Canción)
+    // 🔥 FORMATEADOR DE TIEMPO
+    const formatTime = (time) => {
+        if (isNaN(time)) return "0:00";
+        const m = Math.floor(time / 60);
+        const s = Math.floor(time % 60);
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+
+    const seekBar = document.getElementById('seek-bar');
+    const timeCurrent = document.getElementById('time-current');
+    const timeTotal = document.getElementById('time-total');
+    const miniProgress = document.getElementById('mini-progress');
+
+    // 🔥 ACTUALIZAR LAS BARRAS Y LOS RELOJES
+    media.addEventListener('timeupdate', () => {
+        if(seekBar) seekBar.value = media.currentTime;
+        if(timeCurrent) timeCurrent.innerText = formatTime(media.currentTime);
+        if(timeTotal) timeTotal.innerText = formatTime(media.duration);
+        
+        // La línea finita del mini-player
+        if(miniProgress && !isNaN(media.duration)) {
+            miniProgress.style.width = (media.currentTime / media.duration) * 100 + "%";
+        }
+    });
+
+    media.addEventListener('loadedmetadata', () => {
+        if(seekBar && !isNaN(media.duration)) {
+            seekBar.max = media.duration;
+            timeTotal.innerText = formatTime(media.duration);
+        }
+    });
+
+    // 🔥 PARA QUE USTED PUEDA ADELANTAR O ATRASAR
+    if(seekBar) {
+        seekBar.addEventListener('input', () => {
+            media.currentTime = seekBar.value;
+        });
+    }
+
+    // PILOTO AUTOMÁTICO (Auto-Play Siguiente Canción)
     media.onended = () => {
-        // 1. Saber qué lista estamos viendo (Si "Todo" o una categoría específica)
         let listaActual = canciones;
         if(filtroActual !== 'Todo') {
             listaActual = canciones.filter(c => {
@@ -715,27 +770,20 @@
 
         let siguienteCancion = null;
 
-        // 2. Si estaba sonando el Artista Principal (Hero), saltamos a la primera canción de la lista
         if (idActual === 'PERFIL_MAIN') {
             if (listaActual.length > 0) siguienteCancion = listaActual[0];
         } else {
-            // 3. Buscamos por dónde íbamos
             let idx = listaActual.findIndex(c => c.id === idActual);
-            
             if (idx !== -1 && idx + 1 < listaActual.length) {
-                // Hay una canción después de esta, la agarramos
                 siguienteCancion = listaActual[idx + 1];
             } else {
-                // Se acabó la lista. ¡Volvemos a empezar desde la primera para que la fiesta no pare!
                 if(listaActual.length > 0) siguienteCancion = listaActual[0];
             }
         }
 
-        // 4. Le damos Play a la que encontramos
         if (siguienteCancion) {
             window.gestionarPlay(siguienteCancion.id);
         } else {
-            // Por si acaso la lista estaba vacía
             window.actualizarBotonesPlay(true);
         }
     };
