@@ -266,7 +266,7 @@
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
     
-    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.0</div>
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.5 - Piloto Activo</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
@@ -485,7 +485,6 @@
                 titulo: tit, artista: art, categoria: cat, imagenUrl: urlImg, mp3Url: mp3Link, fecha: new Date()
             });
             
-            // 🔥 AQUÍ ESTÁ EL CAMBIO: NO CERRAMOS EL PANEL, SOLO LIMPIAMOS
             status.innerHTML = "✅ ¡Listo! Sube otra si quieres.";
             setTimeout(() => {
                 document.getElementById('up-titulo').value = "";
@@ -538,7 +537,6 @@
         }
     };
 
-    // 🔥 EDITAR CATEGORÍA RÁPIDO (LISTA V11.0)
     window.editarCategoria = async (id) => {
         const opciones = `
 1. Salsa | 2. Merengue | 3. Tropical
@@ -574,7 +572,7 @@
         try {
             await updateDoc(doc(db, "musicland_canciones", id), { categoria: nuevaCat });
             alert("✅ ¡Categoría cambiada a " + nuevaCat + "!");
-            renderFeeds(); // Actualizar pantalla
+            renderFeeds(); 
         } catch(e) { alert("Error al editar: " + e.message); }
     };
 
@@ -633,7 +631,6 @@
         const createCard = (c) => {
             const isPlaying = idActual === c.id && !media.paused;
             const isFav = misFavoritos.includes(c.id);
-            // 🔥 BOTÓN EDITAR + BORRAR
             return `<div class="n-card" onclick="window.gestionarPlay('${c.id}')">
                 <div class="n-img" style="background-image:url('${c.imagenUrl}')">
                     <div class="btn-delete-card" onclick="event.stopPropagation(); window.borrarCancion('${c.id}')">🗑️</div>
@@ -704,6 +701,44 @@
     window.openFullPlayer = () => document.getElementById('full-player').classList.add('active');
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
     window.confirmarSalida = () => { if(confirm("¿Deseas detener la música y salir de la app?")) { media.pause(); media.src = ""; window.actualizarBotonesPlay(true); document.getElementById('pantalla-salida').style.display = 'flex'; } };
+
+    // 🔥 INSTALACIÓN DEL PILOTO AUTOMÁTICO (Auto-Play Siguiente Canción)
+    media.onended = () => {
+        // 1. Saber qué lista estamos viendo (Si "Todo" o una categoría específica)
+        let listaActual = canciones;
+        if(filtroActual !== 'Todo') {
+            listaActual = canciones.filter(c => {
+                if(!c.categoria && filtroActual === 'Varios') return true;
+                return c.categoria === filtroActual;
+            });
+        }
+
+        let siguienteCancion = null;
+
+        // 2. Si estaba sonando el Artista Principal (Hero), saltamos a la primera canción de la lista
+        if (idActual === 'PERFIL_MAIN') {
+            if (listaActual.length > 0) siguienteCancion = listaActual[0];
+        } else {
+            // 3. Buscamos por dónde íbamos
+            let idx = listaActual.findIndex(c => c.id === idActual);
+            
+            if (idx !== -1 && idx + 1 < listaActual.length) {
+                // Hay una canción después de esta, la agarramos
+                siguienteCancion = listaActual[idx + 1];
+            } else {
+                // Se acabó la lista. ¡Volvemos a empezar desde la primera para que la fiesta no pare!
+                if(listaActual.length > 0) siguienteCancion = listaActual[0];
+            }
+        }
+
+        // 4. Le damos Play a la que encontramos
+        if (siguienteCancion) {
+            window.gestionarPlay(siguienteCancion.id);
+        } else {
+            // Por si acaso la lista estaba vacía
+            window.actualizarBotonesPlay(true);
+        }
+    };
 </script>
 </body>
 </html>
