@@ -83,7 +83,6 @@
         .fp-controls { display: flex; align-items: center; gap: 30px; margin-top: 30px; }
         .fp-btn-main { width: 85px; height: 85px; border-radius: 50%; background: var(--neon); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 30px var(--neon); color: black; flex-shrink: 0; }
         
-        /* 🔥 ESTILOS PARA LA BARRA DE PROGRESO NEÓN */
         #seek-bar { flex: 1; -webkit-appearance: none; background: #333; height: 6px; border-radius: 5px; cursor: pointer; outline: none; }
         #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 12px var(--neon); cursor: pointer; }
 
@@ -94,7 +93,6 @@
         .btn-wa:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(37,211,102,0.8); }
         .btn-wa svg { width: 35px; height: 35px; fill: currentColor; }
 
-        /* 🔥 ADMIN PANEL */
         #admin-panel { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; overflow-y:auto; padding:20px; }
         .admin-box { background:#111; border:1px solid var(--neon); max-width:500px; margin:50px auto; padding:20px; border-radius:20px; }
         .admin-input, .admin-select { width:100%; background:#222; border:1px solid #444; color:white; padding:10px; margin-bottom:10px; border-radius:10px; outline:none; }
@@ -157,11 +155,14 @@
         <h2 style="color:var(--neon); text-align:center;">PANEL DE DIRECTOR 🛠️</h2>
         
         <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <button class="tab-btn active" onclick="verTab('cancion', this)">🎵 Subir Canción</button>
+            <button class="tab-btn active" onclick="verTab('cancion', this)">🎵 Subir/Editar</button>
             <button class="tab-btn" onclick="verTab('perfil', this)">🖼️ Portada/Destacado</button>
         </div>
 
         <div id="tab-cancion">
+            <input type="hidden" id="edit-id" value="">
+            <input type="hidden" id="edit-img-url" value="">
+
             <input type="text" id="up-titulo" class="admin-input" placeholder="Título de la Canción">
             <input type="text" id="up-artista" class="admin-input" placeholder="Nombre del Artista">
             
@@ -187,13 +188,16 @@
                 <option value="Varios">Varios / Otro</option>
             </select>
 
-            <label style="color:#ccc; display:block; margin-top:10px;">📸 Portada Canción (JPG/PNG)</label>
+            <label id="lbl-up-img" style="color:#ccc; display:block; margin-top:10px;">📸 Portada Canción (JPG/PNG)</label>
             <input type="file" id="up-img" class="admin-input" accept="image/*">
             
             <label style="color:#ccc; display:block; margin-top:10px;">🔗 Enlace Audio (Archive.org)</label>
             <input type="text" id="up-mp3-link" class="admin-input" placeholder="Pega aquí el link del MP3">
             
-            <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 SUBIR A LA LISTA</button>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn" style="flex:2; margin-top:0;">🚀 SUBIR A LA LISTA</button>
+                <button onclick="window.cancelarEdicion()" id="btn-cancelar-edit" class="admin-btn" style="flex:1; background:#444; color:white; display:none; margin-top:0;">❌ CANCELAR</button>
+            </div>
         </div>
 
         <div id="tab-perfil" style="display:none;">
@@ -212,7 +216,7 @@
         </div>
 
         <div id="upload-status" style="color:white; text-align:center; margin-top:10px;"></div>
-        <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; width:100%; padding:10px; border:none; border-radius:10px; margin-top:10px; cursor:pointer;">CERRAR</button>
+        <button onclick="window.cancelarEdicion(); document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; width:100%; padding:10px; border:none; border-radius:10px; margin-top:10px; cursor:pointer;">CERRAR</button>
     </div>
 </div>
 
@@ -270,7 +274,7 @@
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
     
-    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.6 - Piloto y Reloj</div>
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.7 - Sistema de Edición Full</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
@@ -481,7 +485,50 @@
         renderFeeds();
     };
 
+    // 🔥 SISTEMA DE EDICIÓN CONECTADO AL LÁPIZ
+    window.editarCategoria = (id) => {
+        const c = canciones.find(x => x.id === id);
+        if(!c) return;
+
+        document.getElementById('edit-id').value = c.id;
+        document.getElementById('edit-img-url').value = c.imagenUrl;
+
+        document.getElementById('up-titulo').value = c.titulo;
+        document.getElementById('up-artista').value = c.artista;
+        document.getElementById('up-categoria').value = c.categoria || 'Varios';
+        document.getElementById('up-mp3-link').value = c.mp3Url;
+        document.getElementById('up-img').value = ""; 
+
+        document.getElementById('lbl-up-img').innerHTML = "📸 Cambiar Portada (Opcional)";
+        document.getElementById('btn-subir').innerHTML = "💾 GUARDAR CAMBIOS";
+        document.getElementById('btn-subir').style.background = "var(--yellow)";
+        document.getElementById('btn-cancelar-edit').style.display = "block";
+
+        window.verTab('cancion', document.querySelector('.tab-btn')); 
+        document.getElementById('admin-panel').style.display = 'block';
+    };
+
+    window.cancelarEdicion = () => {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('edit-img-url').value = "";
+        document.getElementById('up-titulo').value = "";
+        document.getElementById('up-artista').value = "";
+        document.getElementById('up-categoria').value = "Salsa";
+        document.getElementById('up-mp3-link').value = "";
+        document.getElementById('up-img').value = "";
+
+        document.getElementById('lbl-up-img').innerHTML = "📸 Portada Canción (JPG/PNG)";
+        document.getElementById('btn-subir').innerHTML = "🚀 SUBIR A LA LISTA";
+        document.getElementById('btn-subir').style.background = "var(--neon)";
+        document.getElementById('btn-cancelar-edit').style.display = "none";
+        document.getElementById('upload-status').innerHTML = "";
+    };
+
+    // 🔥 SUBIR CANCIÓN MODIFICADO (SIRVE PARA GUARDAR NUEVAS O EDITAR)
     window.subirCancion = async () => {
+        const idEdit = document.getElementById('edit-id').value;
+        const oldImg = document.getElementById('edit-img-url').value;
+
         const tit = document.getElementById('up-titulo').value;
         const art = document.getElementById('up-artista').value;
         const cat = document.getElementById('up-categoria').value;
@@ -489,26 +536,39 @@
         const mp3Link = document.getElementById('up-mp3-link').value; 
         const status = document.getElementById('upload-status');
 
-        if(!tit || !art || !fileImg || !mp3Link) { alert("Faltan datos"); return; }
-        status.innerHTML = "⏳ Subiendo portada...";
-        try {
-            const compressedImg = await compressImage(fileImg);
-            const formData = new FormData(); formData.append("image", compressedImg);
-            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-            const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
+        if(!tit || !art || !mp3Link) { alert("Faltan datos básicos"); return; }
+        if(!idEdit && !fileImg) { alert("Debes subir una portada para la canción nueva"); return; }
 
-            status.innerHTML = "📝 Guardando en lista...";
-            await addDoc(collection(db, "musicland_canciones"), {
-                titulo: tit, artista: art, categoria: cat, imagenUrl: urlImg, mp3Url: mp3Link, fecha: new Date()
-            });
+        let finalImgUrl = oldImg; 
+
+        try {
+            if(fileImg) {
+                status.innerHTML = "⏳ Subiendo nueva portada...";
+                const compressedImg = await compressImage(fileImg);
+                const formData = new FormData(); formData.append("image", compressedImg);
+                const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+                const dataImg = await resImg.json();
+                finalImgUrl = dataImg.data.url;
+            }
+
+            status.innerHTML = idEdit ? "📝 Guardando cambios..." : "📝 Guardando en lista...";
+
+            const dataToSave = {
+                titulo: tit, artista: art, categoria: cat, imagenUrl: finalImgUrl, mp3Url: mp3Link
+            };
+
+            if(idEdit) {
+                await updateDoc(doc(db, "musicland_canciones", idEdit), dataToSave);
+                status.innerHTML = "✅ ¡Cambios Guardados con Éxito!";
+            } else {
+                dataToSave.fecha = new Date();
+                await addDoc(collection(db, "musicland_canciones"), dataToSave);
+                status.innerHTML = "✅ ¡Listo! Sube otra si quieres.";
+            }
             
-            status.innerHTML = "✅ ¡Listo! Sube otra si quieres.";
             setTimeout(() => {
-                document.getElementById('up-titulo').value = "";
-                document.getElementById('up-artista').value = "";
-                document.getElementById('up-img').value = "";
-                document.getElementById('up-mp3-link').value = "";
-                status.innerHTML = "";
+                window.cancelarEdicion();
+                if(idEdit) { document.getElementById('admin-panel').style.display = 'none'; }
             }, 2000);
 
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
@@ -552,45 +612,6 @@
         if(confirm("¿Seguro que quieres eliminar esta canción de la lista?")) {
             try { await deleteDoc(doc(db, "musicland_canciones", id)); alert("🗑️ Canción eliminada"); } catch(e) { alert("Error al borrar: " + e.message); }
         }
-    };
-
-    window.editarCategoria = async (id) => {
-        const opciones = `
-1. Salsa | 2. Merengue | 3. Tropical
-4. Funk | 5. Disco | 6. RockEsp
-7. BaladaEsp | 8. BaladaIng | 9. PopRock
-10. Rancheras | 11. Llanera | 12. Jazz
-13. Soul | 14. Remixes | 15. Mix
-16. Podcast | 17. IA | 18. Varios
-        `;
-        const num = prompt("✏️ ESCRIBE EL NÚMERO:\n" + opciones);
-        
-        let nuevaCat = "";
-        if(num === "1") nuevaCat = "Salsa";
-        else if(num === "2") nuevaCat = "Merengue";
-        else if(num === "3") nuevaCat = "Tropical";
-        else if(num === "4") nuevaCat = "Funk";
-        else if(num === "5") nuevaCat = "Disco";
-        else if(num === "6") nuevaCat = "RockEsp";
-        else if(num === "7") nuevaCat = "BaladaEsp";
-        else if(num === "8") nuevaCat = "BaladaIng";
-        else if(num === "9") nuevaCat = "PopRock";
-        else if(num === "10") nuevaCat = "Rancheras";
-        else if(num === "11") nuevaCat = "Llanera";
-        else if(num === "12") parseInt("Jazz");
-        else if(num === "13") nuevaCat = "Soul";
-        else if(num === "14") nuevaCat = "Remixes";
-        else if(num === "15") nuevaCat = "Mix";
-        else if(num === "16") nuevaCat = "Podcast";
-        else if(num === "17") nuevaCat = "IA";
-        else if(num === "18") nuevaCat = "Varios";
-        else return;
-
-        try {
-            await updateDoc(doc(db, "musicland_canciones", id), { categoria: nuevaCat });
-            alert("✅ ¡Categoría cambiada a " + nuevaCat + "!");
-            renderFeeds(); 
-        } catch(e) { alert("Error al editar: " + e.message); }
     };
 
     async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 800) { h *= 800 / w; w = 800; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8); }; }; }); }
@@ -719,7 +740,6 @@
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
     window.confirmarSalida = () => { if(confirm("¿Deseas detener la música y salir de la app?")) { media.pause(); media.src = ""; window.actualizarBotonesPlay(true); document.getElementById('pantalla-salida').style.display = 'flex'; } };
 
-    // 🔥 FORMATEADOR DE TIEMPO
     const formatTime = (time) => {
         if (isNaN(time)) return "0:00";
         const m = Math.floor(time / 60);
@@ -732,13 +752,11 @@
     const timeTotal = document.getElementById('time-total');
     const miniProgress = document.getElementById('mini-progress');
 
-    // 🔥 ACTUALIZAR LAS BARRAS Y LOS RELOJES
     media.addEventListener('timeupdate', () => {
         if(seekBar) seekBar.value = media.currentTime;
         if(timeCurrent) timeCurrent.innerText = formatTime(media.currentTime);
         if(timeTotal) timeTotal.innerText = formatTime(media.duration);
         
-        // La línea finita del mini-player
         if(miniProgress && !isNaN(media.duration)) {
             miniProgress.style.width = (media.currentTime / media.duration) * 100 + "%";
         }
@@ -751,14 +769,12 @@
         }
     });
 
-    // 🔥 PARA QUE USTED PUEDA ADELANTAR O ATRASAR
     if(seekBar) {
         seekBar.addEventListener('input', () => {
             media.currentTime = seekBar.value;
         });
     }
 
-    // PILOTO AUTOMÁTICO (Auto-Play Siguiente Canción)
     media.onended = () => {
         let listaActual = canciones;
         if(filtroActual !== 'Todo') {
