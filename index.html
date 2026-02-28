@@ -155,14 +155,11 @@
         <h2 style="color:var(--neon); text-align:center;">PANEL DE DIRECTOR 🛠️</h2>
         
         <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <button class="tab-btn active" onclick="verTab('cancion', this)">🎵 Subir/Editar</button>
+            <button class="tab-btn active" onclick="verTab('cancion', this)">🎵 Subir Canción</button>
             <button class="tab-btn" onclick="verTab('perfil', this)">🖼️ Portada/Destacado</button>
         </div>
 
         <div id="tab-cancion">
-            <input type="hidden" id="edit-id" value="">
-            <input type="hidden" id="edit-img-url" value="">
-
             <input type="text" id="up-titulo" class="admin-input" placeholder="Título de la Canción">
             <input type="text" id="up-artista" class="admin-input" placeholder="Nombre del Artista">
             
@@ -188,16 +185,13 @@
                 <option value="Varios">Varios / Otro</option>
             </select>
 
-            <label id="lbl-up-img" style="color:#ccc; display:block; margin-top:10px;">📸 Portada Canción (JPG/PNG)</label>
+            <label style="color:#ccc; display:block; margin-top:10px;">📸 Portada Canción (JPG/PNG)</label>
             <input type="file" id="up-img" class="admin-input" accept="image/*">
             
             <label style="color:#ccc; display:block; margin-top:10px;">🔗 Enlace Audio (Archive.org)</label>
             <input type="text" id="up-mp3-link" class="admin-input" placeholder="Pega aquí el link del MP3">
             
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn" style="flex:2; margin-top:0;">🚀 SUBIR A LA LISTA</button>
-                <button onclick="window.cancelarEdicion()" id="btn-cancelar-edit" class="admin-btn" style="flex:1; background:#444; color:white; display:none; margin-top:0;">❌ CANCELAR</button>
-            </div>
+            <button onclick="window.subirCancion()" id="btn-subir" class="admin-btn">🚀 SUBIR A LA LISTA</button>
         </div>
 
         <div id="tab-perfil" style="display:none;">
@@ -216,7 +210,7 @@
         </div>
 
         <div id="upload-status" style="color:white; text-align:center; margin-top:10px;"></div>
-        <button onclick="window.cancelarEdicion(); document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; width:100%; padding:10px; border:none; border-radius:10px; margin-top:10px; cursor:pointer;">CERRAR</button>
+        <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; width:100%; padding:10px; border:none; border-radius:10px; margin-top:10px; cursor:pointer;">CERRAR</button>
     </div>
 </div>
 
@@ -274,7 +268,7 @@
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
     
-    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.7 - Sistema de Edición Full</div>
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.6 - Piloto y Reloj</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
@@ -293,7 +287,7 @@
     </div>
     <div class="mini-controls">
         <button onclick="window.toggleMute()" class="btn-round" id="mini-vol-btn" style="display:none;">
-            <svg viewBox="0 0 24 24" id="vol-svg"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>
+            <svg viewBox="0 0 24 24" id="vol-svg"><path d="M3,9v6h4l5,5V4L7,9H3zm13.5,3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73,2.5-2.25,2.5-4.02zM14,3.23v2.06c2.89.86,5,3.54,5,6.71s-2.11,5.85-5,6.71v2.06c4.01-.91,7-4.49,7-8.77s-2.99-7.86-7-8.77z"/></svg>
         </button>
         <button onclick="window.toggleMainPlay()" id="mini-play-btn" class="btn-round" style="background:var(--neon); color:black; border:none;"></button>
     </div>
@@ -302,9 +296,13 @@
 <div id="full-player">
     <button onclick="window.closeFullPlayer()" class="btn-modern-down"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></button>
     <div id="fp-art" class="fp-art"></div>
-    <div class="fp-info" style="width:100%;">
-        <div id="fp-title" style="font-size:32px;font-weight:900;color:white;text-align:center;">...</div>
-        <div id="fp-artist" style="font-size:20px;color:var(--neon);font-weight:700;margin-top:10px;text-align:center;">...</div>
+    
+    <div class="fp-info" style="width:100%; display: flex; align-items: start; gap: 15px; margin-top: 15px;">
+        <div style="flex: 1;">
+            <div id="fp-title" style="font-size:32px;font-weight:900;color:white; text-align: left;">...</div>
+            <div id="fp-artist" style="font-size:20px;color:var(--neon);font-weight:700;margin-top:5px; text-align: left;">...</div>
+        </div>
+        <button onclick="window.toggleFavoritoActual()" class="btn-round" id="fp-fav-btn" style="width:50px; height:50px; font-size: 24px; border:none; background:transparent; flex-shrink: 0; margin-top: 10px;">🤍</button>
     </div>
     
     <div style="width: 100%; max-width: 350px; margin-top: 25px; display: flex; align-items: center; gap: 15px;">
@@ -315,10 +313,9 @@
 
     <div class="fp-controls">
         <button onclick="window.toggleMute()" class="btn-round" style="width:55px; height:55px;" id="btn-vol-full">
-            <svg viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M3,9v6h4l5,5V4L7,9H3zm13.5,3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73,2.5-2.25,2.5-4.02zM14,3.23v2.06c2.89.86,5,3.54,5,6.71s-2.11,5.85-5,6.71v2.06c4.01-.91,7-4.49,7-8.77s-2.99-7.86-7-8.77z"/></svg>
         </button>
         
-        <button onclick="window.toggleFavoritoActual()" class="btn-round" id="fp-fav-btn" style="width:55px; height:55px; font-size: 26px; border:none; background:transparent;">🤍</button>
         <button onclick="window.toggleMainPlay()" id="fp-play-btn" class="fp-btn-main"></button>
         
         <button onclick="window.startCast()" id="btn-cast-fijo" class="btn-round btn-cast-pc" style="width:55px; height:55px;">
@@ -440,8 +437,10 @@
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-    const SVG_VOL_ON = `<path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
-    const SVG_VOL_OFF = `<path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L4.27,3M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18.01,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.48,12.43 16.5,12.22 16.5,12Z"/>`;
+    
+    // 🔥 NUEVAS CORNETAS DE SILENCIO (MATERIAL DESIGN)
+    const SVG_VOL_ON = `<path d="M3,9v6h4l5,5V4L7,9H3zm13.5,3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73,2.5-2.25,2.5-4.02zM14,3.23v2.06c2.89.86,5,3.54,5,6.71s-2.11,5.85-5,6.71v2.06c4.01-.91,7-4.49,7-8.77s-2.99-7.86-7-8.77z"/>`;
+    const SVG_VOL_OFF = `<path d="M16.5,12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45,2.45C16.48,12.43,16.5,12.22,16.5,12zM19,12c0,.94-.2,1.82-.54,2.64l1.51,1.51C20.62,14.91,21,13.5,21,12c0-4.28-2.99-7.86-7-8.77v2.06C16.89,6.15,19,8.83,19,12zM4.27,3L3,4.27,7.73,9H3v6h4l5,5V13.27L20.27,21,21.54,19.73L4.27,3zM12,4l-2.09,2.09L12,8.18V4z"/>`;
 
     if(window.innerWidth > 768) { document.getElementById('mini-vol-btn').style.display = 'flex'; }
 
@@ -485,50 +484,7 @@
         renderFeeds();
     };
 
-    // 🔥 SISTEMA DE EDICIÓN CONECTADO AL LÁPIZ
-    window.editarCategoria = (id) => {
-        const c = canciones.find(x => x.id === id);
-        if(!c) return;
-
-        document.getElementById('edit-id').value = c.id;
-        document.getElementById('edit-img-url').value = c.imagenUrl;
-
-        document.getElementById('up-titulo').value = c.titulo;
-        document.getElementById('up-artista').value = c.artista;
-        document.getElementById('up-categoria').value = c.categoria || 'Varios';
-        document.getElementById('up-mp3-link').value = c.mp3Url;
-        document.getElementById('up-img').value = ""; 
-
-        document.getElementById('lbl-up-img').innerHTML = "📸 Cambiar Portada (Opcional)";
-        document.getElementById('btn-subir').innerHTML = "💾 GUARDAR CAMBIOS";
-        document.getElementById('btn-subir').style.background = "var(--yellow)";
-        document.getElementById('btn-cancelar-edit').style.display = "block";
-
-        window.verTab('cancion', document.querySelector('.tab-btn')); 
-        document.getElementById('admin-panel').style.display = 'block';
-    };
-
-    window.cancelarEdicion = () => {
-        document.getElementById('edit-id').value = "";
-        document.getElementById('edit-img-url').value = "";
-        document.getElementById('up-titulo').value = "";
-        document.getElementById('up-artista').value = "";
-        document.getElementById('up-categoria').value = "Salsa";
-        document.getElementById('up-mp3-link').value = "";
-        document.getElementById('up-img').value = "";
-
-        document.getElementById('lbl-up-img').innerHTML = "📸 Portada Canción (JPG/PNG)";
-        document.getElementById('btn-subir').innerHTML = "🚀 SUBIR A LA LISTA";
-        document.getElementById('btn-subir').style.background = "var(--neon)";
-        document.getElementById('btn-cancelar-edit').style.display = "none";
-        document.getElementById('upload-status').innerHTML = "";
-    };
-
-    // 🔥 SUBIR CANCIÓN MODIFICADO (SIRVE PARA GUARDAR NUEVAS O EDITAR)
     window.subirCancion = async () => {
-        const idEdit = document.getElementById('edit-id').value;
-        const oldImg = document.getElementById('edit-img-url').value;
-
         const tit = document.getElementById('up-titulo').value;
         const art = document.getElementById('up-artista').value;
         const cat = document.getElementById('up-categoria').value;
@@ -536,39 +492,26 @@
         const mp3Link = document.getElementById('up-mp3-link').value; 
         const status = document.getElementById('upload-status');
 
-        if(!tit || !art || !mp3Link) { alert("Faltan datos básicos"); return; }
-        if(!idEdit && !fileImg) { alert("Debes subir una portada para la canción nueva"); return; }
-
-        let finalImgUrl = oldImg; 
-
+        if(!tit || !art || !fileImg || !mp3Link) { alert("Faltan datos"); return; }
+        status.innerHTML = "⏳ Subiendo portada...";
         try {
-            if(fileImg) {
-                status.innerHTML = "⏳ Subiendo nueva portada...";
-                const compressedImg = await compressImage(fileImg);
-                const formData = new FormData(); formData.append("image", compressedImg);
-                const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-                const dataImg = await resImg.json();
-                finalImgUrl = dataImg.data.url;
-            }
+            const compressedImg = await compressImage(fileImg);
+            const formData = new FormData(); formData.append("image", compressedImg);
+            const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+            const dataImg = await resImg.json(); const urlImg = dataImg.data.url;
 
-            status.innerHTML = idEdit ? "📝 Guardando cambios..." : "📝 Guardando en lista...";
-
-            const dataToSave = {
-                titulo: tit, artista: art, categoria: cat, imagenUrl: finalImgUrl, mp3Url: mp3Link
-            };
-
-            if(idEdit) {
-                await updateDoc(doc(db, "musicland_canciones", idEdit), dataToSave);
-                status.innerHTML = "✅ ¡Cambios Guardados con Éxito!";
-            } else {
-                dataToSave.fecha = new Date();
-                await addDoc(collection(db, "musicland_canciones"), dataToSave);
-                status.innerHTML = "✅ ¡Listo! Sube otra si quieres.";
-            }
+            status.innerHTML = "📝 Guardando en lista...";
+            await addDoc(collection(db, "musicland_canciones"), {
+                titulo: tit, artista: art, categoria: cat, imagenUrl: urlImg, mp3Url: mp3Link, fecha: new Date()
+            });
             
+            status.innerHTML = "✅ ¡Listo! Sube otra si quieres.";
             setTimeout(() => {
-                window.cancelarEdicion();
-                if(idEdit) { document.getElementById('admin-panel').style.display = 'none'; }
+                document.getElementById('up-titulo').value = "";
+                document.getElementById('up-artista').value = "";
+                document.getElementById('up-img').value = "";
+                document.getElementById('up-mp3-link').value = "";
+                status.innerHTML = "";
             }, 2000);
 
         } catch (e) { status.innerHTML = "❌ Error: " + e.message; }
@@ -612,6 +555,45 @@
         if(confirm("¿Seguro que quieres eliminar esta canción de la lista?")) {
             try { await deleteDoc(doc(db, "musicland_canciones", id)); alert("🗑️ Canción eliminada"); } catch(e) { alert("Error al borrar: " + e.message); }
         }
+    };
+
+    window.editarCategoria = async (id) => {
+        const opciones = `
+1. Salsa | 2. Merengue | 3. Tropical
+4. Funk | 5. Disco | 6. RockEsp
+7. BaladaEsp | 8. BaladaIng | 9. PopRock
+10. Rancheras | 11. Llanera | 12. Jazz
+13. Soul | 14. Remixes | 15. Mix
+16. Podcast | 17. IA | 18. Varios
+        `;
+        const num = prompt("✏️ ESCRIBE EL NÚMERO:\n" + opciones);
+        
+        let nuevaCat = "";
+        if(num === "1") nuevaCat = "Salsa";
+        else if(num === "2") nuevaCat = "Merengue";
+        else if(num === "3") nuevaCat = "Tropical";
+        else if(num === "4") nuevaCat = "Funk";
+        else if(num === "5") nuevaCat = "Disco";
+        else if(num === "6") nuevaCat = "RockEsp";
+        else if(num === "7") nuevaCat = "BaladaEsp";
+        else if(num === "8") nuevaCat = "BaladaIng";
+        else if(num === "9") nuevaCat = "PopRock";
+        else if(num === "10") nuevaCat = "Rancheras";
+        else if(num === "11") nuevaCat = "Llanera";
+        else if(num === "12") nuevaCat = "Jazz";
+        else if(num === "13") nuevaCat = "Soul";
+        else if(num === "14") nuevaCat = "Remixes";
+        else if(num === "15") nuevaCat = "Mix";
+        else if(num === "16") nuevaCat = "Podcast";
+        else if(num === "17") nuevaCat = "IA";
+        else if(num === "18") nuevaCat = "Varios";
+        else return;
+
+        try {
+            await updateDoc(doc(db, "musicland_canciones", id), { categoria: nuevaCat });
+            alert("✅ ¡Categoría cambiada a " + nuevaCat + "!");
+            renderFeeds(); 
+        } catch(e) { alert("Error al editar: " + e.message); }
     };
 
     async function compressImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > 800) { h *= 800 / w; w = 800; } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8); }; }; }); }
@@ -735,7 +717,15 @@
     };
 
     window.toggleMainPlay = () => { media.paused ? media.play() : media.pause(); window.actualizarBotonesPlay(media.paused); };
-    window.toggleMute = () => { media.muted = !media.muted; const iconPath = media.muted ? SVG_VOL_OFF : SVG_VOL_ON; document.getElementById('vol-svg').innerHTML = iconPath; document.getElementById('btn-vol-full').querySelector('svg').innerHTML = iconPath; };
+    // 🔥 FUNCIÓN DE SILENCIO ACTUALIZADA PARA CAMBIAR EL ÍCONO
+    window.toggleMute = () => { 
+        media.muted = !media.muted; 
+        const iconPath = media.muted ? SVG_VOL_OFF : SVG_VOL_ON; 
+        // Actualizar mini player
+        document.getElementById('vol-svg').innerHTML = iconPath; 
+        // Actualizar full player
+        document.getElementById('btn-vol-full').querySelector('svg').innerHTML = iconPath; 
+    };
     window.openFullPlayer = () => document.getElementById('full-player').classList.add('active');
     window.closeFullPlayer = () => document.getElementById('full-player').classList.remove('active');
     window.confirmarSalida = () => { if(confirm("¿Deseas detener la música y salir de la app?")) { media.pause(); media.src = ""; window.actualizarBotonesPlay(true); document.getElementById('pantalla-salida').style.display = 'flex'; } };
