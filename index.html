@@ -59,7 +59,6 @@
         .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
         .btn-fav-card:hover { transform: scale(1.2); }
         
-        /* 🔥 NUEVO BOTÓN PARA AGREGAR A PLAYLIST 🔥 */
         .btn-add-list { position: absolute; top: 8px; right: 45px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; font-weight: bold; }
         .btn-add-list:hover { transform: scale(1.2); color: var(--neon); border-color: var(--neon); }
         
@@ -305,7 +304,7 @@
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
     
-    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v12.0 - Playlists Propias VIP</div>
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v12.1 - Playlist Editable</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
@@ -472,7 +471,6 @@
     let canciones = []; let idActual = null; let perfilData = null; let filtroActual = 'Todo';
     let misFavoritos = JSON.parse(localStorage.getItem('ml_favoritos')) || [];
     
-    // 🔥 SISTEMA DE PLAYLISTS 🔥
     let misPlaylists = JSON.parse(localStorage.getItem('ml_playlists')) || {};
     let cancionA_Agregar = null;
 
@@ -506,8 +504,6 @@
 
     window.filtrar = (cat, btn) => {
         filtroActual = cat;
-        
-        // Quitar activos de todos lados
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         if(btn) btn.classList.add('active');
         
@@ -525,11 +521,10 @@
                 tituloCatalogo.innerText = '📂 Filtrado: ' + cat;
             }
         }
-        
         renderFeeds();
     };
 
-    // 🔥 FUNCIONES DE PLAYLISTS VIP 🔥
+    // 🔥 FUNCIONES DE PLAYLISTS VIP (AHORA CON BOTÓN DE QUITAR) 🔥
     window.abrirModalPlaylist = (id) => {
         cancionA_Agregar = id;
         const container = document.getElementById('pl-list');
@@ -540,10 +535,21 @@
             container.innerHTML = "<p style='color:#666; font-size:14px; text-align:center;'>Aún no tienes carpetas.</p>";
         } else {
             listasNombres.forEach(nombre => {
-                container.innerHTML += `<div class="pl-item" onclick="window.agregarAPlaylist('${nombre}')">
-                    <span>📁 ${nombre}</span>
-                    <span style="color:#888; font-size:12px;">${misPlaylists[nombre].length} 🎵</span>
-                </div>`;
+                const yaEstaGuardada = misPlaylists[nombre].includes(id);
+                
+                if(yaEstaGuardada) {
+                    // Si ya está guardada, mostramos el botón rojo para sacarla
+                    container.innerHTML += `<div class="pl-item" style="border-color: #ff4444;" onclick="window.quitarDePlaylist('${nombre}')">
+                        <span>✅ ${nombre}</span>
+                        <span style="color:#ff4444; font-size:12px;">❌ Quitar</span>
+                    </div>`;
+                } else {
+                    // Si no está, mostramos el botón normal para agregarla
+                    container.innerHTML += `<div class="pl-item" onclick="window.agregarAPlaylist('${nombre}')">
+                        <span>📁 ${nombre}</span>
+                        <span style="color:#888; font-size:12px;">${misPlaylists[nombre].length} 🎵</span>
+                    </div>`;
+                }
             });
         }
         document.getElementById('modal-playlist').style.display = 'flex';
@@ -564,11 +570,20 @@
             misPlaylists[nombre].push(cancionA_Agregar);
             localStorage.setItem('ml_playlists', JSON.stringify(misPlaylists));
             alert(`✅ Guardada en "${nombre}"`);
-        } else {
-            alert("⚠️ Ya guardaste esta canción aquí.");
         }
         document.getElementById('modal-playlist').style.display = 'none';
         renderPlaylists();
+        renderFeeds(); 
+    };
+
+    // 🔥 NUEVA FUNCIÓN PARA SACAR UNA CANCIÓN DE LA CARPETA 🔥
+    window.quitarDePlaylist = (nombre) => {
+        misPlaylists[nombre] = misPlaylists[nombre].filter(cId => cId !== cancionA_Agregar);
+        localStorage.setItem('ml_playlists', JSON.stringify(misPlaylists));
+        document.getElementById('modal-playlist').style.display = 'none';
+        renderPlaylists();
+        renderFeeds(); // Si estás viendo la lista, la canción desaparece al instante
+        alert(`🗑️ Canción sacada de "${nombre}"`);
     };
 
     window.borrarPlaylist = (nombre) => {
@@ -732,7 +747,6 @@
             try { 
                 await deleteDoc(doc(db, "musicland_canciones", id)); 
                 
-                // Borrar la canción de cualquier playlist interna si existía
                 for(let lista in misPlaylists) {
                     misPlaylists[lista] = misPlaylists[lista].filter(cId => cId !== id);
                 }
@@ -815,7 +829,6 @@
 
         let cancionesFiltradas = canciones;
         
-        // Lógica VIP: Filtrar por Categoría normal o por Playlist Personalizada
         if(filtroActual.startsWith('PLAYLIST:')) {
             const nombrePL = filtroActual.replace('PLAYLIST:', '');
             const idsEnLista = misPlaylists[nombrePL] || [];
@@ -870,7 +883,7 @@
             } else { window.toggleMainPlay(); }
         }
         window.actualizarBotonesPlay(media.paused);
-        renderFeeds(); // Para que el botón de play en la tarjeta se actualice visualmente
+        renderFeeds(); 
     };
 
     window.toggleMainPlay = () => { media.paused ? media.play() : media.pause(); window.actualizarBotonesPlay(media.paused); renderFeeds(); };
@@ -924,7 +937,6 @@
     media.onended = () => {
         let listaActual = canciones;
         
-        // Si el usuario está escuchando una playlist, el piloto automático solo pone canciones de esa playlist
         if(filtroActual.startsWith('PLAYLIST:')) {
             const nombrePL = filtroActual.replace('PLAYLIST:', '');
             const idsEnLista = misPlaylists[nombrePL] || [];
