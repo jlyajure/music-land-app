@@ -55,8 +55,13 @@
         .n-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; border-radius: 15px; z-index: 1; }
         .n-card:hover .n-overlay { opacity: 1; }
         .n-play-icon { width: 45px; height: 45px; background: var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; }
+        
         .btn-fav-card { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; }
         .btn-fav-card:hover { transform: scale(1.2); }
+        
+        /* 🔥 NUEVO BOTÓN PARA AGREGAR A PLAYLIST 🔥 */
+        .btn-add-list { position: absolute; top: 8px; right: 45px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; z-index: 3; backdrop-filter: blur(5px); color: white; transition: 0.2s; font-weight: bold; }
+        .btn-add-list:hover { transform: scale(1.2); color: var(--neon); border-color: var(--neon); }
         
         .btn-delete-card { display: none; position: absolute; top: 8px; left: 8px; background: #ff4444; border: 1px solid white; border-radius: 50%; width: 32px; height: 32px; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 4; color: white; box-shadow: 0 0 10px black; }
         .btn-edit-card { display: none; position: absolute; top: 8px; left: 45px; background: var(--yellow); border: 1px solid black; border-radius: 50%; width: 32px; height: 32px; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 4; color: black; box-shadow: 0 0 10px black; font-weight: bold; }
@@ -99,6 +104,12 @@
         .admin-btn { width:100%; background:var(--neon); color:black; font-weight:bold; padding:12px; border:none; border-radius:10px; cursor:pointer; margin-top:10px; }
         .tab-btn { background: #333; color: white; border: none; padding: 10px; flex: 1; cursor: pointer; border-radius: 8px; font-weight: bold; }
         .tab-btn.active { background: var(--neon); color: black; }
+
+        /* 🔥 MODAL PARA CREAR/AGREGAR PLAYLIST 🔥 */
+        #modal-playlist { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:11000; align-items:center; justify-content:center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-pl-content { background:#111; border: 2px solid var(--neon); padding:25px; border-radius:25px; width:100%; max-width:350px; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .pl-item { background:#222; border: 1px solid #333; padding:12px; border-radius:12px; margin-bottom:10px; cursor:pointer; font-weight:bold; transition:0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .pl-item:hover { background:var(--neon); color:black; }
 
         @media (max-width: 768px) {
             header { padding: 10px 15px; height: 65px; }
@@ -149,6 +160,21 @@
         <button onclick="window.confirmarSalida()" style="background:transparent; border:1px solid #ff4444; color:#ff4444; padding:5px 12px; border-radius:20px; cursor:pointer;">SALIR</button>
     </div>
 </header>
+
+<div id="modal-playlist">
+    <div class="modal-pl-content">
+        <h3 style="color:var(--neon); margin-top:0; font-size: 22px;">Guardar en Playlist</h3>
+        
+        <div id="pl-list" style="max-height:180px; overflow-y:auto; margin-bottom:15px; text-align: left;"></div>
+        
+        <div style="border-top: 1px solid #333; padding-top: 15px; margin-top: 10px;">
+            <input type="text" id="pl-new-name" placeholder="Nombre nueva lista..." style="width:100%; padding:12px; border-radius:12px; border:1px solid #444; background:#000; color:white; margin-bottom:10px; font-family: inherit;">
+            <button onclick="window.crearPlaylist()" style="width:100%; padding:12px; background:var(--neon); color:black; font-weight:900; border:none; border-radius:12px; cursor:pointer;">➕ CREAR Y AGREGAR</button>
+        </div>
+        
+        <button onclick="document.getElementById('modal-playlist').style.display='none'" style="width:100%; padding:10px; background:transparent; color:#888; border:none; margin-top:15px; cursor:pointer; font-weight: bold;">Cancelar</button>
+    </div>
+</div>
 
 <div id="admin-panel">
     <div class="admin-box">
@@ -238,7 +264,12 @@
     </div>
     
     <div id="feed-container">
-        <div class="filter-scroll">
+        <div id="seccion-playlists">
+            <h3 id="title-play" style="margin-left:20px; display:none; color: var(--neon);">📁 Tus Playlists</h3>
+            <div class="filter-scroll" id="carousel-play" style="display:none; margin-bottom:15px; padding-bottom: 5px;"></div>
+        </div>
+
+        <div class="filter-scroll" id="main-filters">
             <button class="filter-btn active" onclick="filtrar('Todo', this)">Todo</button>
             <button class="filter-btn" onclick="filtrar('Salsa', this)">Salsa</button>
             <button class="filter-btn" onclick="filtrar('Merengue', this)">Merengue</button>
@@ -274,7 +305,7 @@
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
     
-    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v11.8 - UI Centrada y Corneta</div>
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v12.0 - Playlists Propias VIP</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
@@ -440,11 +471,13 @@
     const media = document.getElementById('main-media');
     let canciones = []; let idActual = null; let perfilData = null; let filtroActual = 'Todo';
     let misFavoritos = JSON.parse(localStorage.getItem('ml_favoritos')) || [];
+    
+    // 🔥 SISTEMA DE PLAYLISTS 🔥
+    let misPlaylists = JSON.parse(localStorage.getItem('ml_playlists')) || {};
+    let cancionA_Agregar = null;
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-    
-    // 🔥 CORNETAS DE SILENCIO OFICIALES Y PERFECTAS
     const SVG_VOL_ON = `<path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
     const SVG_VOL_OFF = `<path fill="currentColor" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.04-.2.05-.42.05-.63zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5V13.27l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
 
@@ -473,8 +506,10 @@
 
     window.filtrar = (cat, btn) => {
         filtroActual = cat;
+        
+        // Quitar activos de todos lados
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if(btn) btn.classList.add('active');
         
         const seccionesExtra = document.getElementById('secciones-extra');
         const tituloCatalogo = document.getElementById('titulo-catalogo');
@@ -484,11 +519,92 @@
             tituloCatalogo.innerText = '📂 Catálogo Completo';
         } else {
             seccionesExtra.style.display = 'none';
-            tituloCatalogo.innerText = '📂 Filtrado: ' + cat;
+            if(cat.startsWith('PLAYLIST:')) {
+                tituloCatalogo.innerText = '📁 ' + cat.replace('PLAYLIST:', '');
+            } else {
+                tituloCatalogo.innerText = '📂 Filtrado: ' + cat;
+            }
         }
         
         renderFeeds();
     };
+
+    // 🔥 FUNCIONES DE PLAYLISTS VIP 🔥
+    window.abrirModalPlaylist = (id) => {
+        cancionA_Agregar = id;
+        const container = document.getElementById('pl-list');
+        container.innerHTML = "";
+        
+        const listasNombres = Object.keys(misPlaylists);
+        if(listasNombres.length === 0) {
+            container.innerHTML = "<p style='color:#666; font-size:14px; text-align:center;'>Aún no tienes carpetas.</p>";
+        } else {
+            listasNombres.forEach(nombre => {
+                container.innerHTML += `<div class="pl-item" onclick="window.agregarAPlaylist('${nombre}')">
+                    <span>📁 ${nombre}</span>
+                    <span style="color:#888; font-size:12px;">${misPlaylists[nombre].length} 🎵</span>
+                </div>`;
+            });
+        }
+        document.getElementById('modal-playlist').style.display = 'flex';
+    };
+
+    window.crearPlaylist = () => {
+        const nombre = document.getElementById('pl-new-name').value.trim();
+        if(!nombre) return alert("Escribe un nombre para la lista");
+        if(nombre.toUpperCase() === 'TODO' || nombre.length > 20) return alert("Nombre inválido o muy largo.");
+        
+        if(!misPlaylists[nombre]) misPlaylists[nombre] = [];
+        window.agregarAPlaylist(nombre);
+        document.getElementById('pl-new-name').value = "";
+    };
+
+    window.agregarAPlaylist = (nombre) => {
+        if(!misPlaylists[nombre].includes(cancionA_Agregar)) {
+            misPlaylists[nombre].push(cancionA_Agregar);
+            localStorage.setItem('ml_playlists', JSON.stringify(misPlaylists));
+            alert(`✅ Guardada en "${nombre}"`);
+        } else {
+            alert("⚠️ Ya guardaste esta canción aquí.");
+        }
+        document.getElementById('modal-playlist').style.display = 'none';
+        renderPlaylists();
+    };
+
+    window.borrarPlaylist = (nombre) => {
+        if(confirm(`¿Seguro que quieres borrar toda la carpeta "${nombre}"?`)){
+            delete misPlaylists[nombre];
+            localStorage.setItem('ml_playlists', JSON.stringify(misPlaylists));
+            if(filtroActual === 'PLAYLIST:'+nombre) window.filtrar('Todo', document.querySelector('#main-filters .filter-btn'));
+            renderPlaylists();
+        }
+    };
+
+    function renderPlaylists() {
+        const container = document.getElementById('carousel-play');
+        const title = document.getElementById('title-play');
+        const listas = Object.keys(misPlaylists);
+        
+        if(listas.length > 0) {
+            title.style.display = 'block';
+            container.style.display = 'flex';
+            container.innerHTML = listas.map(nombre => `
+                <div style="position:relative; display:inline-block; margin-right:10px;">
+                    <button class="filter-btn ${filtroActual === 'PLAYLIST:'+nombre ? 'active':''}" 
+                            onclick="window.filtrar('PLAYLIST:${nombre}', this)" 
+                            style="border-radius:12px; padding: 10px 20px; font-size: 15px; border: 1px solid var(--neon); color: var(--neon);">
+                        📁 ${nombre} <span style="font-size:10px; color:#888;">(${misPlaylists[nombre].length})</span>
+                    </button>
+                    <div onclick="window.borrarPlaylist('${nombre}')" 
+                         style="position:absolute; top:-5px; right:-5px; background:#ff4444; color:white; width:22px; height:22px; border-radius:50%; font-size:12px; font-weight:bold; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow: 0 0 10px black;">✖</div>
+                </div>
+            `).join('');
+        } else {
+            title.style.display = 'none'; 
+            container.style.display = 'none';
+        }
+    }
+
 
     window.editarCategoria = (id) => {
         const c = canciones.find(x => x.id === id);
@@ -613,7 +729,17 @@
 
     window.borrarCancion = async (id) => {
         if(confirm("¿Seguro que quieres eliminar esta canción de la lista?")) {
-            try { await deleteDoc(doc(db, "musicland_canciones", id)); alert("🗑️ Canción eliminada"); } catch(e) { alert("Error al borrar: " + e.message); }
+            try { 
+                await deleteDoc(doc(db, "musicland_canciones", id)); 
+                
+                // Borrar la canción de cualquier playlist interna si existía
+                for(let lista in misPlaylists) {
+                    misPlaylists[lista] = misPlaylists[lista].filter(cId => cId !== id);
+                }
+                localStorage.setItem('ml_playlists', JSON.stringify(misPlaylists));
+                
+                alert("🗑️ Canción eliminada"); 
+            } catch(e) { alert("Error al borrar: " + e.message); }
         }
     };
 
@@ -631,7 +757,9 @@
             return getMs(b.fecha) - getMs(a.fecha);
         });
 
-        renderHero(); renderFeeds(); 
+        renderHero(); 
+        renderPlaylists();
+        renderFeeds(); 
     });
 
     function renderHero() {
@@ -676,6 +804,7 @@
                 <div class="n-img" style="background-image:url('${c.imagenUrl}')">
                     <div class="btn-delete-card" onclick="event.stopPropagation(); window.borrarCancion('${c.id}')">🗑️</div>
                     <div class="btn-edit-card" onclick="event.stopPropagation(); window.editarCategoria('${c.id}')">✏️</div>
+                    <button class="btn-add-list" onclick="event.stopPropagation(); window.abrirModalPlaylist('${c.id}')">➕</button>
                     <button class="btn-fav-card" onclick="event.stopPropagation(); window.toggleFavorito('${c.id}')">${isFav ? '❤️' : '🤍'}</button>
                     <div class="n-overlay"><div class="n-play-icon">${isPlaying ? SVG_PAUSE : SVG_PLAY}</div></div>
                 </div>
@@ -685,7 +814,13 @@
         };
 
         let cancionesFiltradas = canciones;
-        if(filtroActual !== 'Todo') {
+        
+        // Lógica VIP: Filtrar por Categoría normal o por Playlist Personalizada
+        if(filtroActual.startsWith('PLAYLIST:')) {
+            const nombrePL = filtroActual.replace('PLAYLIST:', '');
+            const idsEnLista = misPlaylists[nombrePL] || [];
+            cancionesFiltradas = canciones.filter(c => idsEnLista.includes(c.id));
+        } else if(filtroActual !== 'Todo') {
             cancionesFiltradas = canciones.filter(c => {
                 if(!c.categoria && filtroActual === 'Varios') return true;
                 return c.categoria === filtroActual;
@@ -695,7 +830,7 @@
         document.getElementById('carousel-new').innerHTML = canciones.slice(0, 10).map(c => createCard(c)).join('');
         
         if(cancionesFiltradas.length === 0) {
-            document.getElementById('carousel-all').innerHTML = `<div style="color:#666; width:100%; text-align:center; padding:20px;">No hay canciones en "${filtroActual}" aún.</div>`;
+            document.getElementById('carousel-all').innerHTML = `<div style="color:#666; width:100%; text-align:center; padding:20px;">No hay canciones aquí aún. Explora y agrégalas.</div>`;
         } else {
             document.getElementById('carousel-all').innerHTML = cancionesFiltradas.map(c => createCard(c)).join('');
         }
@@ -735,11 +870,11 @@
             } else { window.toggleMainPlay(); }
         }
         window.actualizarBotonesPlay(media.paused);
+        renderFeeds(); // Para que el botón de play en la tarjeta se actualice visualmente
     };
 
-    window.toggleMainPlay = () => { media.paused ? media.play() : media.pause(); window.actualizarBotonesPlay(media.paused); };
+    window.toggleMainPlay = () => { media.paused ? media.play() : media.pause(); window.actualizarBotonesPlay(media.paused); renderFeeds(); };
     
-    // 🔥 ACTUALIZACIÓN SIMULTÁNEA DE LAS CORNETAS (MINI Y FULL)
     window.toggleMute = () => { 
         media.muted = !media.muted; 
         const iconPath = media.muted ? SVG_VOL_OFF : SVG_VOL_ON; 
@@ -788,7 +923,13 @@
 
     media.onended = () => {
         let listaActual = canciones;
-        if(filtroActual !== 'Todo') {
+        
+        // Si el usuario está escuchando una playlist, el piloto automático solo pone canciones de esa playlist
+        if(filtroActual.startsWith('PLAYLIST:')) {
+            const nombrePL = filtroActual.replace('PLAYLIST:', '');
+            const idsEnLista = misPlaylists[nombrePL] || [];
+            listaActual = canciones.filter(c => idsEnLista.includes(c.id));
+        } else if(filtroActual !== 'Todo') {
             listaActual = canciones.filter(c => {
                 if(!c.categoria && filtroActual === 'Varios') return true;
                 return c.categoria === filtroActual;
