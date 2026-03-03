@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>MUSIC LAND PROJECT</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MUSIC LAND PROJECT">
+    <meta property="og:description" content="Tu rockola privada y catálogo musical exclusivo.">
+    <meta property="og:image" itemprop="image" content="https://music-land-app-5kl2.vercel.app/logo.jpg">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="800">
+    <meta property="og:site_name" content="Music Land">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MUSIC LAND PROJECT">
+    <meta name="twitter:description" content="Tu rockola privada y catálogo musical exclusivo.">
+    <meta name="twitter:image" content="https://music-land-app-5kl2.vercel.app/logo.jpg">
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
@@ -304,7 +317,7 @@
         <div id="carousel-all" class="carousel" style="flex-wrap:wrap; justify-content:center;"></div>
     </div>
     
-    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v12.1 - Playlist Editable</div>
+    <div style="font-size:10px; color:#555; text-align:center; margin-top:20px; padding-bottom:10px;">v12.2 - Tarjeta de Presentación VIP</div>
 </div>
 
 <audio id="main-media" crossorigin="anonymous"></audio>
@@ -524,7 +537,6 @@
         renderFeeds();
     };
 
-    // 🔥 FUNCIONES DE PLAYLISTS VIP (AHORA CON BOTÓN DE QUITAR) 🔥
     window.abrirModalPlaylist = (id) => {
         cancionA_Agregar = id;
         const container = document.getElementById('pl-list');
@@ -538,13 +550,11 @@
                 const yaEstaGuardada = misPlaylists[nombre].includes(id);
                 
                 if(yaEstaGuardada) {
-                    // Si ya está guardada, mostramos el botón rojo para sacarla
                     container.innerHTML += `<div class="pl-item" style="border-color: #ff4444;" onclick="window.quitarDePlaylist('${nombre}')">
                         <span>✅ ${nombre}</span>
                         <span style="color:#ff4444; font-size:12px;">❌ Quitar</span>
                     </div>`;
                 } else {
-                    // Si no está, mostramos el botón normal para agregarla
                     container.innerHTML += `<div class="pl-item" onclick="window.agregarAPlaylist('${nombre}')">
                         <span>📁 ${nombre}</span>
                         <span style="color:#888; font-size:12px;">${misPlaylists[nombre].length} 🎵</span>
@@ -576,13 +586,12 @@
         renderFeeds(); 
     };
 
-    // 🔥 NUEVA FUNCIÓN PARA SACAR UNA CANCIÓN DE LA CARPETA 🔥
     window.quitarDePlaylist = (nombre) => {
         misPlaylists[nombre] = misPlaylists[nombre].filter(cId => cId !== cancionA_Agregar);
         localStorage.setItem('ml_playlists', JSON.stringify(misPlaylists));
         document.getElementById('modal-playlist').style.display = 'none';
         renderPlaylists();
-        renderFeeds(); // Si estás viendo la lista, la canción desaparece al instante
+        renderFeeds(); 
         alert(`🗑️ Canción sacada de "${nombre}"`);
     };
 
